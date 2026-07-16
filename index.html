@@ -1,358 +1,195 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📦 Downloader de Lixos</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    /* Reset básico */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    body {
+        font-family: 'Poppins', 'Segoe UI', sans-serif; /* Fonte mais moderna */
+        background: #0f172a; /* Fundo azul escuro sólido, mais profissional */
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #f8fafc;
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 40px;
-            width: 100%;
-            max-width: 1000px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-            animation: slideIn 0.6s ease-out;
-        }
+    .container {
+        background: #1e293b; /* Fundo do container cinza escuro */
+        border-radius: 24px;
+        padding: 30px;
+        width: 100%;
+        max-width: 1100px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        animation: slideIn 0.5s ease-out forwards;
+    }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 20px;
-        }
+    /* HEADER */
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
 
-        .header h1 {
-            font-size: 2.5em;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-        }
+    .header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        .header .subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9em;
-        }
+    /* TABS */
+    .tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
 
-        .header .icon {
-            font-size: 3em;
-            animation: spin 4s linear infinite;
-        }
+    .tab-btn {
+        padding: 10px 24px;
+        border-radius: 12px;
+        background: transparent;
+        border: 1px solid #334155;
+        cursor: pointer;
+        color: #94a3b8;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        flex: 1;
+        text-align: center;
+    }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    .tab-btn:hover {
+        background: #334155;
+        color: #fff;
+    }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+    .tab-btn.active {
+        background: #3b82f6; /* Azul vibrante */
+        color: white;
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
 
-        .tab-btn {
-            padding: 12px 30px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            background: transparent;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.6);
-            flex: 1;
-            min-width: 120px;
-        }
+    /* GRID DE CARDS */
+    .file-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+    }
 
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            color: white;
-        }
+    .file-card {
+        background: #0f172a;
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #1e293b;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
-        }
+    .file-card:hover {
+        border-color: #3b82f6;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
 
-        .content {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
+    .file-card .top-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
 
-        .content.active {
-            display: block;
-        }
+    .file-card .file-name {
+        font-weight: 600;
+        font-size: 1rem;
+        word-break: break-all;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+    .file-card .file-size {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
 
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
+    /* STATUS BADGES (Círculos coloridos) */
+    .status-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
 
-        .file-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .status-working { color: #4ade80; } .status-working .status-dot { background: #4ade80; }
+    .status-broken { color: #f87171; } .status-broken .status-dot { background: #f87171; }
+    .status-updating { color: #60a5fa; } .status-updating .status-dot { background: #60a5fa; }
+    .status-unknown { color: #64748b; } .status-unknown .status-dot { background: #64748b; }
 
-        .file-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+    /* BOTÕES */
+    .file-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 12px;
+    }
 
-        .file-card .file-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+    .btn {
+        padding: 8px 0;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
 
-        .file-card .file-name {
-            color: white;
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
+    .btn-execute {
+        background: #3b82f6;
+        color: white;
+    }
 
-        .file-card .file-size {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.85em;
-        }
+    .btn-execute:hover { background: #2563eb; }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 700;
-            margin-top: 10px;
-            text-transform: uppercase;
-        }
+    .btn-download {
+        background: #1e293b;
+        color: #cbd5e1;
+        border: 1px solid #334155;
+    }
 
-        .status-working {
-            background: rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            border: 1px solid #10b981;
-        }
+    .btn-download:hover {
+        background: #334155;
+        color: white;
+    }
 
-        .status-broken {
-            background: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            border: 1px solid #ef4444;
-        }
-
-        .status-updating {
-            background: rgba(59, 130, 246, 0.3);
-            color: #3b82f6;
-            border: 1px solid #3b82f6;
-        }
-
-        .status-unknown {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .file-actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-execute {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-
-        .btn-execute:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-        }
-
-        .btn-download {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-download:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-refresh {
-            background: rgba(59, 130, 246, 0.3);
-            color: #3b82f6;
-            border: 1px solid #3b82f6;
-        }
-
-        .btn-refresh:hover {
-            background: rgba(59, 130, 246, 0.5);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-        }
-
-        .stat-item .number {
-            font-size: 2em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-item .label {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.85em;
-            margin-top: 5px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .empty-state .emoji {
-            font-size: 4em;
-            margin-bottom: 15px;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 25px;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            display: none;
-            animation: slideUp 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .toast.show {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #f5576c;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            .header h1 {
-                font-size: 1.8em;
-            }
-            .file-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    /* STATS & TOAST - Mantenha o que você já tem, apenas ajuste as cores */
+</style>
 </head>
 <body>
 
@@ -557,8 +394,17 @@
         }
 
         function downloadFile(path) {
-            window.location.href = `/download/${path}`;
-            showToast(`⬇ Baixando ${path.split('/').pop()}`, 'info');
+            fetch(`/download/${path}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Em vez de só mostrar o toast, vamos mostrar o caminho exato onde foi parar!
+                        showToast(`✅ Baixado com sucesso!\n${data.message}`, 'success');
+                    } else {
+                        showToast(`❌ ${data.message}`, 'error');
+                    }
+                })
+                .catch(() => showToast('❌ Erro de conexão com o servidor', 'error'));
         }
 
         function viewScript(path) {
