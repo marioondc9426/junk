@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📦 Downloader de Lixos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 1000px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+
+        .header .icon {
+            font-size: 3em;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-card .file-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .file-card .file-name {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .file-card .file-size {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-working {
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+
+        .status-broken {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .status-updating {
+            background: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .status-unknown {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-execute {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-execute:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-download {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-download:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-refresh {
+            background: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(59, 130, 246, 0.5);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+        }
+
+        .stat-item .number {
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-item .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state .emoji {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: slideUp 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #f5576c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>📦 Downloader de Lixos</h1>
+                <div class="subtitle">Gerenciador de Executores e Scripts</div>
+            </div>
+            <span class="icon">⚡</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('executors')">🚀 Executores</button>
+            <button class="tab-btn" onclick="switchTab('scripts')">📜 Scripts</button>
+            <button class="tab-btn" onclick="refreshAll()">🔄 Atualizar</button>
+        </div>
+
+        <!-- Executors Tab -->
+        <div id="executors" class="content active">
+            <div id="executor-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px;">Carregando executores...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts Tab -->
+        <div id="scripts" class="content">
+            <div id="script-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px;">Carregando scripts...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="number" id="totalExecutors">0</div>
+                <div class="label">Executores</div>
+            </div>
+            <div class="stat-item">
+                <div class="number" id="totalScripts">0</div>
+                <div class="label">Scripts</div>
+            </div>
+            <div class="stat-item">
+                <div class="number" id="totalFiles">0</div>
+                <div class="label">Total Arquivos</div>
+            </div>
+            <div class="stat-item">
+                <div class="number" id="totalWorking">0</div>
+                <div class="label">✅ Working</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Função para alternar abas
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelectorAll('.tab-btn')[['executors','scripts','refresh'].indexOf(tabName)].classList.add('active');
+        }
+
+        // Função para mostrar toast
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.borderColor = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : 'rgba(255,255,255,0.1)';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Função para obter status
+        function getStatusBadge(status) {
+            const statusMap = {
+                'working': '<span class="status-badge status-working">✅ Working</span>',
+                'broken': '<span class="status-badge status-broken">❌ Broken</span>',
+                'updating': '<span class="status-badge status-updating">🔄 Updating</span>'
+            };
+            return statusMap[status] || '<span class="status-badge status-unknown">❓ Unknown</span>';
+        }
+
+        // Função para carregar dados
+        function loadData() {
+            // Carregar executores
+            fetch('/api/executors')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('executor-list');
+                    if (data.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <div class="emoji">📭</div>
+                                <p>Nenhum executor encontrado</p>
+                            </div>
+                        `;
+                    } else {
+                        list.innerHTML = `
+                            <div class="file-grid">
+                                ${data.map(item => `
+                                    <div class="file-card">
+                                        <div class="file-icon">${item.emoji || '⚡'}</div>
+                                        <div class="file-name">${item.name}</div>
+                                        <div class="file-size">${item.size || 'N/A'}</div>
+                                        ${getStatusBadge(item.status)}
+                                        <div class="file-actions">
+                                            <button class="btn btn-execute" onclick="executeFile('${item.path}')">▶ Executar</button>
+                                            <button class="btn btn-download" onclick="downloadFile('${item.path}')">⬇ Baixar</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                    document.getElementById('totalExecutors').textContent = data.length;
+                    updateStats();
+                })
+                .catch(() => {
+                    document.getElementById('executor-list').innerHTML = `
+                        <div class="empty-state">
+                            <div class="emoji">⚠️</div>
+                            <p>Erro ao carregar executores</p>
+                        </div>
+                    `;
+                });
+
+            // Carregar scripts
+            fetch('/api/scripts')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('script-list');
+                    if (data.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <div class="emoji">📭</div>
+                                <p>Nenhum script encontrado</p>
+                            </div>
+                        `;
+                    } else {
+                        list.innerHTML = `
+                            <div class="file-grid">
+                                ${data.map(item => `
+                                    <div class="file-card">
+                                        <div class="file-icon">${item.emoji || '📜'}</div>
+                                        <div class="file-name">${item.name}</div>
+                                        <div class="file-size">${item.size || 'N/A'}</div>
+                                        <div class="file-actions">
+                                            <button class="btn btn-execute" onclick="viewScript('${item.path}')">👁 Ver</button>
+                                            <button class="btn btn-download" onclick="downloadFile('${item.path}')">⬇ Baixar</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                    document.getElementById('totalScripts').textContent = data.length;
+                    updateStats();
+                })
+                .catch(() => {
+                    document.getElementById('script-list').innerHTML = `
+                        <div class="empty-state">
+                            <div class="emoji">⚠️</div>
+                            <p>Erro ao carregar scripts</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function updateStats() {
+            const total = parseInt(document.getElementById('totalExecutors').textContent) + 
+                        parseInt(document.getElementById('totalScripts').textContent);
+            document.getElementById('totalFiles').textContent = total;
+        }
+
+        function refreshAll() {
+            showToast('🔄 Atualizando...', 'info');
+            loadData();
+            setTimeout(() => showToast('✅ Atualizado!', 'success'), 500);
+        }
+
+        function executeFile(path) {
+            fetch(`/run/${path}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(`✅ ${data.message}`, 'success');
+                    } else {
+                        showToast(`❌ ${data.message}`, 'error');
+                    }
+                })
+                .catch(() => showToast('❌ Erro ao executar', 'error'));
+        }
+
+        function downloadFile(path) {
+            window.location.href = `/download/${path}`;
+            showToast(`⬇ Baixando ${path.split('/').pop()}`, 'info');
+        }
+
+        function viewScript(path) {
+            fetch(`/view/${path}`)
+                .then(response => response.text())
+                .then(content => {
+                    alert('📜 Conteúdo do Script:\n\n' + content.substring(0, 1000) + (content.length > 1000 ? '\n...' : ''));
+                })
+                .catch(() => showToast('❌ Erro ao ler script', 'error'));
+        }
+
+        // Carregar dados ao iniciar
+        loadData();
+    </script>
+</body>
+</html>
