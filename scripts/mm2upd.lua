@@ -1,2240 +1,1072 @@
---	 /$$    /$$                     /$$                    
---	| $$   | $$                    |__/                    
---	| $$   | $$ /$$   /$$ /$$$$$$$  /$$ /$$   /$$ /$$   /$$
---	|  $$ / $$/| $$  | $$| $$__  $$| $$|  $$ /$$/| $$  | $$
---	 \  $$ $$/ | $$  | $$| $$  \ $$| $$ \  $$$$/ | $$  | $$
---	  \  $$$/  | $$  | $$| $$  | $$| $$  >$$  $$ | $$  | $$
---	   \  $/   |  $$$$$$$| $$  | $$| $$ /$$/\  $$|  $$$$$$/
---	    \_/     \____  $$|__/  |__/|__/|__/  \__/ \______/ 
---	            /$$  | $$                                  
---	           |  $$$$$$/                                  
--- 		        \______/   
-                                
-local VynixuMM2Script = Instance.new("ScreenGui")
-local Holder = Instance.new("Frame")
-local Top = Instance.new("Frame")
-local OpenClose = Instance.new("TextButton")
-local Title = Instance.new("TextLabel")
-local ErrorLabel = Instance.new("TextLabel")
-local PlayerList = Instance.new("Frame")
-local Top_2 = Instance.new("Frame")
-local OpenClose_2 = Instance.new("TextButton")
-local Players = Instance.new("Frame")
-local Player1 = Instance.new("TextButton")
-local Player2 = Instance.new("TextButton")
-local Player3 = Instance.new("TextButton")
-local Player4 = Instance.new("TextButton")
-local Player6 = Instance.new("TextButton")
-local Player5 = Instance.new("TextButton")
-local Player8 = Instance.new("TextButton")
-local Player7 = Instance.new("TextButton")
-local Player10 = Instance.new("TextButton")
-local Player11 = Instance.new("TextButton")
-local Player12 = Instance.new("TextButton")
-local Player9 = Instance.new("TextButton")
-local Roles = Instance.new("Frame")
-local Murderer = Instance.new("ImageLabel")
-local Sherrif = Instance.new("ImageLabel")
-local MurdererLabel = Instance.new("TextLabel")
-local SherrifLabel = Instance.new("TextLabel")
-local Main = Instance.new("Frame")
-local CoinFarm = Instance.new("TextButton")
-local Underline = Instance.new("TextLabel")
-local Fly = Instance.new("TextButton")
-local Underline_2 = Instance.new("TextLabel")
-local GunDropGrabber = Instance.new("TextButton")
-local Underline_3 = Instance.new("TextLabel")
-local KillAll = Instance.new("TextButton")
-local Underline_4 = Instance.new("TextLabel")
-local MurdererESP = Instance.new("TextButton")
-local Underline_5 = Instance.new("TextLabel")
-local Noclip = Instance.new("TextButton")
-local Underline_6 = Instance.new("TextLabel")
-local PlayerName = Instance.new("TextBox")
-local Underline_7 = Instance.new("TextLabel")
-local SherrifESP = Instance.new("TextButton")
-local Underline_8 = Instance.new("TextLabel")
-local ShowNames = Instance.new("TextButton")
-local Underline_9 = Instance.new("TextLabel")
-local TPtoLobby = Instance.new("TextButton")
-local Underline_10 = Instance.new("TextLabel")
-local TPtoMap = Instance.new("TextButton")
-local Underline_11 = Instance.new("TextLabel")
-local TPtoMuderer = Instance.new("TextButton")
-local Underline_12 = Instance.new("TextLabel")
-local TPtoPlayer = Instance.new("TextButton")
-local Underline_13 = Instance.new("TextLabel")
-local TPtoSherrif = Instance.new("TextButton")
-local Underline_14 = Instance.new("TextLabel")
-local Walkspeed = Instance.new("TextButton")
-local Underline_15 = Instance.new("TextLabel")
-local JumpPower = Instance.new("TextButton")
-local Underline_16 = Instance.new("TextLabel")
-local WSInput = Instance.new("TextBox")
-local Underline_17 = Instance.new("TextLabel")
-local JPInput = Instance.new("TextBox")
-local Underline_18 = Instance.new("TextLabel")
-local WSReset = Instance.new("TextButton")
-local Underline_19 = Instance.new("TextLabel")
-local JPReset = Instance.new("TextButton")
-local Underline_20 = Instance.new("TextLabel")
---Properties:
-VynixuMM2Script.Name = "VynixuMM2Script"
-VynixuMM2Script.Parent = game.CoreGui
-VynixuMM2Script.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-VynixuMM2Script.ResetOnSpawn = false
-
-Holder.Name = "Holder"
-Holder.Parent = VynixuMM2Script
-Holder.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-Holder.BorderSizePixel = 0
-Holder.Position = UDim2.new(1, -350, 1, -405)
-Holder.Size = UDim2.new(0, 340, 0, 395)
-
-Top.Name = "Top"
-Top.Parent = Holder
-Top.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Top.BorderSizePixel = 0
-Top.Position = UDim2.new(0, 0, 0, -25)
-Top.Size = UDim2.new(1, 0, 0, 25)
-
-OpenClose.Name = "OpenClose"
-OpenClose.Parent = Top
-OpenClose.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-OpenClose.BorderSizePixel = 0
-OpenClose.Rotation = -90
-OpenClose.Size = UDim2.new(0, 25, 0, 25)
-OpenClose.Font = Enum.Font.SourceSans
-OpenClose.Text = ">"
-OpenClose.TextColor3 = Color3.new(1, 1, 1)
-OpenClose.TextSize = 32
-OpenClose.TextStrokeTransparency = 0
-OpenClose.TextWrapped = true
-
-Title.Name = "Title"
-Title.Parent = Top
-Title.BackgroundColor3 = Color3.new(1, 1, 1)
-Title.BackgroundTransparency = 1
-Title.BorderSizePixel = 0
-Title.Size = UDim2.new(1, 0, 1, 0)
-Title.Font = Enum.Font.SourceSans
-Title.Text = "Vynixu's MM2 Script"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.TextSize = 20
-Title.TextStrokeTransparency = 0
-
-ErrorLabel.Name = "ErrorLabel"
-ErrorLabel.Parent = Holder
-ErrorLabel.BackgroundColor3 = Color3.new(1, 1, 1)
-ErrorLabel.BackgroundTransparency = 1
-ErrorLabel.BorderSizePixel = 0
-ErrorLabel.Position = UDim2.new(0, 0, 0, -50)
-ErrorLabel.Size = UDim2.new(1, 0, 0, 25)
-ErrorLabel.Font = Enum.Font.Fantasy
-ErrorLabel.Text = ""
-ErrorLabel.TextColor3 = Color3.new(1, 0, 0.0980392)
-ErrorLabel.TextSize = 14
-ErrorLabel.TextStrokeTransparency = 0
-
-PlayerList.Name = "PlayerList"
-PlayerList.Parent = Holder
-PlayerList.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-PlayerList.BorderSizePixel = 0
-PlayerList.Position = UDim2.new(0, -25, 0, 0)
-PlayerList.Size = UDim2.new(0, 175, 0, 395)
-
-Top_2.Name = "Top"
-Top_2.Parent = PlayerList
-Top_2.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Top_2.BorderSizePixel = 0
-Top_2.Size = UDim2.new(0, 25, 1, 0)
-
-OpenClose_2.Name = "OpenClose"
-OpenClose_2.Parent = Top_2
-OpenClose_2.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-OpenClose_2.BorderSizePixel = 0
-OpenClose_2.Position = UDim2.new(0, 0, 1, -25)
-OpenClose_2.Rotation = 180
-OpenClose_2.Size = UDim2.new(0, 25, 0, 25)
-OpenClose_2.Font = Enum.Font.SourceSans
-OpenClose_2.Text = ">"
-OpenClose_2.TextColor3 = Color3.new(1, 1, 1)
-OpenClose_2.TextSize = 32
-OpenClose_2.TextStrokeTransparency = 0
-OpenClose_2.TextWrapped = true
-
-Players.Name = "Players"
-Players.Parent = PlayerList
-Players.BackgroundColor3 = Color3.new(1, 1, 1)
-Players.BackgroundTransparency = 1
-Players.BorderSizePixel = 0
-Players.Size = UDim2.new(1, 0, 1, 0)
-
-Player1.Name = "Player1"
-Player1.Parent = Players
-Player1.BackgroundColor3 = Color3.new(1, 1, 1)
-Player1.BackgroundTransparency = 1
-Player1.BorderSizePixel = 0
-Player1.Position = UDim2.new(0, 25, 0, 7)
-Player1.Size = UDim2.new(1, -25, 0, 25)
-Player1.Font = Enum.Font.Fantasy
-Player1.Text = "Player"
-Player1.TextColor3 = Color3.new(1, 1, 1)
-Player1.TextSize = 14
-Player1.TextStrokeTransparency = 0
-
-Player2.Name = "Player2"
-Player2.Parent = Players
-Player2.BackgroundColor3 = Color3.new(1, 1, 1)
-Player2.BackgroundTransparency = 1
-Player2.BorderSizePixel = 0
-Player2.Position = UDim2.new(0, 25, 0, 32)
-Player2.Size = UDim2.new(1, -25, 0, 25)
-Player2.Font = Enum.Font.Fantasy
-Player2.Text = "Player"
-Player2.TextColor3 = Color3.new(1, 1, 1)
-Player2.TextSize = 14
-Player2.TextStrokeTransparency = 0
-
-Player3.Name = "Player3"
-Player3.Parent = Players
-Player3.BackgroundColor3 = Color3.new(1, 1, 1)
-Player3.BackgroundTransparency = 1
-Player3.BorderSizePixel = 0
-Player3.Position = UDim2.new(0, 25, 0, 57)
-Player3.Size = UDim2.new(1, -25, 0, 25)
-Player3.Font = Enum.Font.Fantasy
-Player3.Text = "Player"
-Player3.TextColor3 = Color3.new(1, 1, 1)
-Player3.TextSize = 14
-Player3.TextStrokeTransparency = 0
-
-Player4.Name = "Player4"
-Player4.Parent = Players
-Player4.BackgroundColor3 = Color3.new(1, 1, 1)
-Player4.BackgroundTransparency = 1
-Player4.BorderSizePixel = 0
-Player4.Position = UDim2.new(0, 25, 0, 82)
-Player4.Size = UDim2.new(1, -25, 0, 25)
-Player4.Font = Enum.Font.Fantasy
-Player4.Text = "Player"
-Player4.TextColor3 = Color3.new(1, 1, 1)
-Player4.TextSize = 14
-Player4.TextStrokeTransparency = 0
-
-Player6.Name = "Player6"
-Player6.Parent = Players
-Player6.BackgroundColor3 = Color3.new(1, 1, 1)
-Player6.BackgroundTransparency = 1
-Player6.BorderSizePixel = 0
-Player6.Position = UDim2.new(0, 25, 0, 132)
-Player6.Size = UDim2.new(1, -25, 0, 25)
-Player6.Font = Enum.Font.Fantasy
-Player6.Text = "Player"
-Player6.TextColor3 = Color3.new(1, 1, 1)
-Player6.TextSize = 14
-Player6.TextStrokeTransparency = 0
-
-Player5.Name = "Player5"
-Player5.Parent = Players
-Player5.BackgroundColor3 = Color3.new(1, 1, 1)
-Player5.BackgroundTransparency = 1
-Player5.BorderSizePixel = 0
-Player5.Position = UDim2.new(0, 25, 0, 107)
-Player5.Size = UDim2.new(1, -25, 0, 25)
-Player5.Font = Enum.Font.Fantasy
-Player5.Text = "Player"
-Player5.TextColor3 = Color3.new(1, 1, 1)
-Player5.TextSize = 14
-Player5.TextStrokeTransparency = 0
-
-Player8.Name = "Player8"
-Player8.Parent = Players
-Player8.BackgroundColor3 = Color3.new(1, 1, 1)
-Player8.BackgroundTransparency = 1
-Player8.BorderSizePixel = 0
-Player8.Position = UDim2.new(0, 25, 0, 182)
-Player8.Size = UDim2.new(1, -25, 0, 25)
-Player8.Font = Enum.Font.Fantasy
-Player8.Text = "Player"
-Player8.TextColor3 = Color3.new(1, 1, 1)
-Player8.TextSize = 14
-Player8.TextStrokeTransparency = 0
-
-Player7.Name = "Player7"
-Player7.Parent = Players
-Player7.BackgroundColor3 = Color3.new(1, 1, 1)
-Player7.BackgroundTransparency = 1
-Player7.BorderSizePixel = 0
-Player7.Position = UDim2.new(0, 25, 0, 157)
-Player7.Size = UDim2.new(1, -25, 0, 25)
-Player7.Font = Enum.Font.Fantasy
-Player7.Text = "Player"
-Player7.TextColor3 = Color3.new(1, 1, 1)
-Player7.TextSize = 14
-Player7.TextStrokeTransparency = 0
-
-Player10.Name = "Player10"
-Player10.Parent = Players
-Player10.BackgroundColor3 = Color3.new(1, 1, 1)
-Player10.BackgroundTransparency = 1
-Player10.BorderSizePixel = 0
-Player10.Position = UDim2.new(0, 25, 0, 232)
-Player10.Size = UDim2.new(1, -25, 0, 25)
-Player10.Font = Enum.Font.Fantasy
-Player10.Text = "Player"
-Player10.TextColor3 = Color3.new(1, 1, 1)
-Player10.TextSize = 14
-Player10.TextStrokeTransparency = 0
-
-Player11.Name = "Player11"
-Player11.Parent = Players
-Player11.BackgroundColor3 = Color3.new(1, 1, 1)
-Player11.BackgroundTransparency = 1
-Player11.BorderSizePixel = 0
-Player11.Position = UDim2.new(0, 25, 0, 257)
-Player11.Size = UDim2.new(1, -25, 0, 25)
-Player11.Font = Enum.Font.Fantasy
-Player11.Text = "Player"
-Player11.TextColor3 = Color3.new(1, 1, 1)
-Player11.TextSize = 14
-Player11.TextStrokeTransparency = 0
-
-Player12.Name = "Player12"
-Player12.Parent = Players
-Player12.BackgroundColor3 = Color3.new(1, 1, 1)
-Player12.BackgroundTransparency = 1
-Player12.BorderSizePixel = 0
-Player12.Position = UDim2.new(0, 25, 0, 282)
-Player12.Size = UDim2.new(1, -25, 0, 25)
-Player12.Font = Enum.Font.Fantasy
-Player12.Text = "Player"
-Player12.TextColor3 = Color3.new(1, 1, 1)
-Player12.TextSize = 14
-Player12.TextStrokeTransparency = 0
-
-Player9.Name = "Player9"
-Player9.Parent = Players
-Player9.BackgroundColor3 = Color3.new(1, 1, 1)
-Player9.BackgroundTransparency = 1
-Player9.BorderSizePixel = 0
-Player9.Position = UDim2.new(0, 25, 0, 207)
-Player9.Size = UDim2.new(1, -25, 0, 25)
-Player9.Font = Enum.Font.Fantasy
-Player9.Text = "Player"
-Player9.TextColor3 = Color3.new(1, 1, 1)
-Player9.TextSize = 14
-Player9.TextStrokeTransparency = 0
-
-Roles.Name = "Roles"
-Roles.Parent = PlayerList
-Roles.BackgroundColor3 = Color3.new(1, 1, 1)
-Roles.BackgroundTransparency = 1
-Roles.BorderSizePixel = 0
-Roles.Position = UDim2.new(0, -210, 1, -100)
-Roles.Size = UDim2.new(0, 205, 0, 100)
-
-Murderer.Name = "Murderer"
-Murderer.Parent = Roles
-Murderer.BackgroundColor3 = Color3.new(1, 1, 1)
-Murderer.BackgroundTransparency = 1
-Murderer.BorderSizePixel = 0
-Murderer.Size = UDim2.new(0, 100, 0, 100)
-
-Sherrif.Name = "Sherrif"
-Sherrif.Parent = Roles
-Sherrif.BackgroundColor3 = Color3.new(1, 1, 1)
-Sherrif.BackgroundTransparency = 1
-Sherrif.BorderSizePixel = 0
-Sherrif.Position = UDim2.new(1, -100, 0, 0)
-Sherrif.Size = UDim2.new(0, 100, 0, 100)
-
-MurdererLabel.Name = "MurdererLabel"
-MurdererLabel.Parent = Roles
-MurdererLabel.BackgroundColor3 = Color3.new(1, 1, 1)
-MurdererLabel.BackgroundTransparency = 1
-MurdererLabel.BorderSizePixel = 0
-MurdererLabel.Position = UDim2.new(0, 0, 1, -25)
-MurdererLabel.Size = UDim2.new(0, 100, 0, 25)
-MurdererLabel.Font = Enum.Font.Fantasy
-MurdererLabel.Text = "Murderer"
-MurdererLabel.TextColor3 = Color3.new(1, 0, 0.0980392)
-MurdererLabel.TextSize = 24
-MurdererLabel.TextStrokeTransparency = 0
-MurdererLabel.TextWrapped = true
-
-SherrifLabel.Name = "SherrifLabel"
-SherrifLabel.Parent = Roles
-SherrifLabel.BackgroundColor3 = Color3.new(1, 1, 1)
-SherrifLabel.BackgroundTransparency = 1
-SherrifLabel.BorderSizePixel = 0
-SherrifLabel.Position = UDim2.new(1, -100, 1, -25)
-SherrifLabel.Size = UDim2.new(0, 100, 0, 25)
-SherrifLabel.Font = Enum.Font.Fantasy
-SherrifLabel.Text = "Sherrif"
-SherrifLabel.TextColor3 = Color3.new(0, 0.196078, 1)
-SherrifLabel.TextSize = 24
-SherrifLabel.TextStrokeTransparency = 0
-SherrifLabel.TextWrapped = true
-
-Main.Name = "Main"
-Main.Parent = Holder
-Main.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-Main.BorderSizePixel = 0
-Main.Size = UDim2.new(1, 0, 1, 0)
-
-CoinFarm.Name = "CoinFarm"
-CoinFarm.Parent = Main
-CoinFarm.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-CoinFarm.BorderColor3 = Color3.new(0, 0, 0)
-CoinFarm.BorderSizePixel = 0
-CoinFarm.Position = UDim2.new(0, 10, 0, 50)
-CoinFarm.Size = UDim2.new(0, 155, 0, 25)
-CoinFarm.Font = Enum.Font.Fantasy
-CoinFarm.Text = "Coin Farm (x40)"
-CoinFarm.TextColor3 = Color3.new(1, 1, 1)
-CoinFarm.TextSize = 18
-CoinFarm.TextStrokeTransparency = 0
-
-Underline.Name = "Underline"
-Underline.Parent = CoinFarm
-Underline.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline.BorderSizePixel = 0
-Underline.Position = UDim2.new(0, 0, 1, 0)
-Underline.Size = UDim2.new(1, 0, 0, 5)
-Underline.Font = Enum.Font.SourceSans
-Underline.Text = ""
-Underline.TextColor3 = Color3.new(0, 0, 0)
-Underline.TextSize = 14
-
-Fly.Name = "Fly"
-Fly.Parent = Main
-Fly.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-Fly.BorderColor3 = Color3.new(0, 0, 0)
-Fly.BorderSizePixel = 0
-Fly.Position = UDim2.new(0, 175, 0, 90)
-Fly.Size = UDim2.new(0, 155, 0, 25)
-Fly.Font = Enum.Font.Fantasy
-Fly.Text = "Fly [L]"
-Fly.TextColor3 = Color3.new(1, 1, 1)
-Fly.TextSize = 18
-Fly.TextStrokeTransparency = 0
-
-Underline_2.Name = "Underline"
-Underline_2.Parent = Fly
-Underline_2.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_2.BorderSizePixel = 0
-Underline_2.Position = UDim2.new(0, 0, 1, 0)
-Underline_2.Size = UDim2.new(1, 0, 0, 5)
-Underline_2.Font = Enum.Font.SourceSans
-Underline_2.Text = ""
-Underline_2.TextColor3 = Color3.new(0, 0, 0)
-Underline_2.TextSize = 14
-
-GunDropGrabber.Name = "GunDropGrabber"
-GunDropGrabber.Parent = Main
-GunDropGrabber.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-GunDropGrabber.BorderColor3 = Color3.new(0, 0, 0)
-GunDropGrabber.BorderSizePixel = 0
-GunDropGrabber.Position = UDim2.new(0, 10, 0, 90)
-GunDropGrabber.Size = UDim2.new(0, 155, 0, 25)
-GunDropGrabber.Font = Enum.Font.Fantasy
-GunDropGrabber.Text = "Gun Grabber"
-GunDropGrabber.TextColor3 = Color3.new(1, 1, 1)
-GunDropGrabber.TextSize = 18
-GunDropGrabber.TextStrokeTransparency = 0
-
-Underline_3.Name = "Underline"
-Underline_3.Parent = GunDropGrabber
-Underline_3.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_3.BorderSizePixel = 0
-Underline_3.Position = UDim2.new(0, 0, 1, 0)
-Underline_3.Size = UDim2.new(1, 0, 0, 5)
-Underline_3.Font = Enum.Font.SourceSans
-Underline_3.Text = ""
-Underline_3.TextColor3 = Color3.new(0, 0, 0)
-Underline_3.TextSize = 14
-
-KillAll.Name = "KillAll"
-KillAll.Parent = Main
-KillAll.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-KillAll.BorderColor3 = Color3.new(0, 0, 0)
-KillAll.BorderSizePixel = 0
-KillAll.Position = UDim2.new(0, 175, 0, 130)
-KillAll.Size = UDim2.new(0, 155, 0, 25)
-KillAll.Font = Enum.Font.Fantasy
-KillAll.Text = "Kill All"
-KillAll.TextColor3 = Color3.new(1, 1, 1)
-KillAll.TextSize = 18
-KillAll.TextStrokeTransparency = 0
-
-Underline_4.Name = "Underline"
-Underline_4.Parent = KillAll
-Underline_4.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_4.BorderSizePixel = 0
-Underline_4.Position = UDim2.new(0, 0, 1, 0)
-Underline_4.Size = UDim2.new(1, 0, 0, 5)
-Underline_4.Font = Enum.Font.SourceSans
-Underline_4.Text = ""
-Underline_4.TextColor3 = Color3.new(0, 0, 0)
-Underline_4.TextSize = 14
-
-MurdererESP.Name = "MurdererESP"
-MurdererESP.Parent = Main
-MurdererESP.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-MurdererESP.BorderColor3 = Color3.new(0, 0, 0)
-MurdererESP.BorderSizePixel = 0
-MurdererESP.Position = UDim2.new(0, 10, 0, 10)
-MurdererESP.Size = UDim2.new(0, 155, 0, 25)
-MurdererESP.Font = Enum.Font.Fantasy
-MurdererESP.Text = "Murderer ESP"
-MurdererESP.TextColor3 = Color3.new(1, 1, 1)
-MurdererESP.TextSize = 18
-MurdererESP.TextStrokeTransparency = 0
-
-Underline_5.Name = "Underline"
-Underline_5.Parent = MurdererESP
-Underline_5.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_5.BorderSizePixel = 0
-Underline_5.Position = UDim2.new(0, 0, 1, 0)
-Underline_5.Size = UDim2.new(1, 0, 0, 5)
-Underline_5.Font = Enum.Font.SourceSans
-Underline_5.Text = ""
-Underline_5.TextColor3 = Color3.new(0, 0, 0)
-Underline_5.TextSize = 14
-
-Noclip.Name = "Noclip"
-Noclip.Parent = Main
-Noclip.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-Noclip.BorderColor3 = Color3.new(0, 0, 0)
-Noclip.BorderSizePixel = 0
-Noclip.Position = UDim2.new(0, 10, 0, 130)
-Noclip.Size = UDim2.new(0, 155, 0, 25)
-Noclip.Font = Enum.Font.Fantasy
-Noclip.Text = "Noclip [B]"
-Noclip.TextColor3 = Color3.new(1, 1, 1)
-Noclip.TextSize = 18
-Noclip.TextStrokeTransparency = 0
-
-Underline_6.Name = "Underline"
-Underline_6.Parent = Noclip
-Underline_6.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_6.BorderSizePixel = 0
-Underline_6.Position = UDim2.new(0, 0, 1, 0)
-Underline_6.Size = UDim2.new(1, 0, 0, 5)
-Underline_6.Font = Enum.Font.SourceSans
-Underline_6.Text = ""
-Underline_6.TextColor3 = Color3.new(0, 0, 0)
-Underline_6.TextSize = 14
-
-PlayerName.Name = "PlayerName"
-PlayerName.Parent = Main
-PlayerName.BackgroundColor3 = Color3.new(1, 1, 1)
-PlayerName.BackgroundTransparency = 1
-PlayerName.BorderSizePixel = 0
-PlayerName.Position = UDim2.new(0, 175, 0, 350)
-PlayerName.Size = UDim2.new(0, 155, 0, 25)
-PlayerName.Font = Enum.Font.Fantasy
-PlayerName.PlaceholderColor3 = Color3.new(0.490196, 0.490196, 0.490196)
-PlayerName.PlaceholderText = "Player Name"
-PlayerName.Text = ""
-PlayerName.TextColor3 = Color3.new(1, 1, 1)
-PlayerName.TextSize = 18
-PlayerName.TextStrokeTransparency = 0
-
-Underline_7.Name = "Underline"
-Underline_7.Parent = PlayerName
-Underline_7.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_7.BorderSizePixel = 0
-Underline_7.Position = UDim2.new(0, 0, 1, 0)
-Underline_7.Size = UDim2.new(1, 0, 0, 5)
-Underline_7.Font = Enum.Font.SourceSans
-Underline_7.Text = ""
-Underline_7.TextColor3 = Color3.new(0, 0, 0)
-Underline_7.TextSize = 14
-
-SherrifESP.Name = "SherrifESP"
-SherrifESP.Parent = Main
-SherrifESP.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-SherrifESP.BorderColor3 = Color3.new(0, 0, 0)
-SherrifESP.BorderSizePixel = 0
-SherrifESP.Position = UDim2.new(0, 175, 0, 10)
-SherrifESP.Size = UDim2.new(0, 155, 0, 25)
-SherrifESP.Font = Enum.Font.Fantasy
-SherrifESP.Text = "Sherrif ESP"
-SherrifESP.TextColor3 = Color3.new(1, 1, 1)
-SherrifESP.TextSize = 18
-SherrifESP.TextStrokeTransparency = 0
-
-Underline_8.Name = "Underline"
-Underline_8.Parent = SherrifESP
-Underline_8.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_8.BorderSizePixel = 0
-Underline_8.Position = UDim2.new(0, 0, 1, 0)
-Underline_8.Size = UDim2.new(1, 0, 0, 5)
-Underline_8.Font = Enum.Font.SourceSans
-Underline_8.Text = ""
-Underline_8.TextColor3 = Color3.new(0, 0, 0)
-Underline_8.TextSize = 14
-
-ShowNames.Name = "ShowNames"
-ShowNames.Parent = Main
-ShowNames.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-ShowNames.BorderColor3 = Color3.new(0, 0, 0)
-ShowNames.BorderSizePixel = 0
-ShowNames.Position = UDim2.new(0, 175, 0, 50)
-ShowNames.Size = UDim2.new(0, 155, 0, 25)
-ShowNames.Font = Enum.Font.Fantasy
-ShowNames.Text = "Show Names"
-ShowNames.TextColor3 = Color3.new(1, 1, 1)
-ShowNames.TextSize = 18
-ShowNames.TextStrokeTransparency = 0
-
-Underline_9.Name = "Underline"
-Underline_9.Parent = ShowNames
-Underline_9.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_9.BorderSizePixel = 0
-Underline_9.Position = UDim2.new(0, 0, 1, 0)
-Underline_9.Size = UDim2.new(1, 0, 0, 5)
-Underline_9.Font = Enum.Font.SourceSans
-Underline_9.Text = ""
-Underline_9.TextColor3 = Color3.new(0, 0, 0)
-Underline_9.TextSize = 14
-
-TPtoLobby.Name = "TPtoLobby"
-TPtoLobby.Parent = Main
-TPtoLobby.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-TPtoLobby.BorderColor3 = Color3.new(0, 0, 0)
-TPtoLobby.BorderSizePixel = 0
-TPtoLobby.Position = UDim2.new(0, 10, 0, 270)
-TPtoLobby.Size = UDim2.new(0, 155, 0, 25)
-TPtoLobby.Font = Enum.Font.Fantasy
-TPtoLobby.Text = "TP to Lobby"
-TPtoLobby.TextColor3 = Color3.new(1, 1, 1)
-TPtoLobby.TextSize = 18
-TPtoLobby.TextStrokeTransparency = 0
-
-Underline_10.Name = "Underline"
-Underline_10.Parent = TPtoLobby
-Underline_10.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_10.BorderSizePixel = 0
-Underline_10.Position = UDim2.new(0, 0, 1, 0)
-Underline_10.Size = UDim2.new(1, 0, 0, 5)
-Underline_10.Font = Enum.Font.SourceSans
-Underline_10.Text = ""
-Underline_10.TextColor3 = Color3.new(0, 0, 0)
-Underline_10.TextSize = 14
-
-TPtoMap.Name = "TPtoMap"
-TPtoMap.Parent = Main
-TPtoMap.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-TPtoMap.BorderColor3 = Color3.new(0, 0, 0)
-TPtoMap.BorderSizePixel = 0
-TPtoMap.Position = UDim2.new(0, 175, 0, 310)
-TPtoMap.Size = UDim2.new(0, 155, 0, 25)
-TPtoMap.Font = Enum.Font.Fantasy
-TPtoMap.Text = "TP to Map"
-TPtoMap.TextColor3 = Color3.new(1, 1, 1)
-TPtoMap.TextSize = 18
-TPtoMap.TextStrokeTransparency = 0
-
-Underline_11.Name = "Underline"
-Underline_11.Parent = TPtoMap
-Underline_11.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_11.BorderSizePixel = 0
-Underline_11.Position = UDim2.new(0, 0, 1, 0)
-Underline_11.Size = UDim2.new(1, 0, 0, 5)
-Underline_11.Font = Enum.Font.SourceSans
-Underline_11.Text = ""
-Underline_11.TextColor3 = Color3.new(0, 0, 0)
-Underline_11.TextSize = 14
-
-TPtoMuderer.Name = "TPtoMuderer"
-TPtoMuderer.Parent = Main
-TPtoMuderer.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-TPtoMuderer.BorderColor3 = Color3.new(0, 0, 0)
-TPtoMuderer.BorderSizePixel = 0
-TPtoMuderer.Position = UDim2.new(0, 175, 0, 270)
-TPtoMuderer.Size = UDim2.new(0, 155, 0, 25)
-TPtoMuderer.Font = Enum.Font.Fantasy
-TPtoMuderer.Text = "TP to Murderer"
-TPtoMuderer.TextColor3 = Color3.new(1, 1, 1)
-TPtoMuderer.TextSize = 18
-TPtoMuderer.TextStrokeTransparency = 0
-
-Underline_12.Name = "Underline"
-Underline_12.Parent = TPtoMuderer
-Underline_12.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_12.BorderSizePixel = 0
-Underline_12.Position = UDim2.new(0, 0, 1, 0)
-Underline_12.Size = UDim2.new(1, 0, 0, 5)
-Underline_12.Font = Enum.Font.SourceSans
-Underline_12.Text = ""
-Underline_12.TextColor3 = Color3.new(0, 0, 0)
-Underline_12.TextSize = 14
-
-TPtoPlayer.Name = "TPtoPlayer"
-TPtoPlayer.Parent = Main
-TPtoPlayer.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-TPtoPlayer.BorderColor3 = Color3.new(0, 0, 0)
-TPtoPlayer.BorderSizePixel = 0
-TPtoPlayer.Position = UDim2.new(0, 10, 0, 350)
-TPtoPlayer.Size = UDim2.new(0, 155, 0, 25)
-TPtoPlayer.Font = Enum.Font.Fantasy
-TPtoPlayer.Text = "TP to Player >"
-TPtoPlayer.TextColor3 = Color3.new(1, 1, 1)
-TPtoPlayer.TextSize = 18
-TPtoPlayer.TextStrokeTransparency = 0
-
-Underline_13.Name = "Underline"
-Underline_13.Parent = TPtoPlayer
-Underline_13.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_13.BorderSizePixel = 0
-Underline_13.Position = UDim2.new(0, 0, 1, 0)
-Underline_13.Size = UDim2.new(1, 0, 0, 5)
-Underline_13.Font = Enum.Font.SourceSans
-Underline_13.Text = ""
-Underline_13.TextColor3 = Color3.new(0, 0, 0)
-Underline_13.TextSize = 14
-
-TPtoSherrif.Name = "TPtoSherrif"
-TPtoSherrif.Parent = Main
-TPtoSherrif.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-TPtoSherrif.BorderColor3 = Color3.new(0, 0, 0)
-TPtoSherrif.BorderSizePixel = 0
-TPtoSherrif.Position = UDim2.new(0, 10, 0, 310)
-TPtoSherrif.Size = UDim2.new(0, 155, 0, 25)
-TPtoSherrif.Font = Enum.Font.Fantasy
-TPtoSherrif.Text = "TP to Sherrif"
-TPtoSherrif.TextColor3 = Color3.new(1, 1, 1)
-TPtoSherrif.TextSize = 18
-TPtoSherrif.TextStrokeTransparency = 0
-
-Underline_14.Name = "Underline"
-Underline_14.Parent = TPtoSherrif
-Underline_14.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_14.BorderSizePixel = 0
-Underline_14.Position = UDim2.new(0, 0, 1, 0)
-Underline_14.Size = UDim2.new(1, 0, 0, 5)
-Underline_14.Font = Enum.Font.SourceSans
-Underline_14.Text = ""
-Underline_14.TextColor3 = Color3.new(0, 0, 0)
-Underline_14.TextSize = 14
-
-Walkspeed.Name = "Walkspeed"
-Walkspeed.Parent = Main
-Walkspeed.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-Walkspeed.BorderColor3 = Color3.new(0, 0, 0)
-Walkspeed.BorderSizePixel = 0
-Walkspeed.Position = UDim2.new(0, 10, 0, 170)
-Walkspeed.Size = UDim2.new(0, 155, 0, 25)
-Walkspeed.Font = Enum.Font.Fantasy
-Walkspeed.Text = "Set WalkSpeed"
-Walkspeed.TextColor3 = Color3.new(1, 1, 1)
-Walkspeed.TextSize = 18
-Walkspeed.TextStrokeTransparency = 0
-
-Underline_15.Name = "Underline"
-Underline_15.Parent = Walkspeed
-Underline_15.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_15.BorderSizePixel = 0
-Underline_15.Position = UDim2.new(0, 0, 1, 0)
-Underline_15.Size = UDim2.new(1, 0, 0, 5)
-Underline_15.Font = Enum.Font.SourceSans
-Underline_15.Text = ""
-Underline_15.TextColor3 = Color3.new(0, 0, 0)
-Underline_15.TextSize = 14
-
-JumpPower.Name = "JumpPower"
-JumpPower.Parent = Main
-JumpPower.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-JumpPower.BorderColor3 = Color3.new(0, 0, 0)
-JumpPower.BorderSizePixel = 0
-JumpPower.Position = UDim2.new(0, 10, 0, 210)
-JumpPower.Size = UDim2.new(0, 155, 0, 25)
-JumpPower.Font = Enum.Font.Fantasy
-JumpPower.Text = "Set JumpPower"
-JumpPower.TextColor3 = Color3.new(1, 1, 1)
-JumpPower.TextSize = 18
-JumpPower.TextStrokeTransparency = 0
-
-Underline_16.Name = "Underline"
-Underline_16.Parent = JumpPower
-Underline_16.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_16.BorderSizePixel = 0
-Underline_16.Position = UDim2.new(0, 0, 1, 0)
-Underline_16.Size = UDim2.new(1, 0, 0, 5)
-Underline_16.Font = Enum.Font.SourceSans
-Underline_16.Text = ""
-Underline_16.TextColor3 = Color3.new(0, 0, 0)
-Underline_16.TextSize = 14
-
-WSInput.Name = "WSInput"
-WSInput.Parent = Main
-WSInput.BackgroundColor3 = Color3.new(1, 1, 1)
-WSInput.BackgroundTransparency = 1
-WSInput.BorderSizePixel = 0
-WSInput.Position = UDim2.new(0, 175, 0, 170)
-WSInput.Size = UDim2.new(0, 100, 0, 25)
-WSInput.Font = Enum.Font.Fantasy
-WSInput.PlaceholderColor3 = Color3.new(0.490196, 0.490196, 0.490196)
-WSInput.PlaceholderText = "WS Input"
-WSInput.Text = ""
-WSInput.TextColor3 = Color3.new(1, 1, 1)
-WSInput.TextSize = 18
-WSInput.TextStrokeTransparency = 0
-
-Underline_17.Name = "Underline"
-Underline_17.Parent = WSInput
-Underline_17.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_17.BorderSizePixel = 0
-Underline_17.Position = UDim2.new(0, 0, 1, 0)
-Underline_17.Size = UDim2.new(1, 0, 0, 5)
-Underline_17.Font = Enum.Font.SourceSans
-Underline_17.Text = ""
-Underline_17.TextColor3 = Color3.new(0, 0, 0)
-Underline_17.TextSize = 14
-
-JPInput.Name = "JPInput"
-JPInput.Parent = Main
-JPInput.BackgroundColor3 = Color3.new(1, 1, 1)
-JPInput.BackgroundTransparency = 1
-JPInput.BorderSizePixel = 0
-JPInput.Position = UDim2.new(0, 175, 0, 210)
-JPInput.Size = UDim2.new(0, 100, 0, 25)
-JPInput.Font = Enum.Font.Fantasy
-JPInput.PlaceholderColor3 = Color3.new(0.490196, 0.490196, 0.490196)
-JPInput.PlaceholderText = "JP Input"
-JPInput.Text = ""
-JPInput.TextColor3 = Color3.new(1, 1, 1)
-JPInput.TextSize = 18
-JPInput.TextStrokeTransparency = 0
-
-Underline_18.Name = "Underline"
-Underline_18.Parent = JPInput
-Underline_18.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_18.BorderSizePixel = 0
-Underline_18.Position = UDim2.new(0, 0, 1, 0)
-Underline_18.Size = UDim2.new(1, 0, 0, 5)
-Underline_18.Font = Enum.Font.SourceSans
-Underline_18.Text = ""
-Underline_18.TextColor3 = Color3.new(0, 0, 0)
-Underline_18.TextSize = 14
-
-WSReset.Name = "WSReset"
-WSReset.Parent = Main
-WSReset.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-WSReset.BorderColor3 = Color3.new(0, 0, 0)
-WSReset.BorderSizePixel = 0
-WSReset.Position = UDim2.new(0, 280, 0, 170)
-WSReset.Size = UDim2.new(0, 50, 0, 25)
-WSReset.Font = Enum.Font.Fantasy
-WSReset.Text = "Reset"
-WSReset.TextColor3 = Color3.new(1, 1, 1)
-WSReset.TextSize = 18
-WSReset.TextStrokeTransparency = 0
-
-Underline_19.Name = "Underline"
-Underline_19.Parent = WSReset
-Underline_19.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_19.BorderSizePixel = 0
-Underline_19.Position = UDim2.new(0, 0, 1, 0)
-Underline_19.Size = UDim2.new(1, 0, 0, 5)
-Underline_19.Font = Enum.Font.SourceSans
-Underline_19.Text = ""
-Underline_19.TextColor3 = Color3.new(0, 0, 0)
-Underline_19.TextSize = 14
-
-JPReset.Name = "JPReset"
-JPReset.Parent = Main
-JPReset.BackgroundColor3 = Color3.new(0.117647, 0.117647, 0.117647)
-JPReset.BorderColor3 = Color3.new(0, 0, 0)
-JPReset.BorderSizePixel = 0
-JPReset.Position = UDim2.new(0, 280, 0, 210)
-JPReset.Size = UDim2.new(0, 50, 0, 25)
-JPReset.Font = Enum.Font.Fantasy
-JPReset.Text = "Reset"
-JPReset.TextColor3 = Color3.new(1, 1, 1)
-JPReset.TextSize = 18
-JPReset.TextStrokeTransparency = 0
-
-Underline_20.Name = "Underline"
-Underline_20.Parent = JPReset
-Underline_20.BackgroundColor3 = Color3.new(0.392157, 0, 1)
-Underline_20.BorderSizePixel = 0
-Underline_20.Position = UDim2.new(0, 0, 1, 0)
-Underline_20.Size = UDim2.new(1, 0, 0, 5)
-Underline_20.Font = Enum.Font.SourceSans
-Underline_20.Text = ""
-Underline_20.TextColor3 = Color3.new(0, 0, 0)
-Underline_20.TextSize = 14
--- Scripts:
-function SCRIPT_TXVI67_FAKESCRIPT() -- OpenClose.OpenClose 
-	local script = Instance.new('LocalScript')
-	script.Parent = OpenClose
-	local toggle = true
-	local playerListOpen = false
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if toggle == false then
-			toggle = true
-			script.Parent.Rotation = -90
-		else
-			toggle = false
-			script.Parent.Rotation = 90
-		end	
-		
-		
-		if toggle then
-			script.Parent.Parent.Parent.Parent.Holder:TweenPosition(UDim2.new(1, -350, 1, 0), "Out", "Quart", 0.5)
-			
-			if script.Parent.Parent.Parent.PlayerList.Top.OpenClose.Rotation == 0 then
-				playerListOpen = true
-				script.Parent.Parent.Parent.PlayerList:TweenPosition(UDim2.new(0, -25, 0, 0), "Out", "Quart", 0.5)
-			else
-				playerListOpen = false
-			end	
-			
-		else
-			if playerListOpen == true then
-				script.Parent.Parent.Parent.PlayerList:TweenPosition(UDim2.new(0, -175, 0, 0), "Out", "Quart", 0.5)
-			end					
-			script.Parent.Parent.Parent.Parent.Holder:TweenPosition(UDim2.new(1, -350, 1, -405), "Out", "Quart", 0.5)
-		end	
-	end)
-
+-- ////////////////////////////////////////////////////////////
+--  VYNIXU'S MM2 SCRIPT - OBSIDIAN EDITION
+--  COM AUTO GUN GRABBER
+-- ////////////////////////////////////////////////////////////
+
+-- CARREGAR OBSIDIAN
+local Obsidian = loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-obsidian/obsidian/main/source.lua"))()
+
+-- ////////////////////////////////////////////////////////////
+--  CRIAÇÃO DA UI
+-- ////////////////////////////////////////////////////////////
+
+local Window = Obsidian:CreateWindow({
+    Title = "Vynixu's MM2 Script",
+    SubTitle = "Obsidian Edition",
+    Theme = "Dark",
+    Size = UDim2.new(0, 580, 0, 500),
+})
+
+-- ABAS
+local EspTab = Window:AddTab({ Title = "ESP", Icon = "eye" })
+local MovementTab = Window:AddTab({ Title = "Movement", Icon = "run" })
+local TeleportTab = Window:AddTab({ Title = "Teleport", Icon = "map-marker" })
+local MiscTab = Window:AddTab({ Title = "Misc", Icon = "cog" })
+
+-- ////////////////////////////////////////////////////////////
+--  VARIÁVEIS GLOBAIS
+-- ////////////////////////////////////////////////////////////
+
+local Player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local Tracers = {}
+local Highlights = {}
+local Outlines = {}
+local flying = false
+local noclip = false
+local autoGun = false
+
+-- ESTADOS DOS ESPs (TODOS ATIVADOS POR PADRÃO)
+local espStates = {
+    Murderer = true,
+    Sherrif = true,
+    Innocent = true,
+    Gun = true,
+    Names = true,
+}
+
+-- CONFIGS
+local Settings = {
+    EspColor = Color3.fromRGB(255, 0, 0),
+    EspTransparency = 0.4,
+    EspRainbow = false,
+    OutlineEnabled = true,
+    OutlineColor = Color3.fromRGB(0, 0, 0),
+    OutlineRainbow = false,
+    OutlineTransparency = 0,
+}
+
+-- ////////////////////////////////////////////////////////////
+--  FUNÇÕES AUXILIARES
+-- ////////////////////////////////////////////////////////////
+
+local function isMurderer(plr)
+    if not plr then return false end
+    for _, item in pairs(plr:GetChildren()) do
+        if item.Name == "Backpack" then
+            for _, tool in pairs(item:GetChildren()) do
+                if tool.Name == "Knife" then return true end
+            end
+        end
+    end
+    if plr.Character then
+        for _, tool in pairs(plr.Character:GetChildren()) do
+            if tool:IsA("Tool") and tool.Name == "Knife" then return true end
+        end
+    end
+    return false
 end
-coroutine.resume(coroutine.create(SCRIPT_TXVI67_FAKESCRIPT))
-function SCRIPT_UWJS74_FAKESCRIPT() -- OpenClose_2.OpenClose 
-	local script = Instance.new('LocalScript')
-	script.Parent = OpenClose_2
-	local toggle = false
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if toggle == false then
-			toggle = true
-			script.Parent.Rotation = 0
-		else
-			toggle = false
-			script.Parent.Rotation = 180
-		end	
-		
-		
-		if not toggle then
-			script.Parent.Parent.Parent:TweenPosition(UDim2.new(0, -25, 0, 0), "Out", "Quart", 0.5)		
-		else				
-			script.Parent.Parent.Parent:TweenPosition(UDim2.new(0, -175, 0, 0), "Out", "Quart", 0.5)
-		end	
-	end)
 
+local function isSherrif(plr)
+    if not plr then return false end
+    for _, item in pairs(plr:GetChildren()) do
+        if item.Name == "Backpack" then
+            for _, tool in pairs(item:GetChildren()) do
+                if tool.Name == "Gun" then return true end
+            end
+        end
+    end
+    if plr.Character then
+        for _, tool in pairs(plr.Character:GetChildren()) do
+            if tool:IsA("Tool") and tool.Name == "Gun" then return true end
+        end
+    end
+    return false
 end
-coroutine.resume(coroutine.create(SCRIPT_UWJS74_FAKESCRIPT))
-function SCRIPT_HYTP71_FAKESCRIPT() -- Player1.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player1
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function isInnocent(plr)
+    if not plr or plr == Player then return false end
+    if isMurderer(plr) or isSherrif(plr) then return false end
+    return true
 end
-coroutine.resume(coroutine.create(SCRIPT_HYTP71_FAKESCRIPT))
-function SCRIPT_ZPMH72_FAKESCRIPT() -- Player2.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player2
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function removerHighlight(tipo, alvo)
+    if not alvo then return end
+    if Highlights[tipo] and Highlights[tipo][alvo] then
+        Highlights[tipo][alvo]:Destroy()
+        Highlights[tipo][alvo] = nil
+    end
+    if Outlines[tipo] and Outlines[tipo][alvo] then
+        Outlines[tipo][alvo]:Destroy()
+        Outlines[tipo][alvo] = nil
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_ZPMH72_FAKESCRIPT))
-function SCRIPT_PPKR75_FAKESCRIPT() -- Player3.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player3
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function criarHighlight(tipo, alvo, cor, transparencia)
+    if not alvo or not alvo.Parent then return end
+    
+    removerHighlight(tipo, alvo)
+    
+    local highlight = Instance.new("Highlight")
+    highlight.Name = tipo .. "Highlight"
+    highlight.Parent = alvo
+    highlight.FillColor = cor
+    highlight.FillTransparency = transparencia or 0.4
+    highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+    highlight.OutlineTransparency = 1
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    
+    if not Highlights[tipo] then Highlights[tipo] = {} end
+    Highlights[tipo][alvo] = highlight
+    
+    if Settings.OutlineEnabled then
+        local outline = Instance.new("Highlight")
+        outline.Name = tipo .. "Outline"
+        outline.Parent = alvo
+        outline.FillColor = Color3.fromRGB(0, 0, 0)
+        outline.FillTransparency = 1
+        outline.OutlineColor = Settings.OutlineColor
+        outline.OutlineTransparency = Settings.OutlineTransparency
+        outline.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        
+        if not Outlines[tipo] then Outlines[tipo] = {} end
+        Outlines[tipo][alvo] = outline
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_PPKR75_FAKESCRIPT))
-function SCRIPT_MJMP67_FAKESCRIPT() -- Player4.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player4
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_MJMP67_FAKESCRIPT))
-function SCRIPT_CYEV85_FAKESCRIPT() -- Player6.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player6
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
+-- ////////////////////////////////////////////////////////////
+--  1. MURDERER ESP
+-- ////////////////////////////////////////////////////////////
 
+local function ativarMurdererESP()
+    espStates.Murderer = true
+    task.spawn(function()
+        while espStates.Murderer do
+            task.wait(0.1)
+            if not Player.Character then task.wait(0.5) continue end
+            
+            for _, plr in pairs(game.Players:GetPlayers()) do
+                if plr == Player or not plr.Character then continue end
+                if isMurderer(plr) then
+                    criarHighlight("Murderer", plr.Character, Color3.fromRGB(255, 0, 25))
+                else
+                    removerHighlight("Murderer", plr.Character)
+                end
+            end
+        end
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            if plr.Character then removerHighlight("Murderer", plr.Character) end
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_CYEV85_FAKESCRIPT))
-function SCRIPT_ERRH84_FAKESCRIPT() -- Player5.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player5
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function desativarMurdererESP()
+    espStates.Murderer = false
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character then removerHighlight("Murderer", plr.Character) end
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_ERRH84_FAKESCRIPT))
-function SCRIPT_FSET86_FAKESCRIPT() -- Player8.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player8
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_FSET86_FAKESCRIPT))
-function SCRIPT_BGYF75_FAKESCRIPT() -- Player7.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player7
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
+-- ////////////////////////////////////////////////////////////
+--  2. SHERRIF ESP
+-- ////////////////////////////////////////////////////////////
 
+local function ativarSherrifESP()
+    espStates.Sherrif = true
+    task.spawn(function()
+        while espStates.Sherrif do
+            task.wait(0.1)
+            if not Player.Character then task.wait(0.5) continue end
+            
+            for _, plr in pairs(game.Players:GetPlayers()) do
+                if plr == Player or not plr.Character then continue end
+                if isSherrif(plr) then
+                    criarHighlight("Sherrif", plr.Character, Color3.fromRGB(0, 50, 255))
+                else
+                    removerHighlight("Sherrif", plr.Character)
+                end
+            end
+        end
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            if plr.Character then removerHighlight("Sherrif", plr.Character) end
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_BGYF75_FAKESCRIPT))
-function SCRIPT_PNRM77_FAKESCRIPT() -- Player10.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player10
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function desativarSherrifESP()
+    espStates.Sherrif = false
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character then removerHighlight("Sherrif", plr.Character) end
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_PNRM77_FAKESCRIPT))
-function SCRIPT_MYVX75_FAKESCRIPT() -- Player11.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player11
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_MYVX75_FAKESCRIPT))
-function SCRIPT_BFYP71_FAKESCRIPT() -- Player12.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player12
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
+-- ////////////////////////////////////////////////////////////
+--  3. INNOCENT ESP
+-- ////////////////////////////////////////////////////////////
 
+local function ativarInnocentESP()
+    espStates.Innocent = true
+    task.spawn(function()
+        while espStates.Innocent do
+            task.wait(0.5)
+            if not Player.Character then task.wait(1) continue end
+            
+            for _, plr in pairs(game.Players:GetPlayers()) do
+                if plr == Player or not plr.Character then continue end
+                
+                local temPrioridade = false
+                if Highlights["Murderer"] and Highlights["Murderer"][plr.Character] then
+                    temPrioridade = true
+                end
+                if Highlights["Sherrif"] and Highlights["Sherrif"][plr.Character] then
+                    temPrioridade = true
+                end
+                
+                if isInnocent(plr) and not temPrioridade then
+                    criarHighlight("Innocent", plr.Character, Color3.fromRGB(0, 255, 50), 0.4)
+                else
+                    removerHighlight("Innocent", plr.Character)
+                end
+            end
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_BFYP71_FAKESCRIPT))
-function SCRIPT_ISFC72_FAKESCRIPT() -- Player9.GetPlayerName 
-	local script = Instance.new('LocalScript')
-	script.Parent = Player9
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		if script.Parent.Text ~= "" then
-			script.Parent.Parent.Parent.Parent.Main.PlayerName.Text = script.Parent.Text
-		end
-		
-	end)
 
+local function desativarInnocentESP()
+    espStates.Innocent = false
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character then removerHighlight("Innocent", plr.Character) end
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_ISFC72_FAKESCRIPT))
-function SCRIPT_OJXE82_FAKESCRIPT() -- Players.GetPlayers 
-	local script = Instance.new('LocalScript')
-	script.Parent = Players
-	local buttons = {
-		script.Parent.Player1,
-		script.Parent.Player2,
-		script.Parent.Player3,
-		script.Parent.Player4,
-		script.Parent.Player5,
-		script.Parent.Player6,
-		script.Parent.Player7,
-		script.Parent.Player8,
-		script.Parent.Player9,
-		script.Parent.Player10,
-		script.Parent.Player11,
-		script.Parent.Player12,
-	}
-	
-	for i, v in pairs(game.Players:GetChildren()) do
-	    buttons[i].Text = v.Name
-	    buttons[i].Visible = true
-	end
-	
-	game.Players.PlayerRemoving:connect(function()
-		    for i, v in pairs(game.Players:GetChildren()) do
-				buttons[i].Text = v.Name
-				buttons[i].Visible = true
-		    end
-		end)
-		
-	game.Players.PlayerAdded:connect(function()
-	    for i, v in pairs(game.Players:GetChildren()) do
-			buttons[i].Text = v.Name
-	        buttons[i].Visible = true
-	    end
-	end)
-	
-	for i,v in pairs(script.Parent:GetChildren()) do
-		if v.Text == "Player" then
-			v.Text = ""
-		end
-	end
 
-end
-coroutine.resume(coroutine.create(SCRIPT_OJXE82_FAKESCRIPT))
-function SCRIPT_AJZK70_FAKESCRIPT() -- Roles.GetRoles 
-	local script = Instance.new('LocalScript')
-	script.Parent = Roles
-	while wait(0.5) do	
-		local Players = game:GetService("Players")
-			
-		for i, Plr in pairs(Players:GetPlayers()) do
-		    for i, Bp in pairs(Plr:GetChildren()) do
-		        if Bp.Name == "Backpack" then
-		            if Bp:FindFirstChild("Knife") ~= nil then
-						local playerId = Bp.Parent.UserId
-						script.Parent.Murderer.Image = "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid=".. playerId
-		       		end
-		
-					if Bp:FindFirstChild("Gun") ~= nil then
-						local playerId = Bp.Parent.UserId
-						script.Parent.Sherrif.Image = "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid=".. playerId	
-			        end
-		        end
-		    end
-		end
-	end
+-- ////////////////////////////////////////////////////////////
+--  4. GUN ESP
+-- ////////////////////////////////////////////////////////////
 
+local function ativarGunESP()
+    espStates.Gun = true
+    task.spawn(function()
+        local gunHighlights = {}
+        while espStates.Gun do
+            task.wait(0.5)
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj.Name == "GunDrop" then
+                    local parent = obj.Parent
+                    if parent and not parent:FindFirstChild("Humanoid") then
+                        if not gunHighlights[obj] then
+                            local highlight = Instance.new("Highlight")
+                            highlight.Name = "GunHighlight"
+                            highlight.Parent = obj
+                            highlight.FillColor = Color3.fromRGB(0, 255, 50)
+                            highlight.FillTransparency = 0.4
+                            highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+                            highlight.OutlineTransparency = 0
+                            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                            gunHighlights[obj] = highlight
+                        end
+                    end
+                end
+            end
+        end
+        for _, highlight in pairs(gunHighlights) do
+            highlight:Destroy()
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_AJZK70_FAKESCRIPT))
-function SCRIPT_ZSRN70_FAKESCRIPT() -- CoinFarm.CoinFarm 
-	local script = Instance.new('LocalScript')
-	script.Parent = CoinFarm
-	local toggle = false
-	
-	script.Parent.MouseButton1Click:Connect(function()	
-		if toggle == false then
-			toggle = true
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-		else
-			toggle = false
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-		end
-		
-		while toggle do wait(.25)
-			local place = workspace:GetChildren()	
-			local currentX = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.X
-			local currentY = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.Y
-			local currentZ = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.Z
-			
-			for i,v in pairs(place) do	    
-			    local vChildren = v:GetChildren()
-			    for i,child in pairs(vChildren) do
-			        if child.Name == "CoinContainer" then
-			            
-						if child.Coin_Server:FindFirstChild("Coin") ~= nil then
-				            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = child.Coin_Server.Coin.CFrame
-						else
-							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(currentX, currentY, currentZ)
-							script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-							toggle = false
-						end
-			
-			        end
-			    end	
-			end
-		end
-		
-	end)
 
+local function desativarGunESP()
+    espStates.Gun = false
 end
-coroutine.resume(coroutine.create(SCRIPT_ZSRN70_FAKESCRIPT))
-function SCRIPT_ZXKM71_FAKESCRIPT() -- Fly.Fly 
-	local script = Instance.new('LocalScript')
-	script.Parent = Fly
-	flying = false
-	lplayer = game.Players.LocalPlayer
-	speedget = 1
-	speedfly = 1
-	Mouse = lplayer:GetMouse()
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if flying == false then
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-			
-			repeat wait() until lplayer and lplayer.Character and lplayer.Character:FindFirstChild('HumanoidRootPart') and lplayer.Character:FindFirstChild('Humanoid')
-			repeat wait() until Mouse
-			
-			local T = lplayer.Character.HumanoidRootPart
-			local CONTROL = {F = 0, B = 0, L = 0, R = 0}
-			local lCONTROL = {F = 0, B = 0, L = 0, R = 0}
-			local SPEED = speedget
-			
-			local function fly()
-				flying = true
-				local BG = Instance.new('BodyGyro', T)
-				local BV = Instance.new('BodyVelocity', T)
-				BG.P = 9e4
-				BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-				BG.cframe = T.CFrame
-				BV.velocity = Vector3.new(0, 0.1, 0)
-				BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-				spawn(function()
-				repeat wait()
-				lplayer.Character.Humanoid.PlatformStand = true
-				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 then
-					SPEED = 50
-				elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0) and SPEED ~= 0 then
-					SPEED = 0
-				end
-				if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 then
-					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-					lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
-				elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and SPEED ~= 0 then
-					BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-				else
-					BV.velocity = Vector3.new(0, 0.1, 0)
-				end
-				BG.cframe = workspace.CurrentCamera.CoordinateFrame
-				until not flying
-					CONTROL = {F = 0, B = 0, L = 0, R = 0}
-					lCONTROL = {F = 0, B = 0, L = 0, R = 0}
-					SPEED = 0
-					BG:destroy()
-					BV:destroy()
-					lplayer.Character.Humanoid.PlatformStand = false
-				end)
-			end
-			Mouse.KeyDown:connect(function(KEY)
-				if KEY:lower() == 'w' then
-					CONTROL.F = speedfly
-				elseif KEY:lower() == 's' then
-					CONTROL.B = -speedfly
-				elseif KEY:lower() == 'a' then
-					CONTROL.L = -speedfly 
-				elseif KEY:lower() == 'd' then 
-					CONTROL.R = speedfly
-				end
-			end)
-			Mouse.KeyUp:connect(function(KEY)
-				if KEY:lower() == 'w' then
-					CONTROL.F = 0
-				elseif KEY:lower() == 's' then
-					CONTROL.B = 0
-				elseif KEY:lower() == 'a' then
-					CONTROL.L = 0
-				elseif KEY:lower() == 'd' then
-					CONTROL.R = 0
-				end
-			end)
-			fly()
-		else
-			flying = false
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-			lplayer.Character.Humanoid.PlatformStand = false
-		end
-	end)
-	
-	Mouse.KeyDown:Connect(function(k)
-		if k == "l" then
-			
-			if flying == false then
-				script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-				
-				repeat wait() until lplayer and lplayer.Character and lplayer.Character:FindFirstChild('HumanoidRootPart') and lplayer.Character:FindFirstChild('Humanoid')
-				repeat wait() until Mouse
-				
-				local T = lplayer.Character.HumanoidRootPart
-				local CONTROL = {F = 0, B = 0, L = 0, R = 0}
-				local lCONTROL = {F = 0, B = 0, L = 0, R = 0}
-				local SPEED = speedget
-				
-				local function fly()
-					flying = true
-					local BG = Instance.new('BodyGyro', T)
-					local BV = Instance.new('BodyVelocity', T)
-					BG.P = 9e4
-					BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-					BG.cframe = T.CFrame
-					BV.velocity = Vector3.new(0, 0.1, 0)
-					BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-					spawn(function()
-					repeat wait()
-					lplayer.Character.Humanoid.PlatformStand = true
-					if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 then
-						SPEED = 50
-					elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0) and SPEED ~= 0 then
-						SPEED = 0
-					end
-					if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 then
-						BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-						lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
-					elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and SPEED ~= 0 then
-						BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-					else
-						BV.velocity = Vector3.new(0, 0.1, 0)
-					end
-					BG.cframe = workspace.CurrentCamera.CoordinateFrame
-					until not flying
-						CONTROL = {F = 0, B = 0, L = 0, R = 0}
-						lCONTROL = {F = 0, B = 0, L = 0, R = 0}
-						SPEED = 0
-						BG:destroy()
-						BV:destroy()
-						lplayer.Character.Humanoid.PlatformStand = false
-					end)
-				end
-				Mouse.KeyDown:connect(function(KEY)
-					if KEY:lower() == 'w' then
-						CONTROL.F = speedfly
-					elseif KEY:lower() == 's' then
-						CONTROL.B = -speedfly
-					elseif KEY:lower() == 'a' then
-						CONTROL.L = -speedfly 
-					elseif KEY:lower() == 'd' then 
-						CONTROL.R = speedfly
-					end
-				end)
-				Mouse.KeyUp:connect(function(KEY)
-					if KEY:lower() == 'w' then
-						CONTROL.F = 0
-					elseif KEY:lower() == 's' then
-						CONTROL.B = 0
-					elseif KEY:lower() == 'a' then
-						CONTROL.L = 0
-					elseif KEY:lower() == 'd' then
-						CONTROL.R = 0
-					end
-				end)
-				fly()
-			else
-				flying = false
-				script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-				lplayer.Character.Humanoid.PlatformStand = false
-			end
-			
-		end
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_ZXKM71_FAKESCRIPT))
-function SCRIPT_MMKD76_FAKESCRIPT() -- GunDropGrabber.GunDropGrabber 
-	local script = Instance.new('LocalScript')
-	script.Parent = GunDropGrabber
-	
-	-- LISTA DE TODOS OS MAPAS DO MM2
-	local mapas = {
-		"Bank2", "BioLab", "Factory", "Hospital3", "Hotel",
-		"House2", "Mansion2", "MilBase", "Office3", "PoliceStation",
-		"ResearchFacility", "Workplace"
-	}
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		local char = game.Players.LocalPlayer.Character
-		local hrp = char and char:FindFirstChild("HumanoidRootPart")
-		if not hrp then return end
-		
-		local currentPos = hrp.CFrame
-		local gunDrop = nil
-		
-		-- PROCURA EM TODOS OS MAPAS
-		for _, nome in pairs(mapas) do
-			local mapa = workspace:FindFirstChild(nome)
-			if mapa then
-				gunDrop = mapa:FindFirstChild("GunDrop")
-				if gunDrop then break end
-			end
-		end
-		
-		-- FALLBACK: PROCURA EM TODO WORKSPACE
-		if not gunDrop then
-			for _, obj in pairs(workspace:GetDescendants()) do
-				if obj.Name == "GunDrop" then
-					local parent = obj.Parent
-					if parent and not parent:FindFirstChild("Humanoid") then
-						gunDrop = obj
-						break
-					end
-				end
-			end
-		end
-		
-		if gunDrop then
-			hrp.CFrame = gunDrop.CFrame
-			task.wait()
-			hrp.CFrame = currentPos
-			
-			local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
-			if errorLabel then
-				errorLabel.Text = "Gun grabbed! ✅"
-				task.wait(1)
-				errorLabel.Text = ""
-			end
-		else
-			local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
-			if errorLabel then
-				errorLabel.Text = "No gun on the ground!"
-				task.wait(1.5)
-				errorLabel.Text = ""
-			end
-		end
-	end)
-end
-coroutine.resume(coroutine.create(SCRIPT_MMKD76_FAKESCRIPT))
-function SCRIPT_MOWM88_FAKESCRIPT() -- KillAll.KillAll 
-	local script = Instance.new('LocalScript')
-	script.Parent = KillAll
-	script.Parent.MouseButton1Click:Connect(function(input)
-	
-		if game.Players.LocalPlayer.Backpack:FindFirstChild("Knife") ~= nil then -- Only works if you're the murderer
-	
-	    	local Players = game:GetService("Players")	
-		    for i, Victim in pairs(Players:GetPlayers()) do
-		        if Victim.Name ~= game.Players.LocalPlayer.Name then
-		
-		            repeat wait()
-		                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Victim.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 1)
-		            until
-		                Victim.Character.Humanoid.Health == 0
-		
-		        end
-		    end
-		
-		else
-		
-		    script.Parent.Parent.Parent.ErrorLabel.Text = "You need to be murderer in order to do this"
-		
-		wait(3)
-		
-			script.Parent.Parent.Parent.ErrorLabel.Text = ""
-		
-		end
-	
-	end)
+-- ////////////////////////////////////////////////////////////
+--  5. NAMES ESP
+-- ////////////////////////////////////////////////////////////
 
+local function ativarNamesESP()
+    espStates.Names = true
+    local names = {}
+    
+    local function criarNome(plr)
+        if not plr or not plr.Character then return end
+        local head = plr.Character:FindFirstChild("Head")
+        if not head then return end
+        
+        if names[plr] then names[plr]:Destroy() end
+        
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "NameESP"
+        billboard.Parent = head
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 150, 0, 40)
+        billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+        billboard.AlwaysOnTop = true
+        billboard.MaxDistance = 5000
+        billboard.ClipsDescendants = false
+        
+        local nome = Instance.new("TextLabel")
+        nome.Name = "Nome"
+        nome.Parent = billboard
+        nome.BackgroundTransparency = 1
+        nome.Size = UDim2.new(1, 0, 0.6, 0)
+        nome.Font = Enum.Font.GothamBold
+        nome.Text = plr.Name
+        nome.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nome.TextSize = 14
+        nome.TextStrokeTransparency = 0
+        nome.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        nome.TextScaled = false
+        
+        local distancia = Instance.new("TextLabel")
+        distancia.Name = "Distancia"
+        distancia.Parent = billboard
+        distancia.BackgroundTransparency = 1
+        distancia.Size = UDim2.new(1, 0, 0.4, 0)
+        distancia.Position = UDim2.new(0, 0, 0.6, 0)
+        distancia.Font = Enum.Font.Gotham
+        distancia.Text = "0m"
+        distancia.TextColor3 = Color3.fromRGB(200, 200, 200)
+        distancia.TextSize = 12
+        distancia.TextStrokeTransparency = 0
+        distancia.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        
+        names[plr] = billboard
+    end
+    
+    local function removerNome(plr)
+        if names[plr] then names[plr]:Destroy(); names[plr] = nil end
+    end
+    
+    task.spawn(function()
+        while espStates.Names do
+            task.wait(10)
+            for _, plr in pairs(game.Players:GetPlayers()) do
+                if plr == Player then
+                    removerNome(plr)
+                    continue
+                end
+                if plr.Character and plr.Character:FindFirstChild("Head") then
+                    if not names[plr] then criarNome(plr) end
+                    
+                    local distLabel = names[plr] and names[plr]:FindFirstChild("Distancia")
+                    if distLabel and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("HumanoidRootPart") then
+                        local dist = (Player.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+                        distLabel.Text = math.floor(dist) .. "m"
+                    end
+                    
+                    local nomeLabel = names[plr] and names[plr]:FindFirstChild("Nome")
+                    if nomeLabel then
+                        if isMurderer(plr) then
+                            nomeLabel.TextColor3 = Color3.fromRGB(255, 0, 25)
+                        elseif isSherrif(plr) then
+                            nomeLabel.TextColor3 = Color3.fromRGB(0, 50, 255)
+                        else
+                            nomeLabel.TextColor3 = Color3.fromRGB(0, 255, 50)
+                        end
+                    end
+                else
+                    removerNome(plr)
+                end
+            end
+        end
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            removerNome(plr)
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_MOWM88_FAKESCRIPT))
--- INNOCENT ESP (NÃO CONFLITA COM MURDERER/SHERRIF)
-local function INNOCENT_ESP()
-	local script = Instance.new('LocalScript')
-	script.Parent = Main
-	
-	local highlights = {}
-	
-	local function criarChams(personagem, cor)
-		if not personagem then return end
-		
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-		
-		-- VERIFICA SE JÁ TEM MURDERER OU SHERRIF
-		for _, child in pairs(personagem:GetChildren()) do
-			if child:IsA("Highlight") then
-				if child.Name == "MurdererHighlight" or child.Name == "SherrifHighlight" then
-					return
-				end
-			end
-		end
-		
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "InnocentHighlight"
-		highlight.Parent = personagem
-		highlight.FillColor = cor
-		highlight.FillTransparency = 0.4
-		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-		highlight.OutlineTransparency = 0
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		
-		highlights[personagem] = highlight
-	end
-	
-	local function removerChams(personagem)
-		if not personagem then return end
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-	end
-	
-	local function isInnocent(plr)
-		if not plr or not plr.Character then return false end
-		if plr == game.Players.LocalPlayer then return false end
-		
-		-- VERIFICA BACKPACK
-		for _, item in pairs(plr:GetChildren()) do
-			if item.Name == "Backpack" then
-				for _, tool in pairs(item:GetChildren()) do
-					if tool.Name == "Knife" then return false end
-					if tool.Name == "Gun" then return false end
-				end
-			end
-		end
-		
-		-- VERIFICA MÃO (CHARACTER)
-		if plr.Character then
-			for _, tool in pairs(plr.Character:GetChildren()) do
-				if tool:IsA("Tool") then
-					if tool.Name == "Knife" then return false end
-					if tool.Name == "Gun" then return false end
-				end
-			end
-		end
-		
-		return true
-	end
-	
-	task.spawn(function()
-		while true do
-			wait(0.5)
-			
-			local localPlayer = game.Players.LocalPlayer
-			if not localPlayer.Character then
-				wait(1)
-				continue
-			end
-			
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if not plr.Character or plr == localPlayer then continue end
-				
-				local temPrioridade = false
-				for _, child in pairs(plr.Character:GetChildren()) do
-					if child:IsA("Highlight") then
-						if child.Name == "MurdererHighlight" or child.Name == "SherrifHighlight" then
-							temPrioridade = true
-							break
-						end
-					end
-				end
-				
-				if isInnocent(plr) and not temPrioridade then
-					criarChams(plr.Character, Color3.fromRGB(0, 255, 50))
-				else
-					removerChams(plr.Character)
-				end
-			end
-		end
-	end)
-end
-coroutine.resume(coroutine.create(INNOCENT_ESP))
--- GUN ESP (HIGHLIGHT NA GUNDROP)
-local function GUN_ESP()
-	local script = Instance.new('LocalScript')
-	script.Parent = Main
-	
-	local highlights = {}
-	
-	local function criarBrilho(gunDrop)
-		if not gunDrop then return end
-		if highlights[gunDrop] then
-			highlights[gunDrop]:Destroy()
-			highlights[gunDrop] = nil
-		end
-		
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "GunHighlight"
-		highlight.Parent = gunDrop
-		highlight.FillColor = Color3.fromRGB(0, 255, 50)
-		highlight.FillTransparency = 0.4
-		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-		highlight.OutlineTransparency = 0
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		
-		highlights[gunDrop] = highlight
-	end
-	
-	local function removerBrilho(gunDrop)
-		if not gunDrop then return end
-		if highlights[gunDrop] then
-			highlights[gunDrop]:Destroy()
-			highlights[gunDrop] = nil
-		end
-	end
-	
-	local function isGunDropOnGround(gunDrop)
-		if not gunDrop then return false end
-		local parent = gunDrop.Parent
-		if not parent then return false end
-		
-		local isPlayer = false
-		local check = parent
-		while check do
-			if check:FindFirstChild("Humanoid") then
-				isPlayer = true
-				break
-			end
-			check = check.Parent
-		end
-		return not isPlayer
-	end
-	
-	task.spawn(function()
-		while true do
-			wait(0.5)
-			for _, obj in pairs(workspace:GetDescendants()) do
-				if obj.Name == "GunDrop" and isGunDropOnGround(obj) then
-					criarBrilho(obj)
-				end
-			end
-		end
-	end)
-	
-	workspace.DescendantAdded:Connect(function(obj)
-		if obj.Name == "GunDrop" then
-			wait(0.1)
-			if isGunDropOnGround(obj) then
-				criarBrilho(obj)
-			end
-		end
-	end)
-	
-	workspace.DescendantRemoving:Connect(function(obj)
-		if obj.Name == "GunDrop" then
-			removerBrilho(obj)
-		end
-	end)
-end
-coroutine.resume(coroutine.create(GUN_ESP))
--- MURDERER ESP COM BEAM E HIGHLIGHT
-function SCRIPT_FZXM74_FAKESCRIPT()
-	local script = Instance.new('LocalScript')
-	script.Parent = MurdererESP
-	local toggle = false
-	
-	local highlights = {}
-	local beams = {}
-	
-	-- FUNÇÃO PARA VERIFICAR SE É MURDERER (VERIFICA TUDO)
-	local function isMurderer(plr)
-		if not plr then return false end
-		
-		-- VERIFICA BACKPACK
-		for _, item in pairs(plr:GetChildren()) do
-			if item.Name == "Backpack" then
-				for _, tool in pairs(item:GetChildren()) do
-					if tool.Name == "Knife" then
-						return true
-					end
-				end
-			end
-		end
-		
-		-- VERIFICA MÃO (CHARACTER)
-		if plr.Character then
-			for _, tool in pairs(plr.Character:GetChildren()) do
-				if tool:IsA("Tool") and tool.Name == "Knife" then
-					return true
-				end
-			end
-		end
-		
-		return false
-	end
-	
-	local function criarBeam(alvo)
-		if not alvo or not alvo.Character then return end
-		
-		local localChar = game.Players.LocalPlayer.Character
-		if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
-		if not alvo.Character:FindFirstChild("UpperTorso") then return end
-		
-		if beams[alvo] then
-			beams[alvo]:Destroy()
-			beams[alvo] = nil
-		end
-		
-		local at0 = Instance.new("Attachment")
-		at0.Parent = localChar.UpperTorso
-		
-		local at1 = Instance.new("Attachment")
-		at1.Parent = alvo.Character.UpperTorso
-		
-		local beam = Instance.new("Beam")
-		beam.Name = "MurdererBeam"
-		beam.Parent = localChar
-		beam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 25), Color3.fromRGB(255, 0, 25))
-		beam.FaceCamera = true
-		beam.Width0 = 0.2
-		beam.Width1 = 0.2
-		beam.Attachment0 = at0
-		beam.Attachment1 = at1
-		
-		beams[alvo] = beam
-	end
-	
-	local function criarChams(personagem, cor)
-		if not personagem then return end
-		
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-		
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "MurdererHighlight"
-		highlight.Parent = personagem
-		highlight.FillColor = cor
-		highlight.FillTransparency = 0.4
-		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-		highlight.OutlineTransparency = 0
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		
-		highlights[personagem] = highlight
-	end
-	
-	local function removerTudo(personagem)
-		if not personagem then return end
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-	end
-	
-	local function removerBeams()
-		for _, beam in pairs(beams) do
-			if beam then
-				beam:Destroy()
-			end
-		end
-		beams = {}
-	end
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if toggle == false then
-			toggle = true
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-		else
-			toggle = false
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-			removerBeams()
-		end
-		
-		while toggle do 
-			wait(0.1)
-			
-			local localChar = game.Players.LocalPlayer.Character
-			if not localChar then
-				wait(0.5)
-				continue
-			end
-			
-			removerBeams()
-			
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if not plr.Character or plr == game.Players.LocalPlayer then 
-					continue 
-				end
-				
-				if isMurderer(plr) then
-					criarChams(plr.Character, Color3.fromRGB(255, 0, 25))
-					criarBeam(plr)
-				else
-					removerTudo(plr.Character)
-				end
-			end
-		end
-		
-		while toggle == false do 
-			wait()
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if plr.Character then
-					removerTudo(plr.Character)
-				end
-			end
-			removerBeams()
-		end
-	end)
-end
-coroutine.resume(coroutine.create(SCRIPT_FZXM74_FAKESCRIPT))
-function SCRIPT_GVGT66_FAKESCRIPT() -- Noclip.Noclip 
-end
-coroutine.resume(coroutine.create(SCRIPT_GVGT66_FAKESCRIPT))
--- SHERRIF ESP COM BEAM E HIGHLIGHT
-function SCRIPT_CTQL79_FAKESCRIPT()
-	local script = Instance.new('LocalScript')
-	script.Parent = SherrifESP
-	local toggle = false
-	
-	local highlights = {}
-	local beams = {}
-	
-	local function isSherrif(plr)
-		if not plr then return false end
-		
-		-- VERIFICA BACKPACK
-		for _, item in pairs(plr:GetChildren()) do
-			if item.Name == "Backpack" then
-				for _, tool in pairs(item:GetChildren()) do
-					if tool.Name == "Gun" then
-						return true
-					end
-				end
-			end
-		end
-		
-		-- VERIFICA MÃO (CHARACTER)
-		if plr.Character then
-			for _, tool in pairs(plr.Character:GetChildren()) do
-				if tool:IsA("Tool") and tool.Name == "Gun" then
-					return true
-				end
-			end
-		end
-		
-		return false
-	end
-	
-	local function criarBeam(alvo)
-		if not alvo or not alvo.Character then return end
-		
-		local localChar = game.Players.LocalPlayer.Character
-		if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
-		if not alvo.Character:FindFirstChild("UpperTorso") then return end
-		
-		if beams[alvo] then
-			beams[alvo]:Destroy()
-			beams[alvo] = nil
-		end
-		
-		local at0 = Instance.new("Attachment")
-		at0.Parent = localChar.UpperTorso
-		
-		local at1 = Instance.new("Attachment")
-		at1.Parent = alvo.Character.UpperTorso
-		
-		local beam = Instance.new("Beam")
-		beam.Name = "SherrifBeam"
-		beam.Parent = localChar
-		beam.Color = ColorSequence.new(Color3.fromRGB(0, 50, 255), Color3.fromRGB(0, 50, 255))
-		beam.FaceCamera = true
-		beam.Width0 = 0.2
-		beam.Width1 = 0.2
-		beam.Attachment0 = at0
-		beam.Attachment1 = at1
-		
-		beams[alvo] = beam
-	end
-	
-	local function criarChams(personagem, cor)
-		if not personagem then return end
-		
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-		
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "SherrifHighlight"
-		highlight.Parent = personagem
-		highlight.FillColor = cor
-		highlight.FillTransparency = 0.4
-		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-		highlight.OutlineTransparency = 0
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		
-		highlights[personagem] = highlight
-	end
-	
-	local function removerTudo(personagem)
-		if not personagem then return end
-		if highlights[personagem] then
-			highlights[personagem]:Destroy()
-			highlights[personagem] = nil
-		end
-	end
-	
-	local function removerBeams()
-		for _, beam in pairs(beams) do
-			if beam then
-				beam:Destroy()
-			end
-		end
-		beams = {}
-	end
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if toggle == false then
-			toggle = true
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-		else
-			toggle = false
-			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-			removerBeams()
-		end
-		
-		while toggle do 
-			wait(0.1)
-			
-			local localChar = game.Players.LocalPlayer.Character
-			if not localChar then
-				wait(0.5)
-				continue
-			end
-			
-			removerBeams()
-			
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if not plr.Character or plr == game.Players.LocalPlayer then 
-					continue 
-				end
-				
-				if isSherrif(plr) then
-					criarChams(plr.Character, Color3.fromRGB(0, 50, 255))
-					criarBeam(plr)
-				else
-					removerTudo(plr.Character)
-				end
-			end
-		end
-		
-		while toggle == false do 
-			wait()
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if plr.Character then
-					removerTudo(plr.Character)
-				end
-			end
-			removerBeams()
-		end
-	end)
-end
-coroutine.resume(coroutine.create(SCRIPT_CTQL79_FAKESCRIPT))
-function SCRIPT_SUEV76_FAKESCRIPT() -- ShowNames.ShowNames 
-	local script = Instance.new('LocalScript')
-	script.Parent = ShowNames
-	local toggle = false
-	local db = false
-	
-	script.Parent.MouseButton1Click:Connect(function()
-		if toggle == false then
-			toggle = true
-			script.Parent.ActiveFrame.Visible = true
-		else
-			toggle = false
-			script.Parent.ActiveFrame.Visible = false
-		end
-		
-		
-		while db == false do wait(.25)
-			if toggle then
-				
-				if game.StarterPlayer.NameDisplayDistance ~= 100 then
-					game.StarterPlayer.NameDisplayDistance = 100
-					db = true
-				else
-					game.StarterPlayer.NameDisplayDistance = 0
-					db = false
-					toggle = false
-				end
-				
-			end
-		end
-			
-	end)
 
+local function desativarNamesESP()
+    espStates.Names = false
 end
-coroutine.resume(coroutine.create(SCRIPT_SUEV76_FAKESCRIPT))
-local function NAMES_ESP_DISTANCIA()
-	local script = Instance.new('LocalScript')
-	script.Parent = Main
-	
-	local names = {}
-	
-	local function criarNome(plr)
-		if not plr or not plr.Character then return end
-		if not plr.Character:FindFirstChild("Head") then return end
-		
-		if names[plr] then
-			names[plr]:Destroy()
-			names[plr] = nil
-		end
-		
-		local billboard = Instance.new("BillboardGui")
-		billboard.Name = "NameESP"
-		billboard.Parent = plr.Character
-		billboard.Adornee = plr.Character.Head
-		billboard.Size = UDim2.new(0, 200, 0, 50)
-		billboard.StudsOffset = Vector3.new(0, 2.5, 0)
-		billboard.AlwaysOnTop = true
-		
-		local frame = Instance.new("Frame")
-		frame.Parent = billboard
-		frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-		frame.BackgroundTransparency = 0.5
-		frame.BorderSizePixel = 1
-		frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
-		frame.Size = UDim2.new(1, 0, 1, 0)
-		
-		local nome = Instance.new("TextLabel")
-		nome.Name = "Nome"
-		nome.Parent = billboard
-		nome.BackgroundTransparency = 1
-		nome.Size = UDim2.new(1, 0, 0.6, 0)
-		nome.Position = UDim2.new(0, 0, 0, 0)
-		nome.Font = Enum.Font.GothamBold
-		nome.Text = plr.Name
-		nome.TextColor3 = Color3.fromRGB(255, 255, 255)
-		nome.TextSize = 16
-		nome.TextStrokeTransparency = 0.5
-		nome.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-		nome.TextScaled = true
-		
-		local distancia = Instance.new("TextLabel")
-		distancia.Name = "Distancia"
-		distancia.Parent = billboard
-		distancia.BackgroundTransparency = 1
-		distancia.Size = UDim2.new(1, 0, 0.4, 0)
-		distancia.Position = UDim2.new(0, 0, 0.6, 0)
-		distancia.Font = Enum.Font.Gotham
-		distancia.Text = "0m"
-		distancia.TextColor3 = Color3.fromRGB(200, 200, 200)
-		distancia.TextSize = 12
-		distancia.TextStrokeTransparency = 0.5
-		distancia.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-		distancia.TextScaled = true
-		
-		names[plr] = billboard
-	end
-	
-	local function removerNome(plr)
-		if names[plr] then
-			names[plr]:Destroy()
-			names[plr] = nil
-		end
-	end
-	
-	task.spawn(function()
-		while true do
-			wait(0.3)
-			
-			local localPlayer = game.Players.LocalPlayer
-			local localChar = localPlayer.Character
-			
-			for _, plr in pairs(game.Players:GetPlayers()) do
-				if plr == localPlayer then 
-					removerNome(plr)
-					continue 
-				end
-				
-				if plr.Character and plr.Character:FindFirstChild("Head") then
-					if not names[plr] then
-						criarNome(plr)
-					end
-					
-					local distLabel = names[plr] and names[plr]:FindFirstChild("Distancia")
-					if distLabel and localChar and localChar:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("HumanoidRootPart") then
-						local dist = (localChar.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-						distLabel.Text = math.floor(dist) .. "m"
-					end
-					
-					local nomeLabel = names[plr] and names[plr]:FindFirstChild("Nome")
-					if nomeLabel then
-						local isMurderer = false
-						local isSherrif = false
-						
-						for _, item in pairs(plr:GetChildren()) do
-							if item.Name == "Backpack" then
-								for _, tool in pairs(item:GetChildren()) do
-									if tool.Name == "Knife" then isMurderer = true end
-									if tool.Name == "Gun" then isSherrif = true end
-								end
-							end
-						end
-						
-						if isMurderer then
-							nomeLabel.TextColor3 = Color3.fromRGB(255, 0, 25)
-						elseif isSherrif then
-							nomeLabel.TextColor3 = Color3.fromRGB(0, 50, 255)
-						else
-							nomeLabel.TextColor3 = Color3.fromRGB(0, 255, 50)
-						end
-					end
-				else
-					removerNome(plr)
-				end
-			end
-		end
-	end)
-end
-coroutine.resume(coroutine.create(NAMES_ESP_DISTANCIA))
-function SCRIPT_BKLO89_FAKESCRIPT() -- TPtoLobby.TPLobby 
-	local script = Instance.new('LocalScript')
-	script.Parent = TPtoLobby
-	script.Parent.MouseButton1Click:Connect(function()
-		
-		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-108.5, 145, 0.6)
-		
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_BKLO89_FAKESCRIPT))
-function SCRIPT_XMKA81_FAKESCRIPT() -- TPtoMap.TPtoMap 
-	local script = Instance.new('LocalScript')
-	script.Parent = TPtoMap
-	script.Parent.MouseButton1Click:Connect(function()	
-		local Workplace = workspace:GetChildren()
-		
-		for i, Thing in pairs(Workplace) do
-		
-		    local ThingChildren = Thing:GetChildren()
-		    for i, Child in pairs(ThingChildren) do
-		        if Child.Name == "Spawns" then
-		           
-		           game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Child.Spawn.CFrame
-		
-		        end
-		    end
-		end
-	end)
+-- ////////////////////////////////////////////////////////////
+--  6. GUN GRABBER (MANUAL)
+-- ////////////////////////////////////////////////////////////
 
+local function gunGrabber()
+    local char = Player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    
+    local currentPos = hrp.CFrame
+    local gunDrop = nil
+    
+    local mapas = {
+        "Bank2", "BioLab", "Factory", "Hospital3", "Hotel",
+        "House2", "Mansion2", "MilBase", "Office3", "PoliceStation",
+        "ResearchFacility", "Workplace"
+    }
+    
+    for _, nome in pairs(mapas) do
+        local mapa = workspace:FindFirstChild(nome)
+        if mapa then
+            gunDrop = mapa:FindFirstChild("GunDrop")
+            if gunDrop then break end
+        end
+    end
+    
+    if not gunDrop then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj.Name == "GunDrop" then
+                local parent = obj.Parent
+                if parent and not parent:FindFirstChild("Humanoid") then
+                    gunDrop = obj
+                    break
+                end
+            end
+        end
+    end
+    
+    if gunDrop then
+        hrp.CFrame = gunDrop.CFrame
+        task.wait()
+        hrp.CFrame = currentPos
+        Obsidian:Notify({
+            Title = "🔫 Gun Grabber",
+            Content = "Arma pegada com sucesso!",
+            Duration = 2,
+        })
+    else
+        Obsidian:Notify({
+            Title = "❌ Gun Grabber",
+            Content = "Nenhuma arma no chão!",
+            Duration = 2,
+        })
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_XMKA81_FAKESCRIPT))
-function SCRIPT_KCFZ83_FAKESCRIPT() -- TPtoMuderer.TPtoMuderer 
-	local script = Instance.new('LocalScript')
-	script.Parent = TPtoMuderer
-	script.Parent.MouseButton1Click:Connect(function()	
-		local Players = game:GetService("Players")			
-		for i, player in pairs(Players:GetPlayers()) do
-			
-		    local bp = player.Backpack:GetChildren()
-		    for i, tool in pairs(bp) do
-		        if tool.Name == "Knife" then
-												
-			    	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[tool.Parent.Parent.Name].Character.HumanoidRootPart.CFrame
-			
-				end
-			end
-		
-		end
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_KCFZ83_FAKESCRIPT))
-function SCRIPT_AGFB74_FAKESCRIPT() -- TPtoPlayer.TPtoPlayer 
-	local script = Instance.new('LocalScript')
-	script.Parent = TPtoPlayer
-	script.Parent.MouseButton1Click:Connect(function()	
-	
-		local Victim = script.Parent.Parent.PlayerName.Text
-		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[Victim].Character.HumanoidRootPart.CFrame 
-	
-	end)
+-- ////////////////////////////////////////////////////////////
+--  7. AUTO GUN GRABBER (NOVO!)
+-- ////////////////////////////////////////////////////////////
 
+local function autoGunGrabber()
+    local char = Player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    
+    local currentPos = hrp.CFrame
+    local gunDrop = nil
+    
+    local mapas = {
+        "Bank2", "BioLab", "Factory", "Hospital3", "Hotel",
+        "House2", "Mansion2", "MilBase", "Office3", "PoliceStation",
+        "ResearchFacility", "Workplace"
+    }
+    
+    for _, nome in pairs(mapas) do
+        local mapa = workspace:FindFirstChild(nome)
+        if mapa then
+            gunDrop = mapa:FindFirstChild("GunDrop")
+            if gunDrop then break end
+        end
+    end
+    
+    if not gunDrop then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj.Name == "GunDrop" then
+                local parent = obj.Parent
+                if parent and not parent:FindFirstChild("Humanoid") then
+                    gunDrop = obj
+                    break
+                end
+            end
+        end
+    end
+    
+    if gunDrop then
+        hrp.CFrame = gunDrop.CFrame
+        task.wait()
+        hrp.CFrame = currentPos
+        return true
+    end
+    return false
 end
-coroutine.resume(coroutine.create(SCRIPT_AGFB74_FAKESCRIPT))
-function SCRIPT_HFLO69_FAKESCRIPT() -- TPtoSherrif.TPtoSherrif 
-	local script = Instance.new('LocalScript')
-	script.Parent = TPtoSherrif
-	script.Parent.MouseButton1Click:Connect(function()	
-		local Players = game:GetService("Players")			
-		for i, player in pairs(Players:GetPlayers()) do
-			
-		    local bp = player.Backpack:GetChildren()
-		    for i, tool in pairs(bp) do
-		        if tool.Name == "Gun" then
-												
-			    	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players[tool.Parent.Parent.Name].Character.HumanoidRootPart.CFrame
-			
-				end
-			end
-		
-		end
-	end)
 
+-- LOOP DO AUTO GUN GRABBER
+local function iniciarAutoGun()
+    autoGun = true
+    task.spawn(function()
+        while autoGun do
+            task.wait(0.5)
+            if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                local success = autoGunGrabber()
+                if success then
+                    Obsidian:Notify({
+                        Title = "🤖 Auto Gun",
+                        Content = "Arma pegada automaticamente!",
+                        Duration = 1,
+                    })
+                end
+            end
+        end
+    end)
 end
-coroutine.resume(coroutine.create(SCRIPT_HFLO69_FAKESCRIPT))
-function SCRIPT_QSMY75_FAKESCRIPT() -- Walkspeed.Walkspeed 
-	local script = Instance.new('LocalScript')
-	script.Parent = Walkspeed
-	script.Parent.MouseButton1Down:connect(function()	
-		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = script.Parent.Parent.WSInput.Text	
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_QSMY75_FAKESCRIPT))
-function SCRIPT_OPBW78_FAKESCRIPT() -- JumpPower.JumpPower 
-	local script = Instance.new('LocalScript')
-	script.Parent = JumpPower
-	script.Parent.MouseButton1Down:connect(function()	
-		game.Players.LocalPlayer.Character.Humanoid.JumpPower = script.Parent.Parent.JPInput.Text	
-	end)
+-- ////////////////////////////////////////////////////////////
+--  8. FLY
+-- ////////////////////////////////////////////////////////////
 
+local function toggleFly()
+    flying = not flying
+    
+    if flying then
+        Obsidian:Notify({
+            Title = "✈️ Fly",
+            Content = "Ativado! (WASD + Espaço)",
+            Duration = 2,
+        })
+        
+        local char = Player.Character
+        if not char then return end
+        
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local bg = Instance.new("BodyGyro", hrp)
+        bg.P = 9e4
+        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bg.cframe = hrp.CFrame
+        
+        local bv = Instance.new("BodyVelocity", hrp)
+        bv.velocity = Vector3.new(0, 0.1, 0)
+        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        
+        hrp._flyGyro = bg
+        hrp._flyVelocity = bv
+        
+        task.spawn(function()
+            local keys = {W = false, A = false, S = false, D = false, Space = false}
+            
+            local function onKeyDown(key)
+                if key == "w" then keys.W = true end
+                if key == "a" then keys.A = true end
+                if key == "s" then keys.S = true end
+                if key == "d" then keys.D = true end
+                if key == " " then keys.Space = true end
+            end
+            
+            local function onKeyUp(key)
+                if key == "w" then keys.W = false end
+                if key == "a" then keys.A = false end
+                if key == "s" then keys.S = false end
+                if key == "d" then keys.D = false end
+                if key == " " then keys.Space = false end
+            end
+            
+            game:GetService("UserInputService").InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Keyboard then
+                    onKeyDown(string.lower(input.KeyCode.Name))
+                end
+            end)
+            
+            game:GetService("UserInputService").InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Keyboard then
+                    onKeyUp(string.lower(input.KeyCode.Name))
+                end
+            end)
+            
+            while flying and hrp and hrp.Parent do
+                task.wait()
+                
+                local cam = workspace.CurrentCamera
+                local moveDirection = Vector3.new()
+                
+                if keys.W then moveDirection = moveDirection + cam.CFrame.LookVector end
+                if keys.S then moveDirection = moveDirection - cam.CFrame.LookVector end
+                if keys.A then moveDirection = moveDirection - cam.CFrame.RightVector end
+                if keys.D then moveDirection = moveDirection + cam.CFrame.RightVector end
+                if keys.Space then moveDirection = moveDirection + Vector3.new(0, 1, 0) end
+                
+                if moveDirection.Magnitude > 0 then
+                    moveDirection = moveDirection.Unit * 50
+                    hrp._flyVelocity.velocity = moveDirection
+                else
+                    hrp._flyVelocity.velocity = Vector3.new(0, 0.1, 0)
+                end
+                
+                hrp._flyGyro.cframe = cam.CFrame
+            end
+        end)
+    else
+        Obsidian:Notify({
+            Title = "✈️ Fly",
+            Content = "Desativado!",
+            Duration = 1,
+        })
+        
+        local char = Player.Character
+        if not char then return end
+        
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            if hrp:FindFirstChild("_flyGyro") then
+                hrp._flyGyro:Destroy()
+            end
+            if hrp:FindFirstChild("_flyVelocity") then
+                hrp._flyVelocity:Destroy()
+            end
+        end
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_OPBW78_FAKESCRIPT))
-function SCRIPT_MVXU65_FAKESCRIPT() -- WSReset.WSReset 
-	local script = Instance.new('LocalScript')
-	script.Parent = WSReset
-	script.Parent.MouseButton1Down:connect(function()	
-		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
-		script.Parent.Parent.WSInput.Text = ""	
-	end)
 
-end
-coroutine.resume(coroutine.create(SCRIPT_MVXU65_FAKESCRIPT))
-function SCRIPT_PMUA78_FAKESCRIPT() -- JPReset.JPReset 
-	local script = Instance.new('LocalScript')
-	script.Parent = JPReset
-	script.Parent.MouseButton1Down:connect(function()	
-		game.Players.LocalPlayer.Character.Humanoid.JumpPower = 48
-		script.Parent.Parent.JPInput.Text = ""
-	end)
+-- ////////////////////////////////////////////////////////////
+--  9. NOCLIP
+-- ////////////////////////////////////////////////////////////
 
+local function toggleNoclip()
+    noclip = not noclip
+    
+    if noclip then
+        Obsidian:Notify({
+            Title = "🚀 Noclip",
+            Content = "Ativado! (Tecla B)",
+            Duration = 2,
+        })
+    else
+        Obsidian:Notify({
+            Title = "🚀 Noclip",
+            Content = "Desativado!",
+            Duration = 2,
+        })
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_PMUA78_FAKESCRIPT))
-function SCRIPT_HGEW74_FAKESCRIPT() -- Main.Auto Positioning 
-	local script = Instance.new('LocalScript')
-	script.Parent = Main
-	script.Parent.Parent.Position  = UDim2.new(1, -350, 1, 0)
-	script:Destroy()
 
+game:GetService("RunService").Stepped:Connect(function()
+    if noclip and Player.Character then
+        for _, part in pairs(Player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.B then
+        toggleNoclip()
+    end
+end)
+
+-- ////////////////////////////////////////////////////////////
+--  10. WALKSPEED E JUMPPOWER
+-- ////////////////////////////////////////////////////////////
+
+local function setWalkSpeed(value)
+    local char = Player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.WalkSpeed = tonumber(value) or 16
+    end
 end
-coroutine.resume(coroutine.create(SCRIPT_HGEW74_FAKESCRIPT))
+
+local function setJumpPower(value)
+    local char = Player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.JumpPower = tonumber(value) or 50
+    end
+end
+
+local function resetWalkSpeed()
+    local char = Player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.WalkSpeed = 16
+    end
+end
+
+local function resetJumpPower()
+    local char = Player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.JumpPower = 50
+    end
+end
+
+-- ////////////////////////////////////////////////////////////
+--  11. TELEPORTS
+-- ////////////////////////////////////////////////////////////
+
+local function tpToLobby()
+    local char = Player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(-108.5, 145, 0.6)
+    end
+end
+
+local function tpToMap()
+    local char = Player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    
+    for _, thing in pairs(workspace:GetChildren()) do
+        for _, child in pairs(thing:GetChildren()) do
+            if child.Name == "Spawns" and child:FindFirstChild("Spawn") then
+                char.HumanoidRootPart.CFrame = child.Spawn.CFrame
+                return
+            end
+        end
+    end
+end
+
+local function tpToMurderer()
+    local char = Player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if isMurderer(plr) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
+            return
+        end
+    end
+    Obsidian:Notify({
+        Title = "❌ TP",
+        Content = "Nenhum assassino encontrado!",
+        Duration = 2,
+    })
+end
+
+local function tpToSherrif()
+    local char = Player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if isSherrif(plr) and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
+            return
+        end
+    end
+    Obsidian:Notify({
+        Title = "❌ TP",
+        Content = "Nenhum xerife encontrado!",
+        Duration = 2,
+    })
+end
+
+local function tpToPlayer(nome)
+    local char = Player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Name == nome and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
+            return
+        end
+    end
+    Obsidian:Notify({
+        Title = "❌ TP",
+        Content = "Jogador '" .. nome .. "' não encontrado!",
+        Duration = 2,
+    })
+end
+
+-- ////////////////////////////////////////////////////////////
+--  CONSTRUÇÃO DA UI
+-- ////////////////////////////////////////////////////////////
+
+-- ESP SECTION
+local EspSection = EspTab:AddSection({ Title = "ESP Controls" })
+
+EspSection:AddToggle({
+    Title = "Murderer ESP",
+    Description = "Mostra o assassino em vermelho",
+    Default = true,
+    Callback = function(Value)
+        if Value then ativarMurdererESP() else desativarMurdererESP() end
+    end
+})
+
+EspSection:AddToggle({
+    Title = "Sherrif ESP",
+    Description = "Mostra o xerife em azul",
+    Default = true,
+    Callback = function(Value)
+        if Value then ativarSherrifESP() else desativarSherrifESP() end
+    end
+})
+
+EspSection:AddToggle({
+    Title = "Innocent ESP",
+    Description = "Mostra os inocentes em verde",
+    Default = true,
+    Callback = function(Value)
+        if Value then ativarInnocentESP() else desativarInnocentESP() end
+    end
+})
+
+EspSection:AddToggle({
+    Title = "Gun ESP",
+    Description = "Mostra a arma no chão em verde",
+    Default = true,
+    Callback = function(Value)
+        if Value then ativarGunESP() else desativarGunESP() end
+    end
+})
+
+EspSection:AddToggle({
+    Title = "Names ESP",
+    Description = "Mostra o nome dos jogadores",
+    Default = true,
+    Callback = function(Value)
+        if Value then ativarNamesESP() else desativarNamesESP() end
+    end
+})
+
+-- ESP CONFIGS
+local ConfigSection = EspTab:AddSection({ Title = "ESP Configs" })
+
+ConfigSection:AddColorpicker({
+    Title = "ESP Color",
+    Description = "Cor do ESP",
+    Default = Settings.EspColor,
+    Callback = function(Value)
+        Settings.EspColor = Value
+    end
+})
+
+ConfigSection:AddSlider({
+    Title = "ESP Transparency",
+    Description = "Transparência do ESP",
+    Default = 0.4,
+    Min = 0,
+    Max = 1,
+    Rounding = 2,
+    Callback = function(Value)
+        Settings.EspTransparency = Value
+    end
+})
+
+ConfigSection:AddToggle({
+    Title = "Rainbow ESP",
+    Description = "ESP com cores do arco-íris",
+    Default = false,
+    Callback = function(Value)
+        Settings.EspRainbow = Value
+    end
+})
+
+-- OUTLINE SECTION
+local OutlineSection = EspTab:AddSection({ Title = "Outline (Borda)" })
+
+OutlineSection:AddToggle({
+    Title = "Enable Outline",
+    Description = "Ativa a borda preta separada do ESP",
+    Default = true,
+    Callback = function(Value)
+        Settings.OutlineEnabled = Value
+    end
+})
+
+OutlineSection:AddColorpicker({
+    Title = "Outline Color",
+    Description = "Cor da borda",
+    Default = Settings.OutlineColor,
+    Callback = function(Value)
+        Settings.OutlineColor = Value
+    end
+})
+
+OutlineSection:AddToggle({
+    Title = "Rainbow Outline",
+    Description = "Borda com cores do arco-íris",
+    Default = false,
+    Callback = function(Value)
+        Settings.OutlineRainbow = Value
+    end
+})
+
+OutlineSection:AddSlider({
+    Title = "Outline Transparency",
+    Description = "Transparência da borda",
+    Default = 0,
+    Min = 0,
+    Max = 1,
+    Rounding = 2,
+    Callback = function(Value)
+        Settings.OutlineTransparency = Value
+    end
+})
+
+-- MOVEMENT SECTION
+local MovementSection = MovementTab:AddSection({ Title = "Movement" })
+
+MovementSection:AddToggle({
+    Title = "Fly",
+    Description = "Ativa o fly (WASD + Espaço)",
+    Default = false,
+    Callback = function(Value)
+        if Value then toggleFly() end
+    end
+})
+
+MovementSection:AddToggle({
+    Title = "Noclip",
+    Description = "Ativa o noclip (Tecla B)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            noclip = true
+            Obsidian:Notify({
+                Title = "🚀 Noclip",
+                Content = "Ativado! (Tecla B)",
+                Duration = 2,
+            })
+        else
+            noclip = false
+            Obsidian:Notify({
+                Title = "🚀 Noclip",
+                Content = "Desativado!",
+                Duration = 2,
+            })
+        end
+    end
+})
+
+MovementSection:AddInput({
+    Title = "WalkSpeed",
+    Description = "Digite o valor (padrão: 16)",
+    Default = "16",
+    Callback = function(Value)
+        setWalkSpeed(Value)
+    end
+})
+
+MovementSection:AddButton({
+    Title = "Reset WalkSpeed",
+    Description = "Volta para 16",
+    Callback = resetWalkSpeed
+})
+
+MovementSection:AddInput({
+    Title = "JumpPower",
+    Description = "Digite o valor (padrão: 50)",
+    Default = "50",
+    Callback = function(Value)
+        setJumpPower(Value)
+    end
+})
+
+MovementSection:AddButton({
+    Title = "Reset JumpPower",
+    Description = "Volta para 50",
+    Callback = resetJumpPower
+})
+
+-- TELEPORT SECTION
+local TeleportSection = TeleportTab:AddSection({ Title = "Teleports" })
+
+TeleportSection:AddButton({
+    Title = "TP to Lobby",
+    Description = "Teleporta para o lobby",
+    Callback = tpToLobby
+})
+
+TeleportSection:AddButton({
+    Title = "TP to Map",
+    Description = "Teleporta para o mapa",
+    Callback = tpToMap
+})
+
+TeleportSection:AddButton({
+    Title = "TP to Murderer",
+    Description = "Teleporta para o assassino",
+    Callback = tpToMurderer
+})
+
+TeleportSection:AddButton({
+    Title = "TP to Sherrif",
+    Description = "Teleporta para o xerife",
+    Callback = tpToSherrif
+})
+
+-- MISC SECTION
+local MiscSection = MiscTab:AddSection({ Title = "Misc" })
+
+-- GUN GRABBER MANUAL
+MiscSection:AddButton({
+    Title = "🔫 Gun Grabber (Manual)",
+    Description = "Teleporta para a arma no chão",
+    Callback = gunGrabber
+})
+
+-- AUTO GUN GRABBER
+MiscSection:AddToggle({
+    Title = "🤖 Auto Gun Grabber",
+    Description = "Pega a arma automaticamente quando cair",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            autoGun = true
+            iniciarAutoGun()
+            Obsidian:Notify({
+                Title = "🤖 Auto Gun",
+                Content = "Ativado! Pegando arma automaticamente.",
+                Duration = 2,
+            })
+        else
+            autoGun = false
+            Obsidian:Notify({
+                Title = "🤖 Auto Gun",
+                Content = "Desativado!",
+                Duration = 2,
+            })
+        end
+    end
+})
+
+-- TP TO PLAYER
+MiscSection:AddInput({
+    Title = "Player Name",
+    Description = "Digite o nome do jogador",
+    Default = "",
+    Callback = function(Value)
+        _G.TargetPlayer = Value
+    end
+})
+
+MiscSection:AddButton({
+    Title = "TP to Player",
+    Description = "Teleporta para o jogador digitado",
+    Callback = function()
+        if _G.TargetPlayer and _G.TargetPlayer ~= "" then
+            tpToPlayer(_G.TargetPlayer)
+        else
+            Obsidian:Notify({
+                Title = "❌ Erro",
+                Content = "Digite um nome de jogador primeiro!",
+                Duration = 2,
+            })
+        end
+    end
+})
+
+-- ////////////////////////////////////////////////////////////
+--  INICIALIZAÇÃO
+-- ////////////////////////////////////////////////////////////
+
+-- ATIVA TODOS OS ESPs
+ativarMurdererESP()
+ativarSherrifESP()
+ativarInnocentESP()
+ativarGunESP()
+ativarNamesESP()
+
+-- NOTIFICAÇÃO
+Obsidian:Notify({
+    Title = "🔥 Vynixu's MM2 Script",
+    Content = "Todos os ESPs ativados! Use a UI para configurar.",
+    Duration = 5,
+})
+
+print("✅ SCRIPT COMPLETO CARREGADO - OBSIDIAN EDITION")
+print("🔴 Murderer ESP: ATIVADO")
+print("🔵 Sherrif ESP: ATIVADO")
+print("🟢 Innocent ESP: ATIVADO")
+print("🟢 Gun ESP: ATIVADO")
+print("📛 Names ESP: ATIVADO")
+print("🚀 Noclip: Tecla B")
+print("🤖 Auto Gun Grabber: DESATIVADO (toggle na UI)")

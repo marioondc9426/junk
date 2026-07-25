@@ -1372,48 +1372,10 @@ function SCRIPT_MMKD76_FAKESCRIPT() -- GunDropGrabber.GunDropGrabber
 	
 	-- LISTA DE TODOS OS MAPAS DO MM2
 	local mapas = {
-		"Bank2", "BioLab", "Factory", "Hospital3", "Hotel2",
+		"Bank2", "BioLab", "Factory", "Hospital3", "Hotel",
 		"House2", "Mansion2", "MilBase", "Office3", "PoliceStation",
 		"ResearchFacility", "Workplace"
 	}
-	
-	-- VARIÁVEL PARA GUARDAR O MAPA ATUAL
-	local mapaAtual = nil
-	
-	-- FUNÇÃO PARA ENCONTRAR O MAPA ATUAL
-	local function getMapaAtual()
-		-- PROCURA EM TODOS OS MAPAS
-		for _, nome in pairs(mapas) do
-			if workspace:FindFirstChild(nome) then
-				mapaAtual = nome
-				return mapaAtual
-			end
-		end
-		return nil
-	end
-	
-	-- FUNÇÃO PARA VERIFICAR SE O MAPA MUDOU
-	local function verificarMapa()
-		if mapaAtual and workspace:FindFirstChild(mapaAtual) then
-			return mapaAtual -- AINDA É O MESMO MAPA
-		else
-			return getMapaAtual() -- MAPA MUDOU, PROCURA NOVO
-		end
-	end
-	
-	-- QUANDO O JOGADOR ENTRA NO JOGO (OU MAPA MUDA)
-	game.Players.LocalPlayer.CharacterAdded:Connect(function()
-		-- ESPERA O MAPA CARREGAR
-		task.wait(1)
-		getMapaAtual() -- ATUALIZA O CACHE
-	end)
-	
-	-- VERIFICA O MAPA A CADA 5 SEGUNDOS (MANTÉM O CACHE ATUALIZADO)
-	task.spawn(function()
-		while task.wait(5) do
-			verificarMapa()
-		end
-	end)
 	
 	script.Parent.MouseButton1Click:Connect(function()
 		local char = game.Players.LocalPlayer.Character
@@ -1421,23 +1383,29 @@ function SCRIPT_MMKD76_FAKESCRIPT() -- GunDropGrabber.GunDropGrabber
 		if not hrp then return end
 		
 		local currentPos = hrp.CFrame
+		local gunDrop = nil
 		
-		-- VERIFICA SE O MAPA AINDA É O MESMO
-		local mapaNome = verificarMapa()
-		
-		if not mapaNome then
-			local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
-			if errorLabel then
-				errorLabel.Text = "Map not found!"
-				task.wait(1.5)
-				errorLabel.Text = ""
+		-- PROCURA EM TODOS OS MAPAS
+		for _, nome in pairs(mapas) do
+			local mapa = workspace:FindFirstChild(nome)
+			if mapa then
+				gunDrop = mapa:FindFirstChild("GunDrop")
+				if gunDrop then break end
 			end
-			return
 		end
 		
-		-- PROCURA O GunDrop DENTRO DO MAPA ATUAL
-		local mapa = workspace[mapaNome]
-		local gunDrop = mapa and mapa:FindFirstChild("GunDrop")
+		-- FALLBACK: PROCURA EM TODO WORKSPACE
+		if not gunDrop then
+			for _, obj in pairs(workspace:GetDescendants()) do
+				if obj.Name == "GunDrop" then
+					local parent = obj.Parent
+					if parent and not parent:FindFirstChild("Humanoid") then
+						gunDrop = obj
+						break
+					end
+				end
+			end
+		end
 		
 		if gunDrop then
 			hrp.CFrame = gunDrop.CFrame
@@ -1451,36 +1419,11 @@ function SCRIPT_MMKD76_FAKESCRIPT() -- GunDropGrabber.GunDropGrabber
 				errorLabel.Text = ""
 			end
 		else
-			-- SE NÃO ACHOU, TENTA PROCURAR EM TODOS OS MAPAS
-			for _, nome in pairs(mapas) do
-				local mapaTemp = workspace:FindFirstChild(nome)
-				if mapaTemp then
-					gunDrop = mapaTemp:FindFirstChild("GunDrop")
-					if gunDrop then
-						mapaAtual = nome
-						break
-					end
-				end
-			end
-			
-			if gunDrop then
-				hrp.CFrame = gunDrop.CFrame
-				task.wait()
-				hrp.CFrame = currentPos
-				
-				local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
-				if errorLabel then
-					errorLabel.Text = "Gun grabbed! ✅"
-					task.wait(1)
-					errorLabel.Text = ""
-				end
-			else
-				local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
-				if errorLabel then
-					errorLabel.Text = "No gun on the ground!"
-					task.wait(1.5)
-					errorLabel.Text = ""
-				end
+			local errorLabel = script.Parent.Parent.Parent:FindFirstChild("ErrorLabel")
+			if errorLabel then
+				errorLabel.Text = "No gun on the ground!"
+				task.wait(1.5)
+				errorLabel.Text = ""
 			end
 		end
 	end)
@@ -1519,474 +1462,492 @@ function SCRIPT_MOWM88_FAKESCRIPT() -- KillAll.KillAll
 
 end
 coroutine.resume(coroutine.create(SCRIPT_MOWM88_FAKESCRIPT))
--- MURDERER ESP COM CHAMS
--- MURDERER ESP COM CHAMS
--- MURDERER ESP COM HIGHLIGHT (CHAMS VERDADEIRO)
+-- INNOCENT ESP (NÃO CONFLITA COM MURDERER/SHERRIF)
+local function INNOCENT_ESP()
+	local script = Instance.new('LocalScript')
+	script.Parent = Main
+	
+	local highlights = {}
+	
+	local function criarChams(personagem, cor)
+		if not personagem then return end
+		
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+		
+		-- VERIFICA SE JÁ TEM MURDERER OU SHERRIF
+		for _, child in pairs(personagem:GetChildren()) do
+			if child:IsA("Highlight") then
+				if child.Name == "MurdererHighlight" or child.Name == "SherrifHighlight" then
+					return
+				end
+			end
+		end
+		
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "InnocentHighlight"
+		highlight.Parent = personagem
+		highlight.FillColor = cor
+		highlight.FillTransparency = 0.4
+		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+		highlight.OutlineTransparency = 0
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		
+		highlights[personagem] = highlight
+	end
+	
+	local function removerChams(personagem)
+		if not personagem then return end
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+	end
+	
+	local function isInnocent(plr)
+		if not plr or not plr.Character then return false end
+		if plr == game.Players.LocalPlayer then return false end
+		
+		-- VERIFICA BACKPACK
+		for _, item in pairs(plr:GetChildren()) do
+			if item.Name == "Backpack" then
+				for _, tool in pairs(item:GetChildren()) do
+					if tool.Name == "Knife" then return false end
+					if tool.Name == "Gun" then return false end
+				end
+			end
+		end
+		
+		-- VERIFICA MÃO (CHARACTER)
+		if plr.Character then
+			for _, tool in pairs(plr.Character:GetChildren()) do
+				if tool:IsA("Tool") then
+					if tool.Name == "Knife" then return false end
+					if tool.Name == "Gun" then return false end
+				end
+			end
+		end
+		
+		return true
+	end
+	
+	task.spawn(function()
+		while true do
+			wait(0.5)
+			
+			local localPlayer = game.Players.LocalPlayer
+			if not localPlayer.Character then
+				wait(1)
+				continue
+			end
+			
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if not plr.Character or plr == localPlayer then continue end
+				
+				local temPrioridade = false
+				for _, child in pairs(plr.Character:GetChildren()) do
+					if child:IsA("Highlight") then
+						if child.Name == "MurdererHighlight" or child.Name == "SherrifHighlight" then
+							temPrioridade = true
+							break
+						end
+					end
+				end
+				
+				if isInnocent(plr) and not temPrioridade then
+					criarChams(plr.Character, Color3.fromRGB(0, 255, 50))
+				else
+					removerChams(plr.Character)
+				end
+			end
+		end
+	end)
+end
+coroutine.resume(coroutine.create(INNOCENT_ESP))
+-- GUN ESP (HIGHLIGHT NA GUNDROP)
+local function GUN_ESP()
+	local script = Instance.new('LocalScript')
+	script.Parent = Main
+	
+	local highlights = {}
+	
+	local function criarBrilho(gunDrop)
+		if not gunDrop then return end
+		if highlights[gunDrop] then
+			highlights[gunDrop]:Destroy()
+			highlights[gunDrop] = nil
+		end
+		
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "GunHighlight"
+		highlight.Parent = gunDrop
+		highlight.FillColor = Color3.fromRGB(0, 255, 50)
+		highlight.FillTransparency = 0.4
+		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+		highlight.OutlineTransparency = 0
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		
+		highlights[gunDrop] = highlight
+	end
+	
+	local function removerBrilho(gunDrop)
+		if not gunDrop then return end
+		if highlights[gunDrop] then
+			highlights[gunDrop]:Destroy()
+			highlights[gunDrop] = nil
+		end
+	end
+	
+	local function isGunDropOnGround(gunDrop)
+		if not gunDrop then return false end
+		local parent = gunDrop.Parent
+		if not parent then return false end
+		
+		local isPlayer = false
+		local check = parent
+		while check do
+			if check:FindFirstChild("Humanoid") then
+				isPlayer = true
+				break
+			end
+			check = check.Parent
+		end
+		return not isPlayer
+	end
+	
+	task.spawn(function()
+		while true do
+			wait(0.5)
+			for _, obj in pairs(workspace:GetDescendants()) do
+				if obj.Name == "GunDrop" and isGunDropOnGround(obj) then
+					criarBrilho(obj)
+				end
+			end
+		end
+	end)
+	
+	workspace.DescendantAdded:Connect(function(obj)
+		if obj.Name == "GunDrop" then
+			wait(0.1)
+			if isGunDropOnGround(obj) then
+				criarBrilho(obj)
+			end
+		end
+	end)
+	
+	workspace.DescendantRemoving:Connect(function(obj)
+		if obj.Name == "GunDrop" then
+			removerBrilho(obj)
+		end
+	end)
+end
+coroutine.resume(coroutine.create(GUN_ESP))
 -- MURDERER ESP COM BEAM E HIGHLIGHT
 function SCRIPT_FZXM74_FAKESCRIPT()
-    local script = Instance.new('LocalScript')
-    script.Parent = MurdererESP
-    local toggle = false
-    
-    local highlights = {}
-    local beams = {}
-    
-    -- FUNÇÃO PARA CRIAR BEAM
-    local function criarBeam(alvo)
-        if not alvo or not alvo.Character then return end
-        
-        local localChar = game.Players.LocalPlayer.Character
-        if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
-        if not alvo.Character:FindFirstChild("UpperTorso") then return end
-        
-        -- REMOVE BEAM ANTIGO
-        if beams[alvo] then
-            beams[alvo]:Destroy()
-            beams[alvo] = nil
-        end
-        
-        -- CRIA ATTACHMENTS
-        local at0 = Instance.new("Attachment")
-        at0.Parent = localChar.UpperTorso
-        
-        local at1 = Instance.new("Attachment")
-        at1.Parent = alvo.Character.UpperTorso
-        
-        -- CRIA BEAM VERMELHO
-        local beam = Instance.new("Beam")
-        beam.Name = "MurdererBeam"
-        beam.Parent = localChar
-        beam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 25), Color3.fromRGB(255, 0, 25))
-        beam.FaceCamera = true
-        beam.Width0 = 0.2
-        beam.Width1 = 0.2
-        beam.Attachment0 = at0
-        beam.Attachment1 = at1
-        
-        beams[alvo] = beam
-    end
-    
-    -- FUNÇÃO PARA CRIAR HIGHLIGHT
-    local function criarChams(personagem, cor)
-        if not personagem then return end
-        
-        -- REMOVE HIGHLIGHT ANTIGO
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-        
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "MurdererHighlight"
-        highlight.Parent = personagem
-        highlight.FillColor = cor
-        highlight.FillTransparency = 0.4
-        highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-        highlight.OutlineTransparency = 0
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        
-        highlights[personagem] = highlight
-    end
-    
-    -- FUNÇÃO PARA REMOVER TUDO
-    local function removerTudo(personagem)
-        if not personagem then return end
-        
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-    end
-    
-    -- FUNÇÃO PARA REMOVER BEAMS
-    local function removerBeams()
-        for _, beam in pairs(beams) do
-            if beam then
-                beam:Destroy()
-            end
-        end
-        beams = {}
-    end
-    
-    script.Parent.MouseButton1Click:Connect(function()
-        if toggle == false then
-            toggle = true
-            script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-        else
-            toggle = false
-            script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-            removerBeams()
-        end
-        
-        while toggle do 
-            wait(0.1)
-            
-            local localChar = game.Players.LocalPlayer.Character
-            if not localChar then
-                wait(0.5)
-                continue
-            end
-            
-            -- LIMPA BEAMS ANTIGOS
-            removerBeams()
-            
-            for _, plr in pairs(game.Players:GetPlayers()) do
-                if not plr.Character or plr == game.Players.LocalPlayer then 
-                    continue 
-                end
-                
-                -- VERIFICA SE É MURDERER
-                local isMurderer = false
-                for _, bp in pairs(plr:GetChildren()) do
-                    if bp.Name == "Backpack" and bp:FindFirstChild("Knife") then
-                        isMurderer = true
-                        break
-                    end
-                end
-                
-                if isMurderer then
-                    criarChams(plr.Character, Color3.fromRGB(255, 0, 25))
-                    criarBeam(plr)
-                else
-                    removerTudo(plr.Character)
-                end
-            end
-        end
-        
-        while toggle == false do 
-            wait()
-            for _, plr in pairs(game.Players:GetPlayers()) do
-                if plr.Character then
-                    removerTudo(plr.Character)
-                end
-            end
-            removerBeams()
-        end
-    end)
+	local script = Instance.new('LocalScript')
+	script.Parent = MurdererESP
+	local toggle = false
+	
+	local highlights = {}
+	local beams = {}
+	
+	-- FUNÇÃO PARA VERIFICAR SE É MURDERER (VERIFICA TUDO)
+	local function isMurderer(plr)
+		if not plr then return false end
+		
+		-- VERIFICA BACKPACK
+		for _, item in pairs(plr:GetChildren()) do
+			if item.Name == "Backpack" then
+				for _, tool in pairs(item:GetChildren()) do
+					if tool.Name == "Knife" then
+						return true
+					end
+				end
+			end
+		end
+		
+		-- VERIFICA MÃO (CHARACTER)
+		if plr.Character then
+			for _, tool in pairs(plr.Character:GetChildren()) do
+				if tool:IsA("Tool") and tool.Name == "Knife" then
+					return true
+				end
+			end
+		end
+		
+		return false
+	end
+	
+	local function criarBeam(alvo)
+		if not alvo or not alvo.Character then return end
+		
+		local localChar = game.Players.LocalPlayer.Character
+		if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
+		if not alvo.Character:FindFirstChild("UpperTorso") then return end
+		
+		if beams[alvo] then
+			beams[alvo]:Destroy()
+			beams[alvo] = nil
+		end
+		
+		local at0 = Instance.new("Attachment")
+		at0.Parent = localChar.UpperTorso
+		
+		local at1 = Instance.new("Attachment")
+		at1.Parent = alvo.Character.UpperTorso
+		
+		local beam = Instance.new("Beam")
+		beam.Name = "MurdererBeam"
+		beam.Parent = localChar
+		beam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 25), Color3.fromRGB(255, 0, 25))
+		beam.FaceCamera = true
+		beam.Width0 = 0.2
+		beam.Width1 = 0.2
+		beam.Attachment0 = at0
+		beam.Attachment1 = at1
+		
+		beams[alvo] = beam
+	end
+	
+	local function criarChams(personagem, cor)
+		if not personagem then return end
+		
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+		
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "MurdererHighlight"
+		highlight.Parent = personagem
+		highlight.FillColor = cor
+		highlight.FillTransparency = 0.4
+		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+		highlight.OutlineTransparency = 0
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		
+		highlights[personagem] = highlight
+	end
+	
+	local function removerTudo(personagem)
+		if not personagem then return end
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+	end
+	
+	local function removerBeams()
+		for _, beam in pairs(beams) do
+			if beam then
+				beam:Destroy()
+			end
+		end
+		beams = {}
+	end
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		if toggle == false then
+			toggle = true
+			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
+		else
+			toggle = false
+			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
+			removerBeams()
+		end
+		
+		while toggle do 
+			wait(0.1)
+			
+			local localChar = game.Players.LocalPlayer.Character
+			if not localChar then
+				wait(0.5)
+				continue
+			end
+			
+			removerBeams()
+			
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if not plr.Character or plr == game.Players.LocalPlayer then 
+					continue 
+				end
+				
+				if isMurderer(plr) then
+					criarChams(plr.Character, Color3.fromRGB(255, 0, 25))
+					criarBeam(plr)
+				else
+					removerTudo(plr.Character)
+				end
+			end
+		end
+		
+		while toggle == false do 
+			wait()
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if plr.Character then
+					removerTudo(plr.Character)
+				end
+			end
+			removerBeams()
+		end
+	end)
 end
 coroutine.resume(coroutine.create(SCRIPT_FZXM74_FAKESCRIPT))
 function SCRIPT_GVGT66_FAKESCRIPT() -- Noclip.Noclip 
 end
 coroutine.resume(coroutine.create(SCRIPT_GVGT66_FAKESCRIPT))
--- SHERRIF ESP COM CHAMS
--- SHERRIF ESP COM CHAMS
--- SHERRIF ESP COM HIGHLIGHT (CHAMS VERDADEIRO)
 -- SHERRIF ESP COM BEAM E HIGHLIGHT
 function SCRIPT_CTQL79_FAKESCRIPT()
-    local script = Instance.new('LocalScript')
-    script.Parent = SherrifESP
-    local toggle = false
-    
-    local highlights = {}
-    local beams = {}
-    
-    local function criarBeam(alvo)
-        if not alvo or not alvo.Character then return end
-        
-        local localChar = game.Players.LocalPlayer.Character
-        if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
-        if not alvo.Character:FindFirstChild("UpperTorso") then return end
-        
-        if beams[alvo] then
-            beams[alvo]:Destroy()
-            beams[alvo] = nil
-        end
-        
-        local at0 = Instance.new("Attachment")
-        at0.Parent = localChar.UpperTorso
-        
-        local at1 = Instance.new("Attachment")
-        at1.Parent = alvo.Character.UpperTorso
-        
-        local beam = Instance.new("Beam")
-        beam.Name = "SherrifBeam"
-        beam.Parent = localChar
-        beam.Color = ColorSequence.new(Color3.fromRGB(0, 50, 255), Color3.fromRGB(0, 50, 255))
-        beam.FaceCamera = true
-        beam.Width0 = 0.2
-        beam.Width1 = 0.2
-        beam.Attachment0 = at0
-        beam.Attachment1 = at1
-        
-        beams[alvo] = beam
-    end
-    
-    local function criarChams(personagem, cor)
-        if not personagem then return end
-        
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-        
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "SherrifHighlight"
-        highlight.Parent = personagem
-        highlight.FillColor = cor
-        highlight.FillTransparency = 0.4
-        highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-        highlight.OutlineTransparency = 0
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        
-        highlights[personagem] = highlight
-    end
-    
-    local function removerTudo(personagem)
-        if not personagem then return end
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-    end
-    
-    local function removerBeams()
-        for _, beam in pairs(beams) do
-            if beam then
-                beam:Destroy()
-            end
-        end
-        beams = {}
-    end
-    
-    script.Parent.MouseButton1Click:Connect(function()
-        if toggle == false then
-            toggle = true
-            script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
-        else
-            toggle = false
-            script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
-            removerBeams()
-        end
-        
-        while toggle do 
-            wait(0.1)
-            
-            local localChar = game.Players.LocalPlayer.Character
-            if not localChar then
-                wait(0.5)
-                continue
-            end
-            
-            removerBeams()
-            
-            for _, plr in pairs(game.Players:GetPlayers()) do
-                if not plr.Character or plr == game.Players.LocalPlayer then 
-                    continue 
-                end
-                
-                local isSherrif = false
-                for _, bp in pairs(plr:GetChildren()) do
-                    if bp.Name == "Backpack" and bp:FindFirstChild("Gun") then
-                        isSherrif = true
-                        break
-                    end
-                end
-                
-                if isSherrif then
-                    criarChams(plr.Character, Color3.fromRGB(0, 50, 255))
-                    criarBeam(plr)
-                else
-                    removerTudo(plr.Character)
-                end
-            end
-        end
-        
-        while toggle == false do 
-            wait()
-            for _, plr in pairs(game.Players:GetPlayers()) do
-                if plr.Character then
-                    removerTudo(plr.Character)
-                end
-            end
-            removerBeams()
-        end
-    end)
+	local script = Instance.new('LocalScript')
+	script.Parent = SherrifESP
+	local toggle = false
+	
+	local highlights = {}
+	local beams = {}
+	
+	local function isSherrif(plr)
+		if not plr then return false end
+		
+		-- VERIFICA BACKPACK
+		for _, item in pairs(plr:GetChildren()) do
+			if item.Name == "Backpack" then
+				for _, tool in pairs(item:GetChildren()) do
+					if tool.Name == "Gun" then
+						return true
+					end
+				end
+			end
+		end
+		
+		-- VERIFICA MÃO (CHARACTER)
+		if plr.Character then
+			for _, tool in pairs(plr.Character:GetChildren()) do
+				if tool:IsA("Tool") and tool.Name == "Gun" then
+					return true
+				end
+			end
+		end
+		
+		return false
+	end
+	
+	local function criarBeam(alvo)
+		if not alvo or not alvo.Character then return end
+		
+		local localChar = game.Players.LocalPlayer.Character
+		if not localChar or not localChar:FindFirstChild("UpperTorso") then return end
+		if not alvo.Character:FindFirstChild("UpperTorso") then return end
+		
+		if beams[alvo] then
+			beams[alvo]:Destroy()
+			beams[alvo] = nil
+		end
+		
+		local at0 = Instance.new("Attachment")
+		at0.Parent = localChar.UpperTorso
+		
+		local at1 = Instance.new("Attachment")
+		at1.Parent = alvo.Character.UpperTorso
+		
+		local beam = Instance.new("Beam")
+		beam.Name = "SherrifBeam"
+		beam.Parent = localChar
+		beam.Color = ColorSequence.new(Color3.fromRGB(0, 50, 255), Color3.fromRGB(0, 50, 255))
+		beam.FaceCamera = true
+		beam.Width0 = 0.2
+		beam.Width1 = 0.2
+		beam.Attachment0 = at0
+		beam.Attachment1 = at1
+		
+		beams[alvo] = beam
+	end
+	
+	local function criarChams(personagem, cor)
+		if not personagem then return end
+		
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+		
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "SherrifHighlight"
+		highlight.Parent = personagem
+		highlight.FillColor = cor
+		highlight.FillTransparency = 0.4
+		highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
+		highlight.OutlineTransparency = 0
+		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		
+		highlights[personagem] = highlight
+	end
+	
+	local function removerTudo(personagem)
+		if not personagem then return end
+		if highlights[personagem] then
+			highlights[personagem]:Destroy()
+			highlights[personagem] = nil
+		end
+	end
+	
+	local function removerBeams()
+		for _, beam in pairs(beams) do
+			if beam then
+				beam:Destroy()
+			end
+		end
+		beams = {}
+	end
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		if toggle == false then
+			toggle = true
+			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 25)
+		else
+			toggle = false
+			script.Parent.Underline.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
+			removerBeams()
+		end
+		
+		while toggle do 
+			wait(0.1)
+			
+			local localChar = game.Players.LocalPlayer.Character
+			if not localChar then
+				wait(0.5)
+				continue
+			end
+			
+			removerBeams()
+			
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if not plr.Character or plr == game.Players.LocalPlayer then 
+					continue 
+				end
+				
+				if isSherrif(plr) then
+					criarChams(plr.Character, Color3.fromRGB(0, 50, 255))
+					criarBeam(plr)
+				else
+					removerTudo(plr.Character)
+				end
+			end
+		end
+		
+		while toggle == false do 
+			wait()
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if plr.Character then
+					removerTudo(plr.Character)
+				end
+			end
+			removerBeams()
+		end
+	end)
 end
 coroutine.resume(coroutine.create(SCRIPT_CTQL79_FAKESCRIPT))
--- INNOCENT ESP (ATIVA AUTOMATICAMENTE)
--- INNOCENT ESP (NÃO CONFLITA COM MURDERER/SHERRIF)
--- INNOCENT ESP (NÃO CONFLITA)
-local function INNOCENT_ESP()
-    local script = Instance.new('LocalScript')
-    script.Parent = Main
-    
-    local highlights = {}
-    
-    local function criarChams(personagem, cor)
-        if not personagem then return end
-        
-        -- REMOVE HIGHLIGHT DE INOCENTE ANTIGO
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-        
-        -- CRIA HIGHLIGHT
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "InnocentHighlight"
-        highlight.Parent = personagem
-        highlight.FillColor = cor
-        highlight.FillTransparency = 0.4
-        highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-        highlight.OutlineTransparency = 0
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        
-        highlights[personagem] = highlight
-    end
-    
-    local function removerChams(personagem)
-        if not personagem then return end
-        if highlights[personagem] then
-            highlights[personagem]:Destroy()
-            highlights[personagem] = nil
-        end
-    end
-    
-    local function isInnocent(plr)
-        if not plr or not plr.Character then return false end
-        if plr == game.Players.LocalPlayer then return false end
-        
-        for _, bp in pairs(plr:GetChildren()) do
-            if bp.Name == "Backpack" then
-                if bp:FindFirstChild("Knife") then return false end
-                if bp:FindFirstChild("Gun") then return false end
-            end
-        end
-        return true
-    end
-    
-    -- REMOVE INOCENTE SE TIVER MURDERER OU SHERRIF
-    local function limparInocentes()
-        for _, plr in pairs(game.Players:GetPlayers()) do
-            if plr.Character then
-                local temMurderer = false
-                local temSherrif = false
-                for _, child in pairs(plr.Character:GetChildren()) do
-                    if child:IsA("Highlight") then
-                        if child.Name == "MurdererHighlight" then temMurderer = true end
-                        if child.Name == "SherrifHighlight" then temSherrif = true end
-                    end
-                end
-                if temMurderer or temSherrif then
-                    removerChams(plr.Character)
-                end
-            end
-        end
-    end
-    
-    task.spawn(function()
-        while true do
-            wait(0.5)
-            
-            local localPlayer = game.Players.LocalPlayer
-            if not localPlayer.Character then
-                wait(1)
-                continue
-            end
-            
-            for _, plr in pairs(game.Players:GetPlayers()) do
-                if not plr.Character or plr == localPlayer then continue end
-                
-                -- VERIFICA SE JÁ TEM HIGHLIGHT DE MURDERER OU SHERRIF
-                local temOutro = false
-                for _, child in pairs(plr.Character:GetChildren()) do
-                    if child:IsA("Highlight") and 
-                       (child.Name == "MurdererHighlight" or child.Name == "SherrifHighlight") then
-                        temOutro = true
-                        break
-                    end
-                end
-                
-                if isInnocent(plr) and not temOutro then
-                    criarChams(plr.Character, Color3.fromRGB(0, 255, 50))
-                elseif not isInnocent(plr) then
-                    removerChams(plr.Character)
-                end
-            end
-            
-            limparInocentes()
-        end
-    end)
-end
-coroutine.resume(coroutine.create(INNOCENT_ESP))
--- GUN ESP (HIGHLIGHT NA GUNDROP)
-local function GUN_ESP()
-    local script = Instance.new('LocalScript')
-    script.Parent = Main
-    
-    local highlights = {}
-    
-    local function criarBrilho(gunDrop)
-        if not gunDrop then return end
-        if highlights[gunDrop] then
-            highlights[gunDrop]:Destroy()
-            highlights[gunDrop] = nil
-        end
-        
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "GunHighlight"
-        highlight.Parent = gunDrop
-        highlight.FillColor = Color3.fromRGB(0, 255, 50)
-        highlight.FillTransparency = 0.3
-        highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-        highlight.OutlineTransparency = 0
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        
-        highlights[gunDrop] = highlight
-    end
-    
-    local function removerBrilho(gunDrop)
-        if not gunDrop then return end
-        if highlights[gunDrop] then
-            highlights[gunDrop]:Destroy()
-            highlights[gunDrop] = nil
-        end
-    end
-    
-    local function isGunDropOnGround(gunDrop)
-        if not gunDrop then return false end
-        local parent = gunDrop.Parent
-        if not parent then return false end
-        
-        local isPlayer = false
-        local check = parent
-        while check do
-            if check:FindFirstChild("Humanoid") then
-                isPlayer = true
-                break
-            end
-            check = check.Parent
-        end
-        return not isPlayer
-    end
-    
-    task.spawn(function()
-        while true do
-            wait(0.5)
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if obj.Name == "GunDrop" and isGunDropOnGround(obj) then
-                    criarBrilho(obj)
-                end
-            end
-        end
-    end)
-    
-    workspace.DescendantAdded:Connect(function(obj)
-        if obj.Name == "GunDrop" then
-            wait(0.1)
-            if isGunDropOnGround(obj) then
-                criarBrilho(obj)
-            end
-        end
-    end)
-    
-    workspace.DescendantRemoving:Connect(function(obj)
-        if obj.Name == "GunDrop" then
-            removerBrilho(obj)
-        end
-    end)
-end
-coroutine.resume(coroutine.create(GUN_ESP))
 function SCRIPT_SUEV76_FAKESCRIPT() -- ShowNames.ShowNames 
 	local script = Instance.new('LocalScript')
 	script.Parent = ShowNames
@@ -2022,6 +1983,201 @@ function SCRIPT_SUEV76_FAKESCRIPT() -- ShowNames.ShowNames
 
 end
 coroutine.resume(coroutine.create(SCRIPT_SUEV76_FAKESCRIPT))
+-- NAMES ESP (SEM BACKGROUND, NOME MENOR, ATUALIZAÇÃO RÁPIDA)
+-- NAMES ESP (TODOS OS NOMES APARECEM)
+local function NAMES_ESP_DISTANCIA()
+	local script = Instance.new('LocalScript')
+	script.Parent = Main
+	
+	local names = {}
+	
+	local function criarNome(plr)
+		if not plr or not plr.Character then return end
+		
+		local head = plr.Character:FindFirstChild("Head")
+		if not head then return end
+		
+		if names[plr] then
+			names[plr]:Destroy()
+			names[plr] = nil
+		end
+		
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "NameESP"
+		billboard.Parent = head -- <--- PARENT DIRETO NA CABEÇA
+		billboard.Adornee = head
+		billboard.Size = UDim2.new(0, 150, 0, 40) -- UM POUCO MAIOR PRA CABER
+		billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.MaxDistance = 5000 -- <--- MOSTRA DE LONGE
+		billboard.ClipsDescendants = false -- <--- NÃO CORTA O TEXTO
+		
+		-- NOME (SEM FUNDO)
+		local nome = Instance.new("TextLabel")
+		nome.Name = "Nome"
+		nome.Parent = billboard
+		nome.BackgroundTransparency = 1
+		nome.Size = UDim2.new(1, 0, 0.6, 0)
+		nome.Position = UDim2.new(0, 0, 0, 0)
+		nome.Font = Enum.Font.GothamBold
+		nome.Text = plr.Name
+		nome.TextColor3 = Color3.fromRGB(255, 255, 255)
+		nome.TextSize = 14
+		nome.TextStrokeTransparency = 0
+		nome.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+		nome.TextScaled = false
+		nome.ClipsDescendants = false
+		
+		-- DISTÂNCIA (SEM FUNDO)
+		local distancia = Instance.new("TextLabel")
+		distancia.Name = "Distancia"
+		distancia.Parent = billboard
+		distancia.BackgroundTransparency = 1
+		distancia.Size = UDim2.new(1, 0, 0.4, 0)
+		distancia.Position = UDim2.new(0, 0, 0.6, 0)
+		distancia.Font = Enum.Font.Gotham
+		distancia.Text = "0m"
+		distancia.TextColor3 = Color3.fromRGB(200, 200, 200)
+		distancia.TextSize = 12
+		distancia.TextStrokeTransparency = 0
+		distancia.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+		distancia.TextScaled = false
+		distancia.ClipsDescendants = false
+		
+		names[plr] = billboard
+		
+		-- DEBUG (OPCIONAL)
+		-- print("✅ Nome criado para: " .. plr.Name)
+	end
+	
+	local function removerNome(plr)
+		if names[plr] then
+			names[plr]:Destroy()
+			names[plr] = nil
+		end
+	end
+	
+	-- FUNÇÃO PARA ATUALIZAR COR DO NOME
+	local function atualizarCor(plr)
+		local billboard = names[plr]
+		if not billboard then return end
+		
+		local nomeLabel = billboard:FindFirstChild("Nome")
+		if not nomeLabel then return end
+		
+		local isMurderer = false
+		local isSherrif = false
+		
+		-- VERIFICA BACKPACK
+		for _, item in pairs(plr:GetChildren()) do
+			if item.Name == "Backpack" then
+				for _, tool in pairs(item:GetChildren()) do
+					if tool.Name == "Knife" then isMurderer = true end
+					if tool.Name == "Gun" then isSherrif = true end
+				end
+			end
+		end
+		
+		-- VERIFICA MÃO
+		if plr.Character then
+			for _, tool in pairs(plr.Character:GetChildren()) do
+				if tool:IsA("Tool") then
+					if tool.Name == "Knife" then isMurderer = true end
+					if tool.Name == "Gun" then isSherrif = true end
+				end
+			end
+		end
+		
+		if isMurderer then
+			nomeLabel.TextColor3 = Color3.fromRGB(255, 0, 25)
+		elseif isSherrif then
+			nomeLabel.TextColor3 = Color3.fromRGB(0, 50, 255)
+		else
+			nomeLabel.TextColor3 = Color3.fromRGB(0, 255, 50)
+		end
+	end
+	
+	-- FUNÇÃO PARA ATUALIZAR DISTÂNCIA
+	local function atualizarDistancia(plr)
+		local billboard = names[plr]
+		if not billboard then return end
+		
+		local distLabel = billboard:FindFirstChild("Distancia")
+		if not distLabel then return end
+		
+		local localPlayer = game.Players.LocalPlayer
+		local localChar = localPlayer and localPlayer.Character
+		if not localChar then return end
+		
+		local hrp = localChar:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+		
+		local plrHrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+		if not plrHrp then return end
+		
+		local dist = (hrp.Position - plrHrp.Position).Magnitude
+		distLabel.Text = math.floor(dist) .. "m"
+	end
+	
+	-- QUANDO UM JOGADOR ENTRA
+	game.Players.PlayerAdded:Connect(function(plr)
+		plr.CharacterAdded:Connect(function()
+			task.wait(0.5)
+			if plr.Character and plr.Character:FindFirstChild("Head") then
+				criarNome(plr)
+			end
+		end)
+	end)
+	
+	-- QUANDO UM JOGADOR SAI
+	game.Players.PlayerRemoving:Connect(function(plr)
+		removerNome(plr)
+	end)
+	
+	-- CRIA NOMES PARA TODOS OS JOGADORES EXISTENTES
+	for _, plr in pairs(game.Players:GetPlayers()) do
+		if plr ~= game.Players.LocalPlayer then
+			if plr.Character and plr.Character:FindFirstChild("Head") then
+				criarNome(plr)
+			end
+		end
+	end
+	
+	-- LOOP PRINCIPAL (ATUALIZAÇÃO RÁPIDA)
+	task.spawn(function()
+		while true do
+			task.wait(0.015) -- 60 FPS
+			
+			local localPlayer = game.Players.LocalPlayer
+			if not localPlayer then continue end
+			
+			for _, plr in pairs(game.Players:GetPlayers()) do
+				if plr == localPlayer then 
+					removerNome(plr)
+					continue 
+				end
+				
+				-- SE O JOGADOR TEM CHARACTER E HEAD
+				if plr.Character and plr.Character:FindFirstChild("Head") then
+					-- CRIA O NOME SE NÃO EXISTIR
+					if not names[plr] then
+						criarNome(plr)
+					end
+					
+					-- ATUALIZA DISTÂNCIA
+					atualizarDistancia(plr)
+					
+					-- ATUALIZA COR
+					atualizarCor(plr)
+				else
+					-- REMOVE O NOME SE O JOGADOR MORREU
+					removerNome(plr)
+				end
+			end
+		end
+	end)
+end
+coroutine.resume(coroutine.create(NAMES_ESP_DISTANCIA))
 function SCRIPT_BKLO89_FAKESCRIPT() -- TPtoLobby.TPLobby 
 	local script = Instance.new('LocalScript')
 	script.Parent = TPtoLobby
