@@ -1,16 +1,18 @@
 -- ////////////////////////////////////////////////////////////
 --  VYNIXU'S MM2 SCRIPT - OBSIDIAN EDITION
---  COM AUTO GUN GRABBER
+--  COM SAVEMANAGER INTEGRADO
 -- ////////////////////////////////////////////////////////////
 
--- CARREGAR OBSIDIAN
-local Obsidian = loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-obsidian/obsidian/main/source.lua"))()
+-- CARREGAR OBSIDIAN E SAVEMANAGER
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 -- ////////////////////////////////////////////////////////////
 --  CRIAÇÃO DA UI
 -- ////////////////////////////////////////////////////////////
 
-local Window = Obsidian:CreateWindow({
+local Window = Library:CreateWindow({
     Title = "Vynixu's MM2 Script",
     SubTitle = "Obsidian Edition",
     Theme = "Dark",
@@ -18,10 +20,28 @@ local Window = Obsidian:CreateWindow({
 })
 
 -- ABAS
-local EspTab = Window:AddTab({ Title = "ESP", Icon = "eye" })
-local MovementTab = Window:AddTab({ Title = "Movement", Icon = "run" })
-local TeleportTab = Window:AddTab({ Title = "Teleport", Icon = "map-marker" })
-local MiscTab = Window:AddTab({ Title = "Misc", Icon = "cog" })
+local EspTab = Window:AddTab("ESP", "eye")
+local MovementTab = Window:AddTab("Movement", "run")
+local TeleportTab = Window:AddTab("Teleport", "map-marker")
+local MiscTab = Window:AddTab("Misc", "cog")
+local ConfigTab = Window:AddTab("Config", "settings")
+
+-- ////////////////////////////////////////////////////////////
+--  CONFIGURAÇÃO DO SAVEMANAGER
+-- ////////////////////////////////////////////////////////////
+
+-- CONFIGURA O SAVEMANAGER
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+SaveManager:SetFolder("VynixuMM2Script")
+SaveManager:SetSubFolder("Configs")
+
+-- CRIA A SEÇÃO DE CONFIGURAÇÃO NA ABA "Config"
+SaveManager:BuildConfigSection(ConfigTab)
+
+-- CARREGA A CONFIGURAÇÃO AUTOMÁTICA
+SaveManager:LoadAutoloadConfig()
 
 -- ////////////////////////////////////////////////////////////
 --  VARIÁVEIS GLOBAIS
@@ -29,14 +49,13 @@ local MiscTab = Window:AddTab({ Title = "Misc", Icon = "cog" })
 
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local Tracers = {}
 local Highlights = {}
 local Outlines = {}
 local flying = false
 local noclip = false
 local autoGun = false
 
--- ESTADOS DOS ESPs (TODOS ATIVADOS POR PADRÃO)
+-- ESTADOS DOS ESPs
 local espStates = {
     Murderer = true,
     Sherrif = true,
@@ -389,7 +408,7 @@ local function desativarNamesESP()
 end
 
 -- ////////////////////////////////////////////////////////////
---  6. GUN GRABBER (MANUAL)
+--  6. GUN GRABBER
 -- ////////////////////////////////////////////////////////////
 
 local function gunGrabber()
@@ -430,28 +449,20 @@ local function gunGrabber()
         hrp.CFrame = gunDrop.CFrame
         task.wait()
         hrp.CFrame = currentPos
-        Obsidian:Notify({
-            Title = "🔫 Gun Grabber",
-            Content = "Arma pegada com sucesso!",
-            Duration = 2,
-        })
+        Library:Notify("🔫 Gun Grabber", "Arma pegada com sucesso!", 2)
     else
-        Obsidian:Notify({
-            Title = "❌ Gun Grabber",
-            Content = "Nenhuma arma no chão!",
-            Duration = 2,
-        })
+        Library:Notify("❌ Gun Grabber", "Nenhuma arma no chão!", 2)
     end
 end
 
 -- ////////////////////////////////////////////////////////////
---  7. AUTO GUN GRABBER (NOVO!)
+--  7. AUTO GUN GRABBER
 -- ////////////////////////////////////////////////////////////
 
 local function autoGunGrabber()
     local char = Player.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
+    if not hrp then return false end
     
     local currentPos = hrp.CFrame
     local gunDrop = nil
@@ -491,7 +502,6 @@ local function autoGunGrabber()
     return false
 end
 
--- LOOP DO AUTO GUN GRABBER
 local function iniciarAutoGun()
     autoGun = true
     task.spawn(function()
@@ -500,11 +510,7 @@ local function iniciarAutoGun()
             if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 local success = autoGunGrabber()
                 if success then
-                    Obsidian:Notify({
-                        Title = "🤖 Auto Gun",
-                        Content = "Arma pegada automaticamente!",
-                        Duration = 1,
-                    })
+                    Library:Notify("🤖 Auto Gun", "Arma pegada automaticamente!", 1)
                 end
             end
         end
@@ -519,11 +525,7 @@ local function toggleFly()
     flying = not flying
     
     if flying then
-        Obsidian:Notify({
-            Title = "✈️ Fly",
-            Content = "Ativado! (WASD + Espaço)",
-            Duration = 2,
-        })
+        Library:Notify("✈️ Fly", "Ativado! (WASD + Espaço)", 2)
         
         local char = Player.Character
         if not char then return end
@@ -562,13 +564,13 @@ local function toggleFly()
                 if key == " " then keys.Space = false end
             end
             
-            game:GetService("UserInputService").InputBegan:Connect(function(input)
+            UserInputService.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Keyboard then
                     onKeyDown(string.lower(input.KeyCode.Name))
                 end
             end)
             
-            game:GetService("UserInputService").InputEnded:Connect(function(input)
+            UserInputService.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Keyboard then
                     onKeyUp(string.lower(input.KeyCode.Name))
                 end
@@ -597,11 +599,7 @@ local function toggleFly()
             end
         end)
     else
-        Obsidian:Notify({
-            Title = "✈️ Fly",
-            Content = "Desativado!",
-            Duration = 1,
-        })
+        Library:Notify("✈️ Fly", "Desativado!", 1)
         
         local char = Player.Character
         if not char then return end
@@ -626,17 +624,9 @@ local function toggleNoclip()
     noclip = not noclip
     
     if noclip then
-        Obsidian:Notify({
-            Title = "🚀 Noclip",
-            Content = "Ativado! (Tecla B)",
-            Duration = 2,
-        })
+        Library:Notify("🚀 Noclip", "Ativado! (Tecla B)", 2)
     else
-        Obsidian:Notify({
-            Title = "🚀 Noclip",
-            Content = "Desativado!",
-            Duration = 2,
-        })
+        Library:Notify("🚀 Noclip", "Desativado!", 1)
     end
 end
 
@@ -723,11 +713,7 @@ local function tpToMurderer()
             return
         end
     end
-    Obsidian:Notify({
-        Title = "❌ TP",
-        Content = "Nenhum assassino encontrado!",
-        Duration = 2,
-    })
+    Library:Notify("❌ TP", "Nenhum assassino encontrado!", 2)
 end
 
 local function tpToSherrif()
@@ -740,11 +726,7 @@ local function tpToSherrif()
             return
         end
     end
-    Obsidian:Notify({
-        Title = "❌ TP",
-        Content = "Nenhum xerife encontrado!",
-        Duration = 2,
-    })
+    Library:Notify("❌ TP", "Nenhum xerife encontrado!", 2)
 end
 
 local function tpToPlayer(nome)
@@ -757,21 +739,21 @@ local function tpToPlayer(nome)
             return
         end
     end
-    Obsidian:Notify({
-        Title = "❌ TP",
-        Content = "Jogador '" .. nome .. "' não encontrado!",
-        Duration = 2,
-    })
+    Library:Notify("❌ TP", "Jogador '" .. nome .. "' não encontrado!", 2)
 end
 
 -- ////////////////////////////////////////////////////////////
 --  CONSTRUÇÃO DA UI
 -- ////////////////////////////////////////////////////////////
 
--- ESP SECTION
-local EspSection = EspTab:AddSection({ Title = "ESP Controls" })
+-- ////////////////////////////////////////////////////////////
+--  ESP TAB
+-- ////////////////////////////////////////////////////////////
 
-EspSection:AddToggle({
+-- GROUPBOX: ESP CONTROLS
+local EspGroupbox = EspTab:AddGroupbox("ESP Controls")
+
+EspGroupbox:AddToggle({
     Title = "Murderer ESP",
     Description = "Mostra o assassino em vermelho",
     Default = true,
@@ -780,7 +762,7 @@ EspSection:AddToggle({
     end
 })
 
-EspSection:AddToggle({
+EspGroupbox:AddToggle({
     Title = "Sherrif ESP",
     Description = "Mostra o xerife em azul",
     Default = true,
@@ -789,7 +771,7 @@ EspSection:AddToggle({
     end
 })
 
-EspSection:AddToggle({
+EspGroupbox:AddToggle({
     Title = "Innocent ESP",
     Description = "Mostra os inocentes em verde",
     Default = true,
@@ -798,7 +780,7 @@ EspSection:AddToggle({
     end
 })
 
-EspSection:AddToggle({
+EspGroupbox:AddToggle({
     Title = "Gun ESP",
     Description = "Mostra a arma no chão em verde",
     Default = true,
@@ -807,7 +789,7 @@ EspSection:AddToggle({
     end
 })
 
-EspSection:AddToggle({
+EspGroupbox:AddToggle({
     Title = "Names ESP",
     Description = "Mostra o nome dos jogadores",
     Default = true,
@@ -816,10 +798,10 @@ EspSection:AddToggle({
     end
 })
 
--- ESP CONFIGS
-local ConfigSection = EspTab:AddSection({ Title = "ESP Configs" })
+-- GROUPBOX: ESP CONFIGS
+local ConfigGroupbox = EspTab:AddGroupbox("ESP Configs")
 
-ConfigSection:AddColorpicker({
+ConfigGroupbox:AddColorpicker({
     Title = "ESP Color",
     Description = "Cor do ESP",
     Default = Settings.EspColor,
@@ -828,7 +810,7 @@ ConfigSection:AddColorpicker({
     end
 })
 
-ConfigSection:AddSlider({
+ConfigGroupbox:AddSlider({
     Title = "ESP Transparency",
     Description = "Transparência do ESP",
     Default = 0.4,
@@ -840,7 +822,7 @@ ConfigSection:AddSlider({
     end
 })
 
-ConfigSection:AddToggle({
+ConfigGroupbox:AddToggle({
     Title = "Rainbow ESP",
     Description = "ESP com cores do arco-íris",
     Default = false,
@@ -849,10 +831,10 @@ ConfigSection:AddToggle({
     end
 })
 
--- OUTLINE SECTION
-local OutlineSection = EspTab:AddSection({ Title = "Outline (Borda)" })
+-- GROUPBOX: OUTLINE
+local OutlineGroupbox = EspTab:AddGroupbox("Outline (Borda)")
 
-OutlineSection:AddToggle({
+OutlineGroupbox:AddToggle({
     Title = "Enable Outline",
     Description = "Ativa a borda preta separada do ESP",
     Default = true,
@@ -861,7 +843,7 @@ OutlineSection:AddToggle({
     end
 })
 
-OutlineSection:AddColorpicker({
+OutlineGroupbox:AddColorpicker({
     Title = "Outline Color",
     Description = "Cor da borda",
     Default = Settings.OutlineColor,
@@ -870,7 +852,7 @@ OutlineSection:AddColorpicker({
     end
 })
 
-OutlineSection:AddToggle({
+OutlineGroupbox:AddToggle({
     Title = "Rainbow Outline",
     Description = "Borda com cores do arco-íris",
     Default = false,
@@ -879,7 +861,7 @@ OutlineSection:AddToggle({
     end
 })
 
-OutlineSection:AddSlider({
+OutlineGroupbox:AddSlider({
     Title = "Outline Transparency",
     Description = "Transparência da borda",
     Default = 0,
@@ -891,10 +873,13 @@ OutlineSection:AddSlider({
     end
 })
 
--- MOVEMENT SECTION
-local MovementSection = MovementTab:AddSection({ Title = "Movement" })
+-- ////////////////////////////////////////////////////////////
+--  MOVEMENT TAB
+-- ////////////////////////////////////////////////////////////
 
-MovementSection:AddToggle({
+local MovementGroupbox = MovementTab:AddGroupbox("Movement")
+
+MovementGroupbox:AddToggle({
     Title = "Fly",
     Description = "Ativa o fly (WASD + Espaço)",
     Default = false,
@@ -903,30 +888,22 @@ MovementSection:AddToggle({
     end
 })
 
-MovementSection:AddToggle({
+MovementGroupbox:AddToggle({
     Title = "Noclip",
     Description = "Ativa o noclip (Tecla B)",
     Default = false,
     Callback = function(Value)
         if Value then
             noclip = true
-            Obsidian:Notify({
-                Title = "🚀 Noclip",
-                Content = "Ativado! (Tecla B)",
-                Duration = 2,
-            })
+            Library:Notify("🚀 Noclip", "Ativado! (Tecla B)", 2)
         else
             noclip = false
-            Obsidian:Notify({
-                Title = "🚀 Noclip",
-                Content = "Desativado!",
-                Duration = 2,
-            })
+            Library:Notify("🚀 Noclip", "Desativado!", 1)
         end
     end
 })
 
-MovementSection:AddInput({
+MovementGroupbox:AddInput({
     Title = "WalkSpeed",
     Description = "Digite o valor (padrão: 16)",
     Default = "16",
@@ -935,13 +912,13 @@ MovementSection:AddInput({
     end
 })
 
-MovementSection:AddButton({
+MovementGroupbox:AddButton({
     Title = "Reset WalkSpeed",
     Description = "Volta para 16",
     Callback = resetWalkSpeed
 })
 
-MovementSection:AddInput({
+MovementGroupbox:AddInput({
     Title = "JumpPower",
     Description = "Digite o valor (padrão: 50)",
     Default = "50",
@@ -950,51 +927,55 @@ MovementSection:AddInput({
     end
 })
 
-MovementSection:AddButton({
+MovementGroupbox:AddButton({
     Title = "Reset JumpPower",
     Description = "Volta para 50",
     Callback = resetJumpPower
 })
 
--- TELEPORT SECTION
-local TeleportSection = TeleportTab:AddSection({ Title = "Teleports" })
+-- ////////////////////////////////////////////////////////////
+--  TELEPORT TAB
+-- ////////////////////////////////////////////////////////////
 
-TeleportSection:AddButton({
+local TeleportGroupbox = TeleportTab:AddGroupbox("Teleports")
+
+TeleportGroupbox:AddButton({
     Title = "TP to Lobby",
     Description = "Teleporta para o lobby",
     Callback = tpToLobby
 })
 
-TeleportSection:AddButton({
+TeleportGroupbox:AddButton({
     Title = "TP to Map",
     Description = "Teleporta para o mapa",
     Callback = tpToMap
 })
 
-TeleportSection:AddButton({
+TeleportGroupbox:AddButton({
     Title = "TP to Murderer",
     Description = "Teleporta para o assassino",
     Callback = tpToMurderer
 })
 
-TeleportSection:AddButton({
+TeleportGroupbox:AddButton({
     Title = "TP to Sherrif",
     Description = "Teleporta para o xerife",
     Callback = tpToSherrif
 })
 
--- MISC SECTION
-local MiscSection = MiscTab:AddSection({ Title = "Misc" })
+-- ////////////////////////////////////////////////////////////
+--  MISC TAB
+-- ////////////////////////////////////////////////////////////
 
--- GUN GRABBER MANUAL
-MiscSection:AddButton({
+local MiscGroupbox = MiscTab:AddGroupbox("Misc")
+
+MiscGroupbox:AddButton({
     Title = "🔫 Gun Grabber (Manual)",
     Description = "Teleporta para a arma no chão",
     Callback = gunGrabber
 })
 
--- AUTO GUN GRABBER
-MiscSection:AddToggle({
+MiscGroupbox:AddToggle({
     Title = "🤖 Auto Gun Grabber",
     Description = "Pega a arma automaticamente quando cair",
     Default = false,
@@ -1002,24 +983,15 @@ MiscSection:AddToggle({
         if Value then
             autoGun = true
             iniciarAutoGun()
-            Obsidian:Notify({
-                Title = "🤖 Auto Gun",
-                Content = "Ativado! Pegando arma automaticamente.",
-                Duration = 2,
-            })
+            Library:Notify("🤖 Auto Gun", "Ativado! Pegando arma automaticamente.", 2)
         else
             autoGun = false
-            Obsidian:Notify({
-                Title = "🤖 Auto Gun",
-                Content = "Desativado!",
-                Duration = 2,
-            })
+            Library:Notify("🤖 Auto Gun", "Desativado!", 1)
         end
     end
 })
 
--- TP TO PLAYER
-MiscSection:AddInput({
+MiscGroupbox:AddInput({
     Title = "Player Name",
     Description = "Digite o nome do jogador",
     Default = "",
@@ -1028,18 +1000,14 @@ MiscSection:AddInput({
     end
 })
 
-MiscSection:AddButton({
+MiscGroupbox:AddButton({
     Title = "TP to Player",
     Description = "Teleporta para o jogador digitado",
     Callback = function()
         if _G.TargetPlayer and _G.TargetPlayer ~= "" then
             tpToPlayer(_G.TargetPlayer)
         else
-            Obsidian:Notify({
-                Title = "❌ Erro",
-                Content = "Digite um nome de jogador primeiro!",
-                Duration = 2,
-            })
+            Library:Notify("❌ Erro", "Digite um nome de jogador primeiro!", 2)
         end
     end
 })
@@ -1056,11 +1024,7 @@ ativarGunESP()
 ativarNamesESP()
 
 -- NOTIFICAÇÃO
-Obsidian:Notify({
-    Title = "🔥 Vynixu's MM2 Script",
-    Content = "Todos os ESPs ativados! Use a UI para configurar.",
-    Duration = 5,
-})
+Library:Notify("🔥 Vynixu's MM2 Script", "Todos os ESPs ativados! Use a UI para configurar.", 5)
 
 print("✅ SCRIPT COMPLETO CARREGADO - OBSIDIAN EDITION")
 print("🔴 Murderer ESP: ATIVADO")
@@ -1070,3 +1034,4 @@ print("🟢 Gun ESP: ATIVADO")
 print("📛 Names ESP: ATIVADO")
 print("🚀 Noclip: Tecla B")
 print("🤖 Auto Gun Grabber: DESATIVADO (toggle na UI)")
+print("💾 SaveManager: Configurações salvas automaticamente")
