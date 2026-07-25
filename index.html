@@ -1,423 +1,506 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📦 Downloader de Lixos</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QEMU Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css" rel="stylesheet">
 <style>
-    /* Reset básico */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-        font-family: 'Poppins', 'Segoe UI', sans-serif; /* Fonte mais moderna */
-        background: #0f172a; /* Fundo azul escuro sólido, mais profissional */
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        color: #f8fafc;
-    }
-
-    .container {
-        background: #1e293b; /* Fundo do container cinza escuro */
-        border-radius: 24px;
-        padding: 30px;
-        width: 100%;
-        max-width: 1100px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        animation: slideIn 0.5s ease-out forwards;
-    }
-
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* HEADER */
-    .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 24px;
-    }
-
-    .header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #f1f5f9;
-        letter-spacing: -0.5px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* TABS */
-    .tabs {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 30px;
-    }
-
-    .tab-btn {
-        padding: 10px 24px;
-        border-radius: 12px;
-        background: transparent;
-        border: 1px solid #334155;
-        cursor: pointer;
-        color: #94a3b8;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        flex: 1;
-        text-align: center;
-    }
-
-    .tab-btn:hover {
-        background: #334155;
-        color: #fff;
-    }
-
-    .tab-btn.active {
-        background: #3b82f6; /* Azul vibrante */
-        color: white;
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    /* GRID DE CARDS */
-    .file-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 16px;
-    }
-
-    .file-card {
-        background: #0f172a;
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid #1e293b;
-        transition: all 0.2s;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .file-card:hover {
-        border-color: #3b82f6;
-        transform: translateY(-4px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    }
-
-    .file-card .top-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
-    }
-
-    .file-card .file-name {
-        font-weight: 600;
-        font-size: 1rem;
-        word-break: break-all;
-    }
-
-    .file-card .file-size {
-        font-size: 0.8rem;
-        color: #64748b;
-        margin-top: 4px;
-    }
-
-    /* STATUS BADGES (Círculos coloridos) */
-    .status-container {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 12px 0;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-
-    .status-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-    
-    .status-working { color: #4ade80; } .status-working .status-dot { background: #4ade80; }
-    .status-broken { color: #f87171; } .status-broken .status-dot { background: #f87171; }
-    .status-updating { color: #60a5fa; } .status-updating .status-dot { background: #60a5fa; }
-    .status-unknown { color: #64748b; } .status-unknown .status-dot { background: #64748b; }
-
-    /* BOTÕES */
-    .file-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: 12px;
-    }
-
-    .btn {
-        padding: 8px 0;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-align: center;
-    }
-
-    .btn-execute {
-        background: #3b82f6;
-        color: white;
-    }
-
-    .btn-execute:hover { background: #2563eb; }
-
-    .btn-download {
-        background: #1e293b;
-        color: #cbd5e1;
-        border: 1px solid #334155;
-    }
-
-    .btn-download:hover {
-        background: #334155;
-        color: white;
-    }
-
-    /* STATS & TOAST - Mantenha o que você já tem, apenas ajuste as cores */
+:root{--bg:#0c0e12;--s1:#131619;--s2:#1a1d22;--s3:#22262d;--border:#2a2f38;--border2:#353b47;--text:#e2e6ed;--muted:#6b7585;--sub:#9aa0ad;--accent:#4f8ef7;--accent-b:#1e3a6e;--green:#3ecf6e;--green-b:#0f3320;--amber:#f59e0b;--amber-b:#3a2500;--red:#f04747;--red-b:#3a0f0f;--radius:6px;--radius2:10px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;display:flex}
+.sidebar{width:192px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:16px 14px 12px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
+.logo i{color:var(--accent);font-size:18px}
+.nav-section{padding:10px 8px 4px;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{margin:1px 6px;padding:7px 10px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--sub);font-size:13px;transition:all .12s;user-select:none}
+.nav-item:hover{background:var(--s3);color:var(--text)}
+.nav-item.active{background:var(--accent-b);color:var(--accent)}
+.nav-item i{font-size:16px;flex-shrink:0}
+.cnt{margin-left:auto;font-size:10px;background:var(--s3);padding:1px 6px;border-radius:99px;color:var(--muted)}
+.sidebar-bottom{margin-top:auto;padding:8px 6px;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:600}
+.topbar-right{display:flex;gap:6px}
+button{font-family:var(--font);font-size:12px;cursor:pointer;border-radius:var(--radius);border:1px solid var(--border2);background:var(--s3);color:var(--text);padding:5px 11px;display:inline-flex;align-items:center;gap:5px;transition:background .1s;white-space:nowrap}
+button:hover{background:var(--s2)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{filter:brightness(1.1)}
+button.danger{background:var(--red-b);border-color:var(--red);color:var(--red)}
+button.icon-btn{padding:5px 8px}
+.content{flex:1;overflow-y:auto;padding:16px 18px}
+.sec-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.sec-label:not(:first-child){margin-top:20px}
+.vm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.vm-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;cursor:pointer;transition:border-color .12s,transform .1s;user-select:none}
+.vm-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.vm-card.running{border-color:var(--green)}
+.vm-card.selected{border-color:var(--accent)}
+.vm-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.vm-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.chip{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--green-b);color:var(--green);border:1px solid var(--green)}
+.chip.off{background:var(--s1);color:var(--muted);border:1px solid var(--border)}
+.chip.leg{background:var(--amber-b);color:var(--amber);border:1px solid var(--amber)}
+.chip.mod{background:var(--accent-b);color:var(--accent);border:1px solid var(--accent)}
+.vm-name{font-weight:600;font-size:13px;margin-bottom:2px}
+.vm-sub{font-size:11px;color:var(--muted)}
+.spec-row{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.spec{font-size:10px;padding:2px 6px;background:var(--s1);border:1px solid var(--border);border-radius:4px;color:var(--sub);font-family:var(--mono)}
+.vm-btns{display:flex;gap:5px;margin-top:8px}
+.vm-btns button{flex:1;justify-content:center;font-size:11px;padding:5px 6px}
+.detail{width:254px;border-left:1px solid var(--border);background:var(--s1);display:flex;flex-direction:column;flex-shrink:0}
+.detail-head{padding:14px;border-bottom:1px solid var(--border)}
+.detail-name{font-weight:600;font-size:14px;margin-bottom:3px}
+.detail-sub{font-size:11px;color:var(--muted)}
+.detail-body{padding:10px 14px;overflow-y:auto;flex:1}
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.d-row:last-child{border-bottom:none}
+.d-key{font-size:11px;color:var(--muted)}
+.d-val{font-size:11px;color:var(--text);font-weight:500;text-align:right;font-family:var(--mono);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-foot{padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px}
+.detail-foot button{justify-content:center;width:100%;font-size:12px}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:8px 13px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .1s;white-space:nowrap}
+.tab:hover{color:var(--sub)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(2px)}
+.modal{background:var(--s2);border:1px solid var(--border2);border-radius:14px;width:570px;max-height:92vh;display:flex;flex-direction:column}
+.modal-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.modal-title{font-size:14px;font-weight:600}
+.modal-body{padding:16px 18px;overflow-y:auto;flex:1}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg.full{grid-column:1/-1}
+label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{font-family:var(--font);font-size:12px;padding:7px 10px;background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);width:100%;transition:border-color .1s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:52px;font-family:var(--mono);font-size:11px}
+.input-row{display:flex;gap:5px}
+.input-row input{flex:1}
+.bios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}
+.bios-opt{padding:8px 6px;border:1px solid var(--border);border-radius:var(--radius);text-align:center;cursor:pointer;color:var(--muted);background:var(--s1);font-size:11px;transition:all .1s}
+.bios-opt:hover{border-color:var(--border2);color:var(--sub)}
+.bios-opt.sel{background:var(--accent-b);border-color:var(--accent);color:var(--accent)}
+.bios-opt i{font-size:18px;display:block;margin-bottom:3px}
+.iso-list{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto}
+.iso-item{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--s1);transition:border-color .1s}
+.iso-item:hover{border-color:var(--border2)}
+.iso-item.sel{border-color:var(--accent);background:var(--accent-b)}
+.iso-item i{font-size:16px;color:var(--muted);flex-shrink:0}
+.iso-name{font-size:12px;font-weight:500}
+.iso-sub{font-size:10px;color:var(--muted)}
+.iso-badge{margin-left:auto;font-size:10px;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.clock-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 14px;margin-top:8px}
+.clock-title{font-size:11px;font-weight:600;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.clock-display{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--accent);margin-bottom:10px}
+.clock-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.clock-row label{font-size:11px;color:var(--muted);width:110px;flex-shrink:0;text-transform:none;letter-spacing:0}
+.faithful-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border);margin-top:4px}
+.faithful-label{font-size:12px;color:var(--text);flex:1}
+.faithful-sub{font-size:10px;color:var(--muted)}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--s3);border:1px solid var(--border2);border-radius:99px;cursor:pointer;transition:background .15s}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:transform .15s;pointer-events:none}
+.toggle input:checked~.toggle-thumb{transform:translateX(16px)}
+.ram-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 14px;margin-top:8px}
+.wiz-progress{display:flex;align-items:center;gap:6px;margin-bottom:16px}
+.wiz-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);transition:background .2s}
+.wiz-dot.done{background:var(--accent)}
+.wiz-dot.cur{background:var(--accent);box-shadow:0 0 0 3px var(--accent-b)}
+.wiz-label{font-size:11px;color:var(--muted);margin-left:4px}
+.wiz-step{display:none}
+.wiz-step.active{display:block}
+.hint{font-size:11px;color:var(--muted);padding:8px 11px;background:var(--s1);border-radius:var(--radius);border:1px solid var(--border);margin-top:8px;line-height:1.5}
+.hint b{color:var(--sub)}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.sum-row:last-child{border-bottom:none}
+.sum-key{color:var(--muted)}
+.sum-val{font-family:var(--mono);color:var(--text);font-weight:500}
+.view{display:none}
+.view.active{display:block}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--s2);border:1px solid var(--border2);padding:10px 16px;border-radius:var(--radius2);font-size:12px;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:100;max-width:300px}
+.toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
-
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div>
-                <h1>📦 Downloader de Lixos</h1>
-                <div class="subtitle">Gerenciador de Executores e Scripts</div>
-            </div>
-            <span class="icon">⚡</span>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('executors')">🚀 Executores</button>
-            <button class="tab-btn" onclick="switchTab('scripts')">📜 Scripts</button>
-            <button class="tab-btn" onclick="refreshAll()">🔄 Atualizar</button>
-        </div>
-
-        <!-- Executors Tab -->
-        <div id="executors" class="content active">
-            <div id="executor-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 15px;">Carregando executores...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Scripts Tab -->
-        <div id="scripts" class="content">
-            <div id="script-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 15px;">Carregando scripts...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-item">
-                <div class="number" id="totalExecutors">0</div>
-                <div class="label">Executores</div>
-            </div>
-            <div class="stat-item">
-                <div class="number" id="totalScripts">0</div>
-                <div class="label">Scripts</div>
-            </div>
-            <div class="stat-item">
-                <div class="number" id="totalFiles">0</div>
-                <div class="label">Total Arquivos</div>
-            </div>
-            <div class="stat-item">
-                <div class="number" id="totalWorking">0</div>
-                <div class="label">✅ Working</div>
-            </div>
-        </div>
+<div class="sidebar">
+  <div class="logo"><i class="ti ti-cpu"></i>QEMU Hub</div>
+  <div class="nav-section">principal</div>
+  <div class="nav-item active" onclick="nav('vms',this)"><i class="ti ti-layout-grid"></i>VMs<span class="cnt" id="cnt-vms">0</span></div>
+  <div class="nav-item" onclick="nav('isos',this)"><i class="ti ti-disc"></i>ISOs</div>
+  <div class="nav-item" onclick="nav('bios',this)"><i class="ti ti-circuit-board"></i>BIOSes</div>
+  <div class="nav-section">sistema</div>
+  <div class="nav-item" onclick="nav('nets',this)"><i class="ti ti-network"></i>Redes</div>
+  <div class="nav-item" onclick="nav('disks',this)"><i class="ti ti-device-floppy"></i>Discos</div>
+  <div class="sidebar-bottom">
+    <div class="nav-item" onclick="nav('settings',this)"><i class="ti ti-settings"></i>Configuracoes</div>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">Maquinas virtuais</span>
+    <div class="topbar-right">
+      <button onclick="openWizard()"><i class="ti ti-plus"></i> Nova VM</button>
+      <button class="icon-btn" onclick="loadVms()"><i class="ti ti-refresh"></i></button>
     </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div style="flex:1;overflow-y:auto">
+      <!-- VMs -->
+      <div class="view active content" id="view-vms">
+        <div id="running-section" style="display:none">
+          <div class="sec-label">Em execucao</div>
+          <div class="vm-grid" id="grid-running"></div>
+        </div>
+        <div class="sec-label" id="stopped-label">Paradas</div>
+        <div class="vm-grid" id="grid-stopped"></div>
+      </div>
+      <!-- ISOs -->
+      <div class="view content" id="view-isos">
+        <div class="sec-label">ISOs detectadas</div>
+        <div id="iso-list-view" class="iso-list" style="max-height:none"></div>
+        <div class="hint" style="margin-top:12px"><i class="ti ti-info-circle"></i> Configure as pastas em <b>Configuracoes</b></div>
+      </div>
+      <!-- BIOSes -->
+      <div class="view content" id="view-bios">
+        <div class="sec-label">BIOSes cadastradas</div>
+        <div id="bios-list-view" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div style="margin-top:10px"><button onclick="document.getElementById('bios-modal').style.display='flex'"><i class="ti ti-plus"></i> Adicionar BIOS</button></div>
+        <div class="hint" style="margin-top:10px"><i class="ti ti-info-circle"></i> Baixe ROMs em <b>theretroweb.com</b> — placas com chipset i815 (ex: Intel D815EEA)</div>
+      </div>
+      <!-- Redes -->
+      <div class="view content" id="view-nets">
+        <div class="sec-label">Modos de rede</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="iso-item" style="cursor:default"><i class="ti ti-world" style="color:var(--accent)"></i><div><div class="iso-name">user (NAT)</div><div class="iso-sub">padrao — internet funciona, use hostfwd=tcp::PORT-:PORT para port forward</div></div></div>
+          <div class="iso-item" style="cursor:default"><i class="ti ti-network" style="color:var(--green)"></i><div><div class="iso-name">bridge</div><div class="iso-sub">VM na mesma rede do host. Requer br0 configurado.</div></div></div>
+          <div class="iso-item" style="cursor:default"><i class="ti ti-plug-off" style="color:var(--muted)"></i><div><div class="iso-name">none</div><div class="iso-sub">sem rede — util para SOs antigos</div></div></div>
+        </div>
+      </div>
+      <!-- Discos -->
+      <div class="view content" id="view-disks">
+        <div class="sec-label">Criar disco novo</div>
+        <div class="form-grid" style="max-width:400px">
+          <div class="fg full"><label>Caminho de saida</label><div class="input-row"><input id="disk-path" placeholder="/home/user/vms/novo.qcow2"><button onclick="createDisk()"><i class="ti ti-plus"></i></button></div></div>
+          <div class="fg"><label>Tamanho (GB)</label><input id="disk-size" type="number" value="20"></div>
+          <div class="fg"><label>Formato</label><select id="disk-fmt"><option>qcow2</option><option>raw</option></select></div>
+        </div>
+        <div class="hint" style="margin-top:10px;max-width:400px"><i class="ti ti-info-circle"></i> qcow2 = cresce sob demanda. raw = tamanho fixo, performance maxima.</div>
+        <div id="disk-result" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--green)"></div>
+      </div>
+      <!-- Settings -->
+      <div class="view content" id="view-settings">
+        <div class="sec-label">QEMU</div>
+        <div class="form-grid" style="max-width:480px">
+          <div class="fg full"><label>Binario do QEMU</label><input id="cfg-bin" value="qemu-system-x86_64"></div>
+          <div class="fg"><label>RAM padrao (MB)</label><input id="cfg-ram" type="number" value="2048"></div>
+          <div class="fg"><label>vCPUs padrao</label><input id="cfg-cpu" type="number" value="2"></div>
+          <div class="fg"><label>Aceleracao padrao</label><select id="cfg-accel"><option value="kvm">kvm (Linux)</option><option value="hvf">hvf (macOS)</option><option value="whpx">whpx (Windows)</option><option value="tcg">tcg (software)</option></select></div>
+          <div class="fg"><label>Display padrao</label><select id="cfg-disp"><option value="gtk">gtk</option><option value="sdl">sdl</option><option value="vnc">vnc</option><option value="egl-headless">egl-headless</option></select></div>
+        </div>
+        <div class="sec-label" style="margin-top:18px">Pastas de ISOs</div>
+        <div id="iso-dirs-list" style="display:flex;flex-direction:column;gap:5px;max-width:480px;margin-bottom:8px"></div>
+        <div class="input-row" style="max-width:480px">
+          <input id="new-iso-dir" placeholder="/home/user/isos">
+          <button onclick="addIsoDir()"><i class="ti ti-plus"></i> Adicionar</button>
+        </div>
+        <div style="margin-top:18px;max-width:480px;display:flex;justify-content:flex-end">
+          <button class="primary" onclick="saveSettings()"><i class="ti ti-check"></i> Salvar</button>
+        </div>
+      </div>
+    </div>
+    <!-- DETAIL PANEL -->
+    <div class="detail" id="detail" style="display:none">
+      <div class="detail-head">
+        <div class="detail-name" id="d-name">—</div>
+        <div class="detail-sub" id="d-sub"></div>
+      </div>
+      <div class="detail-body" id="d-body"></div>
+      <div class="detail-foot" id="d-foot"></div>
+    </div>
+  </div>
+</div>
 
-    <!-- Toast -->
-    <div id="toast" class="toast"></div>
+<!-- WIZARD -->
+<div class="overlay" id="wizard-modal" style="display:none">
+<div class="modal">
+  <div class="modal-head"><span class="modal-title">Nova VM</span><button class="icon-btn" onclick="closeWizard()"><i class="ti ti-x"></i></button></div>
+  <div class="modal-body">
+    <div class="wiz-progress">
+      <div class="wiz-dot cur" id="wp0"></div><div class="wiz-dot" id="wp1"></div><div class="wiz-dot" id="wp2"></div><div class="wiz-dot" id="wp3"></div>
+      <span class="wiz-label" id="wiz-label">Escolha a ISO</span>
+    </div>
+    <!-- step 0 -->
+    <div class="wiz-step active" id="ws0">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Selecione a ISO (o launcher detecta o SO e configura tudo automaticamente):</div>
+      <div class="iso-list" id="wiz-iso-list"></div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <input id="wiz-iso-manual" placeholder="ou cole o caminho manualmente" style="flex:1">
+        <button onclick="manualIso()"><i class="ti ti-check"></i></button>
+      </div>
+      <div class="hint"><i class="ti ti-sparkles"></i> O SO e detectado pelo nome da ISO e as configs sao preenchidas automaticamente</div>
+    </div>
+    <!-- step 1 -->
+    <div class="wiz-step" id="ws1">
+      <div class="tabs">
+        <div class="tab active" onclick="subTab(0,this)">Geral</div>
+        <div class="tab" onclick="subTab(1,this)">CPU &amp; Clock</div>
+        <div class="tab" onclick="subTab(2,this)">Display</div>
+        <div class="tab" onclick="subTab(3,this)">Rede</div>
+        <div class="tab" onclick="subTab(4,this)">Extras</div>
+      </div>
+      <!-- sub geral -->
+      <div id="sub0" class="form-grid">
+        <div class="fg"><label>ID</label><input id="f-id" placeholder="ex: winxp-lab"></div>
+        <div class="fg"><label>Nome</label><input id="f-name" placeholder="ex: Windows XP Lab"></div>
+        <div class="fg full"><label>Caminho do disco</label><input id="f-disk" placeholder="/home/user/vms/winxp.qcow2"></div>
+        <div class="fg full"><label>ISO</label><input id="f-iso" readonly style="color:var(--muted)"></div>
+        <div class="fg"><label>RAM (MB)</label><input id="f-ram" type="number"></div>
+        <div class="fg"><label>Chipset</label><select id="f-chipset"><option value="i440FX">i440FX (legacy)</option><option value="Q35">Q35 (moderno)</option></select></div>
+        <div class="fg"><label>Aceleracao</label><select id="f-accel"><option value="kvm">kvm</option><option value="tcg">tcg (software)</option><option value="hvf">hvf (macOS)</option><option value="whpx">whpx (Windows)</option></select></div>
+        <div class="fg"><label>Formato disco</label><select id="f-fmt"><option>qcow2</option><option>raw</option><option>vmdk</option></select></div>
+      </div>
+      <!-- sub cpu clock -->
+      <div id="sub1" class="form-grid" style="display:none">
+        <div class="fg"><label>vCPUs</label><input id="f-cpus" type="number" value="2" min="1"></div>
+        <div class="fg"><label>Sockets</label><input id="f-sockets" type="number" value="1" min="1"></div>
+        <div class="fg"><label>Cores/socket</label><input id="f-cores" type="number" value="2" min="1"></div>
+        <div class="fg"><label>Threads/core</label><input id="f-threads" type="number" value="1" min="1"></div>
+        <div class="fg full"><label>Modelo de CPU</label>
+          <select id="f-cpu-model" onchange="onCpuModelChange()">
+            <option value="host">host — mesmo do PC</option>
+            <option value="max">max — tudo disponivel</option>
+            <option value="pentium">Pentium MMX</option>
+            <option value="pentium2">Pentium II</option>
+            <option value="pentium3">Pentium III</option>
+            <option value="pentium4">Pentium 4</option>
+            <option value="core2duo">Core 2 Duo</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Features extras</label><input id="f-cpu-flags" placeholder="+aes,+avx2 (vazio = padrao do modelo)"></div>
+        <div class="fg full">
+          <div class="clock-box">
+            <div class="clock-title"><i class="ti ti-clock-bolt"></i> Gerenciador de Clock da CPU</div>
+            <div class="clock-display" id="clock-display">— MHz</div>
+            <div class="clock-row">
+              <label style="text-transform:none;letter-spacing:0">Clock custom (MHz)</label>
+              <input id="f-custom-mhz" type="number" placeholder="ex: 800" style="width:110px" oninput="updateClockDisplay()">
+            </div>
+            <div class="clock-row">
+              <label style="text-transform:none;letter-spacing:0">Preset</label>
+              <select onchange="applyClockPreset(this.value)" style="width:190px">
+                <option value="">— selecione —</option>
+                <option value="100">Pentium MMX (100 MHz)</option>
+                <option value="300">Pentium II (300 MHz)</option>
+                <option value="800">Pentium III (800 MHz)</option>
+                <option value="1000">Pentium III (1000 MHz)</option>
+                <option value="2000">Pentium 4 (2000 MHz)</option>
+                <option value="2400">Core 2 Duo (2400 MHz)</option>
+                <option value="3600">Moderno (3600 MHz)</option>
+              </select>
+            </div>
+            <div class="faithful-row">
+              <div style="flex:1">
+                <div class="faithful-label">Clock fiel ao hardware real</div>
+                <div class="faithful-sub">Usa -icount para emular o clock real. Desativa KVM — mais lento, mais autentico para SOs antigos.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="f-clock-faithful" onchange="updateClockDisplay()"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+        <div class="fg full">
+          <div class="ram-box">
+            <div class="clock-title"><i class="ti ti-wave-square"></i> Velocidade de Memoria RAM</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">QEMU nao simula latencia de RAM diretamente, mas estas opcoes ajudam:</div>
+            <div class="clock-row">
+              <label style="width:140px;text-transform:none;letter-spacing:0;font-size:12px">Hugepages</label>
+              <label class="toggle"><input type="checkbox" id="f-hugepages"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              <span style="font-size:11px;color:var(--muted);margin-left:8px">Reduz latencia — requer hugepages no host</span>
+            </div>
+            <div class="clock-row" style="margin-top:6px">
+              <label style="width:140px;text-transform:none;letter-spacing:0;font-size:12px">RAM (MB)</label>
+              <input id="f-ram2" type="number" style="width:100px" oninput="document.getElementById('f-ram').value=this.value">
+            </div>
+            <div class="hint" style="margin-top:8px"><i class="ti ti-info-circle"></i> Para emular RAM de epoca (SDRAM 100 MHz do i815), use <b>clock fiel</b> acima — o sistema inteiro roda na velocidade emulada.</div>
+          </div>
+        </div>
+      </div>
+      <!-- sub display -->
+      <div id="sub2" class="form-grid" style="display:none">
+        <div class="fg full"><label>GPU / VGA</label>
+          <select id="f-vga">
+            <option value="std">VGA padrao (compativel universal)</option>
+            <option value="virtio-vga">virtio-vga (Linux, boa performance)</option>
+            <option value="virtio-gpu-pci">virtio-gpu-pci (sem display integrado)</option>
+            <option value="qxl-vga">QXL (Windows + SPICE)</option>
+            <option value="vmware-svga">VMware SVGA</option>
+            <option value="cirrus-vga">Cirrus Logic (Win9x)</option>
+            <option value="none">none (headless)</option>
+          </select>
+        </div>
+        <div class="fg full"><label>VGA BIOS (.bin)</label><input id="f-vgabios" placeholder="deixe vazio para usar padrao"></div>
+        <div class="fg"><label>VRAM (MB)</label><input id="f-vram" type="number" placeholder="64"></div>
+        <div class="fg"><label>Display backend</label>
+          <select id="f-display">
+            <option value="gtk">gtk (padrao Linux)</option>
+            <option value="sdl">sdl</option>
+            <option value="spice-app">spice-app</option>
+            <option value="vnc">vnc (:0)</option>
+            <option value="egl-headless">egl-headless</option>
+          </select>
+        </div>
+        <div class="fg"><label>Audio</label>
+          <select id="f-audio">
+            <option value="none">none</option>
+            <option value="intel-hda">Intel HDA (Win7+)</option>
+            <option value="ac97">AC97 (WinXP)</option>
+            <option value="sb16">SB16 (Win9x)</option>
+            <option value="es1370">ES1370</option>
+          </select>
+        </div>
+      </div>
+      <!-- sub rede -->
+      <div id="sub3" class="form-grid" style="display:none">
+        <div class="fg full"><label>Placa de rede (NIC)</label>
+          <select id="f-nic">
+            <option value="virtio-net-pci">virtio-net-pci (performance)</option>
+            <option value="e1000">e1000 (Intel, Win7+)</option>
+            <option value="rtl8139">RTL8139 (WinXP/Vista)</option>
+            <option value="ne2k_pci">NE2000 (Win9x)</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Tipo de rede</label>
+          <select id="f-nettype" onchange="document.getElementById('f-bridge-row').style.display=this.value==='bridge'?'':'none'">
+            <option value="user">user (NAT)</option>
+            <option value="bridge">bridge</option>
+            <option value="none">none (sem rede)</option>
+          </select>
+        </div>
+        <div class="fg full" id="f-bridge-row" style="display:none"><label>Interface bridge</label><input id="f-bridge" value="br0"></div>
+        <div class="fg full"><label>Port forward</label><input id="f-portfwd" placeholder="hostfwd=tcp::2222-:22"></div>
+      </div>
+      <!-- sub extras -->
+      <div id="sub4" class="form-grid" style="display:none">
+        <div class="fg full"><label>USB</label>
+          <select id="f-usb">
+            <option value="none">none</option>
+            <option value="usb-ehci">EHCI (USB 2.0)</option>
+            <option value="qemu-xhci">XHCI (USB 3.0)</option>
+          </select>
+        </div>
+        <div class="fg"><label>TPM 2.0</label><label class="toggle" style="margin-top:4px"><input type="checkbox" id="f-tpm"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+        <div class="fg"><label>RTC</label><select id="f-rtc"><option value="utc">UTC</option><option value="localtime">localtime</option></select></div>
+        <div class="fg full"><label>Argumentos extras</label><textarea id="f-extra" placeholder="-no-hpet -global PIIX4_PM.disable_s3=1"></textarea></div>
+      </div>
+    </div>
+    <!-- step 2: bios -->
+    <div class="wiz-step" id="ws2">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Escolha o firmware / BIOS:</div>
+      <div class="bios-grid">
+        <div class="bios-opt sel" onclick="selBios(this,'Award')"><i class="ti ti-circuit-board"></i>Award</div>
+        <div class="bios-opt" onclick="selBios(this,'Phoenix')"><i class="ti ti-circuit-board"></i>Phoenix</div>
+        <div class="bios-opt" onclick="selBios(this,'AMI')"><i class="ti ti-circuit-board"></i>AMI</div>
+        <div class="bios-opt" onclick="selBios(this,'OVMF')"><i class="ti ti-shield-lock"></i>OVMF (UEFI)</div>
+        <div class="bios-opt" onclick="selBios(this,'SeaBIOS')"><i class="ti ti-code"></i>SeaBIOS</div>
+        <div class="bios-opt" onclick="selBios(this,'custom')"><i class="ti ti-folder-open"></i>.bin custom</div>
+      </div>
+      <div id="bios-path-box" style="display:none;margin-top:10px">
+        <div class="fg"><label>Caminho da ROM (.bin)</label><input id="f-bios-path" placeholder="/home/user/bios/D815EEA.bin"></div>
+      </div>
+      <div id="bios-ovmf-box" style="display:none;margin-top:10px">
+        <div class="form-grid">
+          <div class="fg full"><label>OVMF_CODE.fd</label><input id="f-pflash-code" placeholder="/usr/share/OVMF/OVMF_CODE.fd"></div>
+          <div class="fg full"><label>OVMF_VARS.fd</label><input id="f-pflash-vars" placeholder="/home/user/vms/win11_VARS.fd"></div>
+        </div>
+      </div>
+      <div class="hint"><i class="ti ti-info-circle"></i> Para SOs legacy (XP, 98, 95, builds historicos): <b>Award ou Phoenix</b> dao mais compatibilidade. ROMs em <b>theretroweb.com</b>.</div>
+    </div>
+    <!-- step 3: resumo -->
+    <div class="wiz-step" id="ws3">
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Revise antes de criar:</div>
+      <div id="wiz-summary"></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button onclick="wizPrev()" id="wiz-prev-btn" style="display:none"><i class="ti ti-arrow-left"></i> Voltar</button>
+    <div style="display:flex;gap:6px">
+      <button onclick="closeWizard()">Cancelar</button>
+      <button class="primary" onclick="wizNext()" id="wiz-next-btn">Proximo <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+</div>
 
-    <script>
-        // Função para alternar abas
-        function switchTab(tabName) {
-            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            document.querySelectorAll('.tab-btn')[['executors','scripts','refresh'].indexOf(tabName)].classList.add('active');
-        }
+<!-- BIOS MODAL -->
+<div class="overlay" id="bios-modal" style="display:none">
+<div class="modal" style="width:420px">
+  <div class="modal-head"><span class="modal-title">Adicionar BIOS</span><button class="icon-btn" onclick="document.getElementById('bios-modal').style.display='none'"><i class="ti ti-x"></i></button></div>
+  <div class="modal-body">
+    <div class="form-grid">
+      <div class="fg full"><label>Nome / descricao</label><input id="nb-name" placeholder="Award v6.00PG — Intel D815EEA"></div>
+      <div class="fg full"><label>Caminho do .bin</label><input id="nb-path" placeholder="/home/user/bios/D815EEA.bin"></div>
+      <div class="fg"><label>Tipo</label><select id="nb-type"><option>Award</option><option>Phoenix</option><option>AMI</option><option>Outro</option></select></div>
+      <div class="fg"><label>Chipset alvo</label><input id="nb-chip" placeholder="i815"></div>
+    </div>
+  </div>
+  <div class="modal-foot"><div></div><div style="display:flex;gap:6px"><button onclick="document.getElementById('bios-modal').style.display='none'">Cancelar</button><button class="primary" onclick="saveBios()"><i class="ti ti-check"></i> Salvar</button></div></div>
+</div>
+</div>
 
-        // Função para mostrar toast
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.style.borderColor = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : 'rgba(255,255,255,0.1)';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
+<div class="toast" id="toast"></div>
 
-        // Função para obter status
-        function getStatusBadge(status) {
-            const statusMap = {
-                'working': '<span class="status-badge status-working">✅ Working</span>',
-                'broken': '<span class="status-badge status-broken">❌ Broken</span>',
-                'updating': '<span class="status-badge status-updating">🔄 Updating</span>'
-            };
-            return statusMap[status] || '<span class="status-badge status-unknown">❓ Unknown</span>';
-        }
+<script>
+const api=()=>window.pywebview?.api;
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.borderColor=ok?'var(--green)':'var(--red)';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800)}
+function nav(v,el){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');const ti={vms:'Maquinas virtuais',isos:'ISOs',bios:'BIOSes',nets:'Redes',disks:'Discos',settings:'Configuracoes'};document.getElementById('topbar-title').textContent=ti[v]||v;document.getElementById('detail').style.display='none';if(v==='isos')loadIsos();if(v==='bios')loadBiosList();if(v==='settings')loadSettings()}
+function osIcon(vm){const n=(vm.name||'').toLowerCase();if(n.includes('linux')||n.includes('arch')||n.includes('cachy')||n.includes('ubuntu')||n.includes('debian')||n.includes('pop'))return{bg:'#0f3320',c:'#3ecf6e',t:'LX'};if(n.includes('11'))return{bg:'#1e3a6e',c:'#4f8ef7',t:'11'};if(n.includes('10'))return{bg:'#1e3a6e',c:'#4f8ef7',t:'10'};if(n.includes('vista')||n.includes('7'))return{bg:'#3a2500',c:'#f59e0b',t:'7'};if(n.includes('xp')||n.includes('neptune'))return{bg:'#3a2500',c:'#f59e0b',t:'XP'};if(n.includes('98')||n.includes('95')||n.includes('chicago')||n.includes('memphis'))return{bg:'#2a1a00',c:'#d97706',t:'9x'};return{bg:'var(--s3)',c:'var(--sub)',t:'VM'}}
+function vmCard(vm){const ic=osIcon(vm);const r=vm.running;return`<div class="vm-card ${r?'running':''}" onclick="selectVm(${JSON.stringify(JSON.stringify(vm))})"><div class="vm-top"><div class="vm-icon" style="background:${ic.bg};color:${ic.c}">${ic.t}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span class="chip ${r?'on':'off'}">${r?'rodando':'parada'}</span><span class="chip ${vm.type==='modern'?'mod':'leg'}">${vm.type==='modern'?'moderno':'legacy'}</span></div></div><div class="vm-name">${vm.name}</div><div class="vm-sub">${vm.chipset||'i440FX'} · ${vm.bios||'SeaBIOS'}</div><div class="spec-row"><span class="spec">${vm.cpus||1} CPU</span><span class="spec">${vm.ram_mb||1024} MB</span><span class="spec">${vm.vga||'std'}</span>${vm.clock_faithful?'<span class="spec" style="color:var(--amber)">clock fiel</span>':''}</div><div class="vm-btns">${r?`<button class="danger" onclick="event.stopPropagation();stopVm('${vm.id}')"><i class="ti ti-player-stop"></i> Parar</button>`:`<button class="primary" onclick="event.stopPropagation();startVm('${vm.id}')"><i class="ti ti-player-play"></i> Iniciar</button>`}<button class="icon-btn" onclick="event.stopPropagation();previewCmd('${vm.id}')"><i class="ti ti-terminal"></i></button></div></div>`}
+async function loadVms(){if(!api())return;const vms=await api().list_vms();document.getElementById('cnt-vms').textContent=vms.length;const run=vms.filter(v=>v.running),stop=vms.filter(v=>!v.running);document.getElementById('running-section').style.display=run.length?'':'none';document.getElementById('grid-running').innerHTML=run.map(vmCard).join('');document.getElementById('stopped-label').textContent=stop.length?'Paradas':'Nenhuma VM — clique em "+ Nova VM"';document.getElementById('grid-stopped').innerHTML=stop.map(vmCard).join('')}
+function selectVm(j){const vm=JSON.parse(j);document.getElementById('detail').style.display='flex';document.getElementById('d-name').textContent=vm.name;document.getElementById('d-sub').textContent=`${vm.chipset||'i440FX'} · ${vm.bios||'SeaBIOS'}`;const rows=[['CPU',vm.cpu_model||'host'],['Clock',vm.clock_faithful?`fiel (${vm.custom_cpu_mhz||'—'} MHz)`:(vm.custom_cpu_mhz?vm.custom_cpu_mhz+' MHz':'host')],['vCPUs',vm.cpus||1],['RAM',(vm.ram_mb||1024)+' MB'],['Hugepages',vm.hugepages?'sim':'nao'],['VGA',vm.vga||'std'],['BIOS',vm.bios||'SeaBIOS'],['NIC',vm.nic||'rtl8139'],['USB',vm.usb||'none'],['TPM',vm.tpm?'sim':'nao'],['RTC',vm.rtc||'utc']];document.getElementById('d-body').innerHTML=rows.map(([k,v])=>`<div class="d-row"><span class="d-key">${k}</span><span class="d-val">${v}</span></div>`).join('');document.getElementById('d-foot').innerHTML=`${vm.running?`<button class="danger" onclick="stopVm('${vm.id}')"><i class="ti ti-player-stop"></i> Parar</button>`:`<button class="primary" onclick="startVm('${vm.id}')"><i class="ti ti-player-play"></i> Iniciar</button>`}<button onclick="previewCmd('${vm.id}')"><i class="ti ti-terminal"></i> Ver comando</button><button onclick="removeVm('${vm.id}')"><i class="ti ti-trash" style="color:var(--red)"></i> Remover</button>`}
+async function startVm(id){const r=await api().start_vm(id);toast(r.message||(r.success?'iniciada':'erro'),r.success);setTimeout(loadVms,600)}
+async function stopVm(id){const r=await api().stop_vm(id);toast(r.success?'parada':'nao estava rodando',r.success);setTimeout(loadVms,800)}
+async function removeVm(id){if(!confirm('Remover VM? O disco nao sera apagado.'))return;await api().remove_vm(id);document.getElementById('detail').style.display='none';loadVms();toast('VM removida')}
+async function previewCmd(id){const r=await api().preview_cmd(id);if(r.success)alert('Comando QEMU:\n\n'+r.cmd)}
 
-        // Função para carregar dados
-        function loadData() {
-            // Carregar executores
-            fetch('/api/executors')
-                .then(response => response.json())
-                .then(data => {
-                    const list = document.getElementById('executor-list');
-                    if (data.length === 0) {
-                        list.innerHTML = `
-                            <div class="empty-state">
-                                <div class="emoji">📭</div>
-                                <p>Nenhum executor encontrado</p>
-                            </div>
-                        `;
-                    } else {
-                        list.innerHTML = `
-                            <div class="file-grid">
-                                ${data.map(item => `
-                                    <div class="file-card">
-                                        <div class="file-icon">${item.emoji || '⚡'}</div>
-                                        <div class="file-name">${item.name}</div>
-                                        <div class="file-size">${item.size || 'N/A'}</div>
-                                        ${getStatusBadge(item.status)}
-                                        <div class="file-actions">
-                                            <button class="btn btn-execute" onclick="executeFile('${item.path}')">▶ Executar</button>
-                                            <button class="btn btn-download" onclick="downloadFile('${item.path}')">⬇ Baixar</button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        `;
-                    }
-                    document.getElementById('totalExecutors').textContent = data.length;
-                    updateStats();
-                })
-                .catch(() => {
-                    document.getElementById('executor-list').innerHTML = `
-                        <div class="empty-state">
-                            <div class="emoji">⚠️</div>
-                            <p>Erro ao carregar executores</p>
-                        </div>
-                    `;
-                });
-
-            // Carregar scripts
-            fetch('/api/scripts')
-                .then(response => response.json())
-                .then(data => {
-                    const list = document.getElementById('script-list');
-                    if (data.length === 0) {
-                        list.innerHTML = `
-                            <div class="empty-state">
-                                <div class="emoji">📭</div>
-                                <p>Nenhum script encontrado</p>
-                            </div>
-                        `;
-                    } else {
-                        list.innerHTML = `
-                            <div class="file-grid">
-                                ${data.map(item => `
-                                    <div class="file-card">
-                                        <div class="file-icon">${item.emoji || '📜'}</div>
-                                        <div class="file-name">${item.name}</div>
-                                        <div class="file-size">${item.size || 'N/A'}</div>
-                                        <div class="file-actions">
-                                            <button class="btn btn-execute" onclick="viewScript('${item.path}')">👁 Ver</button>
-                                            <button class="btn btn-download" onclick="downloadFile('${item.path}')">⬇ Baixar</button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        `;
-                    }
-                    document.getElementById('totalScripts').textContent = data.length;
-                    updateStats();
-                })
-                .catch(() => {
-                    document.getElementById('script-list').innerHTML = `
-                        <div class="empty-state">
-                            <div class="emoji">⚠️</div>
-                            <p>Erro ao carregar scripts</p>
-                        </div>
-                    `;
-                });
-        }
-
-        function updateStats() {
-            const total = parseInt(document.getElementById('totalExecutors').textContent) + 
-                        parseInt(document.getElementById('totalScripts').textContent);
-            document.getElementById('totalFiles').textContent = total;
-        }
-
-        function refreshAll() {
-            showToast('🔄 Atualizando...', 'info');
-            loadData();
-            setTimeout(() => showToast('✅ Atualizado!', 'success'), 500);
-        }
-
-        function executeFile(path) {
-            fetch(`/run/${path}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(`✅ ${data.message}`, 'success');
-                    } else {
-                        showToast(`❌ ${data.message}`, 'error');
-                    }
-                })
-                .catch(() => showToast('❌ Erro ao executar', 'error'));
-        }
-
-        function downloadFile(path) {
-            fetch(`/download/${path}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Em vez de só mostrar o toast, vamos mostrar o caminho exato onde foi parar!
-                        showToast(`✅ Baixado com sucesso!\n${data.message}`, 'success');
-                    } else {
-                        showToast(`❌ ${data.message}`, 'error');
-                    }
-                })
-                .catch(() => showToast('❌ Erro de conexão com o servidor', 'error'));
-        }
-
-        function viewScript(path) {
-            fetch(`/view/${path}`)
-                .then(response => response.text())
-                .then(content => {
-                    alert('📜 Conteúdo do Script:\n\n' + content.substring(0, 1000) + (content.length > 1000 ? '\n...' : ''));
-                })
-                .catch(() => showToast('❌ Erro ao ler script', 'error'));
-        }
-
-        // Carregar dados ao iniciar
-        loadData();
-    </script>
+// WIZARD
+let wStep=0,wData={};
+const wLabels=['Escolha a ISO','Configuracao','BIOS / Firmware','Revisar'];
+function openWizard(){wStep=0;wData={};loadWizIsos();renderWiz();document.getElementById('wizard-modal').style.display='flex'}
+function closeWizard(){document.getElementById('wizard-modal').style.display='none'}
+function renderWiz(){document.querySelectorAll('.wiz-step').forEach((s,i)=>s.classList.toggle('active',i===wStep));for(let i=0;i<4;i++){const d=document.getElementById('wp'+i);d.classList.toggle('done',i<wStep);d.classList.toggle('cur',i===wStep)}document.getElementById('wiz-label').textContent=wLabels[wStep];document.getElementById('wiz-prev-btn').style.display=wStep>0?'':'none';document.getElementById('wiz-next-btn').innerHTML=wStep===3?'<i class="ti ti-check"></i> Criar VM':'Proximo <i class="ti ti-arrow-right"></i>';if(wStep===3)buildSummary()}
+async function loadWizIsos(){const list=document.getElementById('wiz-iso-list');if(!api()){list.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px">configure as pastas de ISOs em Configuracoes e reinicie</div>';return}const isos=await api().list_isos();if(!isos.length){list.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px">nenhuma ISO encontrada</div>';return}list.innerHTML=isos.map(iso=>`<div class="iso-item" onclick="pickIso(this,'${iso.path.replace(/'/g,"\\'")}','${iso.name.replace(/'/g,"\\'")}',${JSON.stringify(JSON.stringify(iso.profile))})"><i class="ti ti-disc"></i><div><div class="iso-name">${iso.name}</div><div class="iso-sub">${iso.size_mb} MB · ${iso.profile?.bios||'SeaBIOS'} recomendado</div></div><span class="iso-badge chip ${iso.profile?.type==='modern'?'mod':'leg'}">${iso.profile?.type==='modern'?'moderno':'legacy'}</span></div>`).join('')}
+function pickIso(el,path,name,pj){document.querySelectorAll('#wiz-iso-list .iso-item').forEach(i=>i.classList.remove('sel'));el.classList.add('sel');const p=JSON.parse(pj);wData={iso_path:path,iso_name:name,...p};fillWizForm()}
+function manualIso(){const p=document.getElementById('wiz-iso-manual').value.trim();if(!p)return;wData.iso_path=p;wData.iso_name=p.split('/').pop().replace('.iso','');fillWizForm();toast('ISO manual: '+wData.iso_name)}
+function fillWizForm(){const d=wData;document.getElementById('f-id').value=(d.iso_name||'').toLowerCase().replace(/[^a-z0-9]/g,'-').slice(0,20);document.getElementById('f-name').value=d.iso_name||'';document.getElementById('f-iso').value=d.iso_path||'';document.getElementById('f-ram').value=d.ram||1024;document.getElementById('f-ram2').value=d.ram||1024;document.getElementById('f-cpus').value=d.cpus||2;document.getElementById('f-cores').value=d.cpus||2;document.getElementById('f-chipset').value=d.chipset||'i440FX';document.getElementById('f-cpu-model').value=d.cpu_model||'host';document.getElementById('f-clock-faithful').checked=d.clock_faithful||false;document.getElementById('f-vga').value=d.vga||'std';document.getElementById('f-nic').value=d.nic||'rtl8139';document.getElementById('f-usb').value=d.usb||'none';document.getElementById('f-tpm').checked=d.tpm||false;updateClockDisplay();const bm={'Award':0,'Phoenix':1,'AMI':2,'OVMF':3,'SeaBIOS':4};const bi=bm[d.bios]??4;document.querySelectorAll('.bios-opt').forEach((b,i)=>b.classList.toggle('sel',i===bi));wData.bios=d.bios||'SeaBIOS';toggleBiosBoxes(wData.bios)}
+function wizNext(){if(wStep===0&&!wData.iso_path){toast('selecione uma ISO',false);return}if(wStep===1)collectWizForm();if(wStep===3){createVm();return}wStep++;renderWiz()}
+function wizPrev(){if(wStep>0){wStep--;renderWiz()}}
+function collectWizForm(){wData.id=document.getElementById('f-id').value.trim();wData.name=document.getElementById('f-name').value.trim();wData.disk_path=document.getElementById('f-disk').value.trim();wData.ram_mb=parseInt(document.getElementById('f-ram').value)||1024;wData.chipset=document.getElementById('f-chipset').value;wData.accel=document.getElementById('f-accel').value;wData.disk_format=document.getElementById('f-fmt').value;wData.cpus=parseInt(document.getElementById('f-cpus').value)||1;wData.sockets=parseInt(document.getElementById('f-sockets').value)||1;wData.cores=parseInt(document.getElementById('f-cores').value)||1;wData.threads=parseInt(document.getElementById('f-threads').value)||1;wData.cpu_model=document.getElementById('f-cpu-model').value;wData.clock_faithful=document.getElementById('f-clock-faithful').checked;wData.custom_cpu_mhz=document.getElementById('f-custom-mhz').value||null;wData.hugepages=document.getElementById('f-hugepages').checked;wData.vga=document.getElementById('f-vga').value;wData.vram_mb=parseInt(document.getElementById('f-vram').value)||null;wData.display_backend=document.getElementById('f-display').value;wData.audio=document.getElementById('f-audio').value;wData.nic=document.getElementById('f-nic').value;wData.net_type=document.getElementById('f-nettype').value;wData.bridge_iface=document.getElementById('f-bridge').value;wData.port_forward=document.getElementById('f-portfwd').value;wData.usb=document.getElementById('f-usb').value;wData.tpm=document.getElementById('f-tpm').checked;wData.rtc=document.getElementById('f-rtc').value;wData.extra_args=document.getElementById('f-extra').value;wData.bios_path=document.getElementById('f-bios-path').value;wData.pflash_code=document.getElementById('f-pflash-code').value;wData.pflash_vars=document.getElementById('f-pflash-vars').value}
+function buildSummary(){collectWizForm();const rows=[['ID',wData.id||'—'],['ISO',wData.iso_name||'—'],['Tipo',wData.type==='modern'?'Moderno (UEFI)':'Legacy (BIOS)'],['Chipset',wData.chipset||'—'],['CPU',wData.cpu_model||'—'],['Clock',wData.clock_faithful?'fiel ao hardware':(wData.custom_cpu_mhz?wData.custom_cpu_mhz+' MHz':'host')],['RAM',(wData.ram_mb||'—')+' MB'],['VGA',wData.vga||'—'],['BIOS',wData.bios||'—'],['NIC',wData.nic||'—'],['USB',wData.usb||'—']];document.getElementById('wiz-summary').innerHTML=rows.map(([k,v])=>`<div class="sum-row"><span class="sum-key">${k}</span><span class="sum-val">${v}</span></div>`).join('')}
+async function createVm(){if(!wData.id||!wData.name){toast('ID e Nome obrigatorios',false);return}if(!api()){toast('pywebview nao conectado',false);return}const r=await api().add_vm(wData);if(r.success){toast('VM criada!');closeWizard();loadVms()}else toast(r.message||'erro',false)}
+function subTab(idx,el){for(let i=0;i<5;i++)document.getElementById('sub'+i).style.display=i===idx?'grid':'none';document.querySelectorAll('#ws1 .tab').forEach((t,i)=>t.classList.toggle('active',i===idx))}
+function selBios(el,b){document.querySelectorAll('.bios-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');wData.bios=b;toggleBiosBoxes(b)}
+function toggleBiosBoxes(b){document.getElementById('bios-path-box').style.display=['Award','Phoenix','AMI','custom'].includes(b)?'':'none';document.getElementById('bios-ovmf-box').style.display=b==='OVMF'?'':'none'}
+const CPU_HZ={pentium:100,pentium2:300,pentium3:800,pentium4:2000,core2duo:2400};
+function onCpuModelChange(){const v=document.getElementById('f-cpu-model').value;const mhz=CPU_HZ[v];if(mhz){document.getElementById('f-custom-mhz').value=mhz;document.getElementById('f-clock-faithful').checked=true}else document.getElementById('f-clock-faithful').checked=false;updateClockDisplay()}
+function updateClockDisplay(){const mhz=document.getElementById('f-custom-mhz').value;const f=document.getElementById('f-clock-faithful').checked;const d=document.getElementById('clock-display');d.textContent=(mhz?mhz+' MHz':'— MHz')+(f?' (fiel)':'');d.style.color=f?'var(--amber)':'var(--accent)'}
+function applyClockPreset(mhz){if(!mhz)return;document.getElementById('f-custom-mhz').value=mhz;updateClockDisplay()}
+async function loadIsos(){const l=document.getElementById('iso-list-view');if(!api()){l.innerHTML='<div style="color:var(--muted)">pywebview nao conectado</div>';return}const isos=await api().list_isos();if(!isos.length){l.innerHTML='<div style="color:var(--muted);font-size:12px">nenhuma ISO — configure as pastas em Configuracoes</div>';return}l.innerHTML=isos.map(iso=>`<div class="iso-item" style="cursor:default"><i class="ti ti-disc"></i><div><div class="iso-name">${iso.name}</div><div class="iso-sub">${iso.size_mb} MB · ${iso.profile?.bios||'?'} recomendado · CPU: ${iso.profile?.cpu_model||'host'}</div></div><span class="iso-badge chip ${iso.profile?.type==='modern'?'mod':'leg'}">${iso.profile?.type==='modern'?'moderno':'legacy'}</span></div>`).join('')}
+async function loadBiosList(){const l=document.getElementById('bios-list-view');if(!api()){l.innerHTML='';return}const bios=await api().list_bios();l.innerHTML=bios.map(b=>`<div class="iso-item" style="cursor:default"><i class="ti ti-circuit-board" style="color:var(--amber)"></i><div><div class="iso-name">${b.name}</div><div class="iso-sub">${b.path} · ${b.chipset||''}</div></div><span class="iso-badge chip leg">${b.type||'Award'}</span><button class="icon-btn" onclick="removeBios('${b.path}')"><i class="ti ti-trash" style="color:var(--red)"></i></button></div>`).join('')||'<div style="color:var(--muted);font-size:12px">nenhuma BIOS cadastrada</div>'}
+async function saveBios(){const e={name:document.getElementById('nb-name').value,path:document.getElementById('nb-path').value,type:document.getElementById('nb-type').value,chipset:document.getElementById('nb-chip').value};if(!e.path){toast('caminho obrigatorio',false);return}await api().add_bios(e);document.getElementById('bios-modal').style.display='none';loadBiosList();toast('BIOS adicionada')}
+async function removeBios(path){await api().remove_bios(path);loadBiosList();toast('removida')}
+function createDisk(){const path=document.getElementById('disk-path').value.trim();const size=document.getElementById('disk-size').value;const fmt=document.getElementById('disk-fmt').value;if(!path){toast('caminho obrigatorio',false);return}const cmd=`qemu-img create -f ${fmt} "${path}" ${size}G`;document.getElementById('disk-result').textContent='execute: '+cmd;toast('copie o comando acima')}
+async function loadSettings(){if(!api())return;const cfg=await api().get_config();document.getElementById('cfg-bin').value=cfg.qemu_binary||'';document.getElementById('cfg-ram').value=cfg.default_ram_mb||2048;document.getElementById('cfg-cpu').value=cfg.default_cpus||2;document.getElementById('cfg-accel').value=cfg.default_accel||'kvm';document.getElementById('cfg-disp').value=cfg.default_display||'gtk';const dirs=document.getElementById('iso-dirs-list');dirs.innerHTML=(cfg.iso_dirs||[]).map(d=>`<div class="input-row"><input value="${d}" readonly style="color:var(--sub)"><button onclick="removeIsoDir('${d}')"><i class="ti ti-trash"></i></button></div>`).join('')}
+async function saveSettings(){if(!api())return;const cfg={qemu_binary:document.getElementById('cfg-bin').value,default_ram_mb:parseInt(document.getElementById('cfg-ram').value),default_cpus:parseInt(document.getElementById('cfg-cpu').value),default_accel:document.getElementById('cfg-accel').value,default_display:document.getElementById('cfg-disp').value};await api().save_config(cfg);toast('configuracoes salvas')}
+async function addIsoDir(){const d=document.getElementById('new-iso-dir').value.trim();if(!d||!api())return;const cfg=await api().get_config();cfg.iso_dirs=[...(cfg.iso_dirs||[]),d];await api().save_config(cfg);document.getElementById('new-iso-dir').value='';loadSettings();toast('pasta adicionada')}
+async function removeIsoDir(dir){if(!api())return;const cfg=await api().get_config();cfg.iso_dirs=(cfg.iso_dirs||[]).filter(d=>d!==dir);await api().save_config(cfg);loadSettings()}
+window.addEventListener('pywebviewready',()=>loadVms());
+setTimeout(()=>{if(!window.pywebview)console.log('modo preview');else loadVms()},500);
+</script>
 </body>
 </html>
