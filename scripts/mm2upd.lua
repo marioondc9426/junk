@@ -202,23 +202,11 @@ end)
 
 local ESP = { Highlights = {} }
 
-function ESP:getExisting(tipo, char)
-    if self.Highlights[tipo] and self.Highlights[tipo][char] then
-        local h = self.Highlights[tipo][char]
-        -- verifica se ainda existe no workspace
-        if h.fill and h.fill.Parent then
-            return h
-        end
-    end
-    return nil
-end
-
 function ESP:remove(tipo, char)
     if not char then return end
     if self.Highlights[tipo] and self.Highlights[tipo][char] then
         local h = self.Highlights[tipo][char]
-        if h.fill and h.fill.Parent then h.fill:Destroy() end
-        if h.outline and h.outline.Parent then h.outline:Destroy() end
+        if h and h.Parent then h:Destroy() end
         self.Highlights[tipo][char] = nil
     end
 end
@@ -226,43 +214,34 @@ end
 function ESP:create(tipo, char, cor)
     if not char or not char.Parent then return end
 
-    -- se já existe e a cor é a mesma, não recria (evita piscar)
-    local existing = self:getExisting(tipo, char)
-    if existing then
-        if existing.fill.FillColor ~= cor then
-            existing.fill.FillColor = cor
+    -- se já existe, só atualiza — sem recriar, sem piscar
+    if self.Highlights[tipo] and self.Highlights[tipo][char] then
+        local h = self.Highlights[tipo][char]
+        if h and h.Parent then
+            h.FillColor = cor
+            h.FillTransparency = Settings.EspTransparency
+            h.OutlineColor = Settings.OutlineRainbow
+                and Color3.fromHSV((tick() * 0.3) % 1, 1, 1)
+                or Settings.OutlineColor
+            h.OutlineTransparency = Settings.OutlineEnabled and Settings.OutlineTransp or 1
+            return
         end
-        -- atualiza transparência se mudou
-        if existing.fill.FillTransparency ~= Settings.EspTransparency then
-            existing.fill.FillTransparency = Settings.EspTransparency
-        end
-        return
     end
 
-    -- remove qualquer versão antiga morta
     self:remove(tipo, char)
 
-    local fill = Instance.new("Highlight")
-    fill.Name = tipo .. "_Fill"
-    fill.Parent = char
-    fill.FillColor = cor
-    fill.FillTransparency = Settings.EspTransparency
-    fill.OutlineTransparency = 1
-    fill.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-
-    local outline = nil
-    if Settings.OutlineEnabled then
-        outline = Instance.new("Highlight")
-        outline.Name = tipo .. "_Outline"
-        outline.Parent = char
-        outline.FillTransparency = 1
-        outline.OutlineColor = Settings.OutlineColor
-        outline.OutlineTransparency = Settings.OutlineTransp
-        outline.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    end
+    -- UM único Highlight com fill + outline (igual o esp universal que funciona)
+    local h = Instance.new("Highlight")
+    h.Name = tipo .. "_ESP"
+    h.Parent = char
+    h.FillColor = cor
+    h.FillTransparency = Settings.EspTransparency
+    h.OutlineColor = Settings.OutlineColor
+    h.OutlineTransparency = Settings.OutlineEnabled and Settings.OutlineTransp or 1
+    h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 
     if not self.Highlights[tipo] then self.Highlights[tipo] = {} end
-    self.Highlights[tipo][char] = { fill = fill, outline = outline }
+    self.Highlights[tipo][char] = h
 end
 
 -- rainbow no renderstep sem piscar
@@ -271,8 +250,8 @@ RS.RenderStepped:Connect(function()
     local color = Color3.fromHSV((tick() * 0.3) % 1, 1, 1)
     for _, charMap in pairs(ESP.Highlights) do
         for _, h in pairs(charMap) do
-            if h.outline and h.outline.Parent then
-                h.outline.OutlineColor = color
+            if h and h.Parent then
+                h.OutlineColor = color
             end
         end
     end
@@ -419,6 +398,21 @@ local function criarNome(plr)
     end)
 end
 
+-- distância atualizada no RenderStepped (alta taxa)
+RS.RenderStepped:Connect(function()
+    if not espStates.Names then return end
+    local lc = Player.Character
+    local lhrp = lc and lc:FindFirstChild("HumanoidRootPart")
+    if not lhrp then return end
+    for plr, bb in pairs(namesBillboards) do
+        local dl = bb:FindFirstChild("Dist")
+        if dl and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local d = (lhrp.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+            dl.Text = math.floor(d) .. "m"
+        end
+    end
+end)
+
 local function ativarNamesESP()
     espStates.Names = true
     task.spawn(function()
@@ -435,13 +429,6 @@ local function ativarNamesESP()
                             nl.TextColor3 = isMurderer(plr) and Color3.fromRGB(255, 0, 25)
                                 or isSherrif(plr) and Color3.fromRGB(0, 50, 255)
                                 or Color3.fromRGB(0, 255, 50)
-                        end
-                        local dl = bb:FindFirstChild("Dist")
-                        local lc = Player.Character
-                        if dl and lc and lc:FindFirstChild("HumanoidRootPart")
-                            and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                            local d = (lc.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-                            dl.Text = math.floor(d) .. "m"
                         end
                     end
                 else
@@ -556,7 +543,11 @@ local function stopFly()
     local char = Player.Character
     if char then
         local hum = char:FindFirstChildWhichIsA("Humanoid")
-        if hum then hum.PlatformStand = false end
+        if hum then
+            hum.PlatformStand = false
+            -- força o humanoid a sair do estado travado
+            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+        end
         pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
     end
     Library:Notify({ Title = "Voo", Description = "Desativado!", Time = 1 })
@@ -889,6 +880,118 @@ TpBox:AddButton({
 })
 
 -- ////////////////////////////////////////////////////////////
+--  HITBOX EXPANDER
+-- ////////////////////////////////////////////////////////////
+
+local hitboxAtivo = false
+local hitboxSize = 10
+local hitboxOriginais = {}
+
+local function aplicarHitbox()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr == Player or not plr.Character then continue end
+        local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+        if hrp and not hitboxOriginais[plr] then
+            hitboxOriginais[plr] = hrp.Size
+            hrp.Size = Vector3.new(hitboxSize, hitboxSize, hitboxSize)
+        end
+    end
+end
+
+local function removerHitbox()
+    for plr, size in pairs(hitboxOriginais) do
+        if plr.Character then
+            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then hrp.Size = size end
+        end
+    end
+    hitboxOriginais = {}
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        if hitboxAtivo then aplicarHitbox() end
+    end
+end)
+
+game.Players.PlayerRemoving:Connect(function(plr)
+    hitboxOriginais[plr] = nil
+end)
+
+-- ////////////////////////////////////////////////////////////
+--  FLING
+-- ////////////////////////////////////////////////////////////
+
+local flingAtivo = false
+local flingConn = nil
+
+local function ativarFling()
+    flingAtivo = true
+    Library:Notify({ Title = "Fling", Description = "Clique em um ponto para ser flingado!", Time = 3 })
+
+    flingConn = UIS.InputBegan:Connect(function(input, gp)
+        if gp or not flingAtivo then return end
+        if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+
+        local char = Player.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+        if not hrp or not hum then return end
+
+        -- raycast pra achar o ponto clicado
+        local ray = workspace.CurrentCamera:ScreenPointToRay(
+            input.Position.X, input.Position.Y
+        )
+        local params = RaycastParams.new()
+        params.FilterDescendantsInstances = { char }
+        params.FilterType = Enum.RaycastFilterType.Exclude
+        local result = workspace:Raycast(ray.Origin, ray.Direction * 5000, params)
+        if not result then return end
+
+        local target = result.Position
+
+        -- força o fling: BV enorme na direção do target + pequena BG pra cair de pé
+        local dir = (target - hrp.Position)
+        local dist = dir.Magnitude
+        if dist < 1 then return end
+        local dirUnit = dir.Unit
+
+        -- cria forças temporárias
+        local bv = Instance.new("BodyVelocity", hrp)
+        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.Velocity = dirUnit * math.clamp(dist * 3, 80, 500)
+
+        local bg = Instance.new("BodyGyro", hrp)
+        bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bg.P = 9e4
+        -- aponta pra frente mas mantém upright
+        bg.CFrame = CFrame.new(hrp.Position, hrp.Position + Vector3.new(dirUnit.X, 0, dirUnit.Z))
+
+        hum.PlatformStand = true
+
+        task.spawn(function()
+            -- espera chegar perto do destino ou timeout
+            local t0 = tick()
+            repeat task.wait() until
+                (hrp.Position - target).Magnitude < 8
+                or tick() - t0 > 4
+
+            -- remove forças e tenta cair de pé
+            bv:Destroy()
+            bg:Destroy()
+            hum.PlatformStand = false
+            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+        end)
+    end)
+end
+
+local function desativarFling()
+    flingAtivo = false
+    if flingConn then flingConn:Disconnect(); flingConn = nil end
+end
+
+-- ////////////////////////////////////////////////////////////
 --  UI - ABA MISC
 -- ////////////////////////////////////////////////////////////
 
@@ -916,6 +1019,43 @@ MiscBox:AddButton({
     Func = function()
         carregarRoles()
         Library:Notify({ Title = "Roles", Description = "Roles recarregadas!", Time = 2 })
+    end
+})
+
+local HitboxBox = MiscTab:AddRightGroupbox("Hitbox Expander", "maximize")
+
+HitboxBox:AddToggle("HitboxToggle", {
+    Text = "Hitbox Expander",
+    Default = false,
+    Callback = function(v)
+        hitboxAtivo = v
+        if not v then removerHitbox() end
+        Library:Notify({ Title = "Hitbox", Description = v and "Ativado!" or "Desativado!", Time = 1 })
+    end
+})
+
+HitboxBox:AddSlider("HitboxSize", {
+    Text = "Tamanho",
+    Default = 10,
+    Min = 2,
+    Max = 50,
+    Rounding = 0,
+    Callback = function(v)
+        hitboxSize = v
+        if hitboxAtivo then
+            removerHitbox()
+            aplicarHitbox()
+        end
+    end
+})
+
+local FlingBox = MiscTab:AddRightGroupbox("Fling", "send")
+
+FlingBox:AddToggle("FlingToggle", {
+    Text = "Fling (clique no chão)",
+    Default = false,
+    Callback = function(v)
+        if v then ativarFling() else desativarFling() end
     end
 })
 
