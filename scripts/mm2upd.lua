@@ -3,8 +3,10 @@
 -- 1 instância por vez: fecha a antiga
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
 getgenv().VynixuMM2_Running = true
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua"))()
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local Options, Toggles = Library.Options, Library.Toggles
 
 getgenv().VynixuMM2_Destroy = function()
@@ -374,19 +376,27 @@ local function stopFly()
             hum:ChangeState(Enum.HumanoidStateType.GettingUp) -- desbloqueia o char
         end
         pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
+        if not noclip then restaurarColisoes() end
     end
     Library:Notify({ Title="Voo", Description="Desativado!", Time=1 })
 end
 local function toggleFly() if flying then stopFly() else startFly() end end
 
--- noclip
+-- noclip (pula se fly ativo pra nao deletar colisoes das pernas)
 RS.Stepped:Connect(function()
-    if noclip and Player.Character then
+    if noclip and not flying and Player.Character then
         for _, p in pairs(Player.Character:GetDescendants()) do
             if p:IsA("BasePart") then p.CanCollide = false end
         end
     end
 end)
+
+local function restaurarColisoes()
+    local char = Player.Character; if not char then return end
+    for _, p in pairs(char:GetDescendants()) do
+        if p:IsA("BasePart") then pcall(function() p.CanCollide = true end) end
+    end
+end
 
 -- movimento
 local function setWalkSpeed(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.WalkSpeed=tonumber(v) or 16 end end
@@ -431,26 +441,65 @@ local function findGunDrop()
         if obj.Name=="GunDrop" then local p=obj.Parent; if p and not p:FindFirstChild("Humanoid") then return obj end end
     end
 end
+local isBugaga = Player.Name == "bugagamesreal"
+
+-- retorna true se o player parece morto/fora do mapa (>1k de distancia da maioria)
+local function playerPareceMorto()
+    local c=Player.Character; local hrp=c and c:FindFirstChild("HumanoidRootPart"); if not hrp then return true end
+    local count, longe = 0, 0
+    for _,plr in pairs(game.Players:GetPlayers()) do
+        if plr==Player or not plr.Character then continue end
+        local ohrp=plr.Character:FindFirstChild("HumanoidRootPart"); if not ohrp then continue end
+        count+=1; if (hrp.Position-ohrp.Position).Magnitude>1000 then longe+=1 end
+    end
+    return count>0 and longe==count -- todos estao longe = provavelmente morto/fora
+end
+
 local function gunGrabber()
     local c=Player.Character; local hrp=c and c:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+    if not isBugaga then task.wait(0.2) end -- delay pra quem nao é bugaga
     local gun=findGunDrop()
     if gun then local pos=hrp.CFrame; hrp.CFrame=gun.CFrame; task.wait(); hrp.CFrame=pos; Library:Notify({Title="Gun Grabber",Description="Arma pega!",Time=2})
     else Library:Notify({Title="Gun Grabber",Description="Nenhuma arma no chão!",Time=2}) end
 end
+
 local function iniciarAutoGun()
     autoGun=true
     task.spawn(function()
         while autoGun do
             task.wait(0.5)
+            -- desliga auto se parecer morto (todos longe >1k)
+            if playerPareceMorto() then
+                autoGun=false
+                Toggles.AutoGunGrabber:SetValue(false)
+                Library:Notify({Title="Auto Gun",Description="Desligado: parece que você morreu.",Time=3})
+                break
+            end
             local c=Player.Character; local hrp=c and c:FindFirstChild("HumanoidRootPart")
-            if hrp then local gun=findGunDrop(); if gun then local pos=hrp.CFrame; hrp.CFrame=gun.CFrame; task.wait(); hrp.CFrame=pos; Library:Notify({Title="Auto Gun",Description="Arma pega!",Time=1}) end end
+            if hrp then
+                local gun=findGunDrop()
+                if gun then
+                    if not isBugaga then task.wait(0.2) end
+                    local pos=hrp.CFrame; hrp.CFrame=gun.CFrame; task.wait(); hrp.CFrame=pos
+                    Library:Notify({Title="Auto Gun",Description="Arma pega!",Time=1})
+                end
+            end
         end
     end)
 end
 
 -- hitbox expander
+-- usa sethiddenproperty se disponivel, senao tenta direto
 local hitboxAtivo, hitboxBrutal, hitboxSize = false, false, 10
 local hitboxOriginais, hitboxHighlights = {}, {}
+
+local function setPartSize(part, size)
+    local ok = pcall(function()
+        if sethiddenproperty then sethiddenproperty(part, "Size", size)
+        else part.Size = size end
+    end)
+    return ok
+end
 
 local function getHitboxParts(char)
     if hitboxBrutal then
@@ -466,14 +515,14 @@ local function aplicarHitbox()
         for _,part in pairs(getHitboxParts(plr.Character)) do
             if not hitboxOriginais[plr][part] then
                 hitboxOriginais[plr][part]=part.Size
-                part.Size=Vector3.new(hitboxSize,hitboxSize,hitboxSize)
+                setPartSize(part, Vector3.new(hitboxSize,hitboxSize,hitboxSize))
             end
         end
     end
 end
 local function removerHitbox()
     for _,parts in pairs(hitboxOriginais) do
-        for part,size in pairs(parts) do pcall(function() part.Size=size end) end
+        for part,size in pairs(parts) do setPartSize(part, size) end
     end; hitboxOriginais={}
 end
 local function verHitbox()
@@ -495,56 +544,24 @@ end
 task.spawn(function() while true do task.wait(0.5); if hitboxAtivo then aplicarHitbox() end end end)
 game.Players.PlayerRemoving:Connect(function(plr) hitboxOriginais[plr]=nil end)
 
--- fling com arco aleatório
-local flingAtivo, flingConn = false, nil
+-- anti fling: remove colisao dos outros players pra nao te empurrar
+local antiFlingAtivo = false
+local antiFlingConn = nil
 
-local function ativarFling()
-    flingAtivo=true
-    Library:Notify({Title="Fling",Description="Clique em um ponto!",Time=3})
-    flingConn=UIS.InputBegan:Connect(function(input,gp)
-        if gp or not flingAtivo then return end
-        if input.UserInputType~=Enum.UserInputType.MouseButton1 then return end
-        local char=Player.Character
-        local hrp=char and char:FindFirstChild("HumanoidRootPart")
-        local hum=char and char:FindFirstChildWhichIsA("Humanoid")
-        if not hrp or not hum then return end
-        local ray=workspace.CurrentCamera:ScreenPointToRay(input.Position.X,input.Position.Y)
-        local params=RaycastParams.new()
-        params.FilterDescendantsInstances={char}; params.FilterType=Enum.RaycastFilterType.Exclude
-        local result=workspace:Raycast(ray.Origin,ray.Direction*5000,params)
-        if not result then return end
-        local target=result.Position
-        local dir=(target-hrp.Position); local dist=dir.Magnitude; if dist<1 then return end
-        -- arco: speed, altura e desvio lateral todos aleatorios
-        local speed=math.random(60,120)
-        local arc=math.random(15,50)
-        local lateral=math.random(-20,20)
-        local spin=math.random(-200,200)
-        local du=dir.Unit
-        local lv=Vector3.new(-du.Z,0,du.X).Unit
-        hum.PlatformStand=true
-        local bv=Instance.new("BodyVelocity",hrp)
-        bv.MaxForce=Vector3.new(9e9,9e9,9e9)
-        bv.Velocity=du*speed+Vector3.new(0,arc,0)+lv*lateral
-        local ba=Instance.new("BodyAngularVelocity",hrp)
-        ba.MaxTorque=Vector3.new(9e9,9e9,9e9)
-        ba.AngularVelocity=Vector3.new(math.random(-spin,spin)*0.05,math.random(-spin,spin)*0.05,math.random(-spin,spin)*0.05)
-        task.spawn(function()
-            local t0=tick(); local maxT=math.clamp(dist/speed*1.5,0.5,4)
-            while tick()-t0<maxT do
-                task.wait(0.05)
-                local v=bv.Velocity
-                bv.Velocity=Vector3.new(v.X*0.98,v.Y-2,v.Z*0.98)
-                if (hrp.Position-target).Magnitude<6 then break end
+local function ativarAntiFling()
+    antiFlingAtivo = true
+    antiFlingConn = RS.Stepped:Connect(function()
+        for _,plr in pairs(game.Players:GetPlayers()) do
+            if plr==Player or not plr.Character then continue end
+            for _,p in pairs(plr.Character:GetDescendants()) do
+                if p:IsA("BasePart") then p.CanCollide = false end
             end
-            bv:Destroy(); ba:Destroy()
-            hum.PlatformStand=false
-            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-        end)
+        end
     end)
 end
-local function desativarFling()
-    flingAtivo=false; if flingConn then flingConn:Disconnect(); flingConn=nil end
+local function desativarAntiFling()
+    antiFlingAtivo = false
+    if antiFlingConn then antiFlingConn:Disconnect(); antiFlingConn=nil end
 end
 
 -- ui esp
@@ -582,8 +599,13 @@ MovBox:AddInput("FlySpeedInput", { Text="Velocidade de Voo", Default="50", Callb
 local NoclipToggle = MovBox:AddToggle("NoclipToggle", { Text="Noclip", Default=false, Callback=function(v) noclip=v; Library:Notify({Title="Noclip",Description=v and "Ativado!" or "Desativado!",Time=1}) end })
 NoclipToggle:AddKeyPicker("NoclipKeybind", { Text="Tecla Noclip", Default="B", Mode="Toggle", SyncToggleState=true, Callback=function() noclip=not noclip end })
 MovBox:AddInput("WalkSpeedInput", { Text="Velocidade", Default="16", Callback=function(v) setWalkSpeed(v) end })
+local WSResetToggle = MovBox:AddToggle("WSResetToggle", { Text="Resetar Velocidade", Default=false })
+WSResetToggle:AddKeyPicker("WSResetKey", { Text="Tecla Reset Speed", Default="None", Mode="Toggle", Callback=function() resetWalkSpeed() end })
 MovBox:AddButton({ Text="Resetar Velocidade", Func=resetWalkSpeed })
+
 MovBox:AddInput("JumpPowerInput", { Text="Força de Pulo", Default="50", Callback=function(v) setJumpPower(v) end })
+local JPResetToggle = MovBox:AddToggle("JPResetToggle", { Text="Resetar Pulo", Default=false })
+JPResetToggle:AddKeyPicker("JPResetKey", { Text="Tecla Reset Jump", Default="None", Mode="Toggle", Callback=function() resetJumpPower() end })
 MovBox:AddButton({ Text="Resetar Pulo", Func=resetJumpPower })
 
 -- ui teleporte
@@ -599,14 +621,17 @@ TpBox:AddButton({ Text="TP para Jogador", Func=function()
 end })
 
 -- ui misc
-local MiscBox    = MiscTab:AddLeftGroupbox("Misc", "cog")
-local HitboxBox  = MiscTab:AddRightGroupbox("Hitbox", "maximize")
-local FlingBox   = MiscTab:AddRightGroupbox("Fling", "send")
+local MiscBox   = MiscTab:AddLeftGroupbox("Misc", "cog")
+local HitboxBox = MiscTab:AddRightGroupbox("Hitbox", "maximize")
 
 MiscBox:AddButton({ Text="Pegar Arma (Manual)", Func=gunGrabber })
-MiscBox:AddToggle("AutoGunGrabber", { Text="Auto Pegar Arma", Default=false, Callback=function(v)
+local AutoGunToggle = MiscBox:AddToggle("AutoGunGrabber", { Text="Auto Pegar Arma", Default=false, Callback=function(v)
     if v then autoGun=true; iniciarAutoGun(); Library:Notify({Title="Auto Gun",Description="Ativado!",Time=2})
     else autoGun=false; Library:Notify({Title="Auto Gun",Description="Desativado!",Time=1}) end
+end })
+MiscBox:AddToggle("AntiFling", { Text="Anti Fling", Default=false, Callback=function(v)
+    if v then ativarAntiFling() else desativarAntiFling() end
+    Library:Notify({Title="Anti Fling",Description=v and "Ativado!" or "Desativado!",Time=1})
 end })
 MiscBox:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end })
 
@@ -622,9 +647,10 @@ HitboxBox:AddSlider("HitboxSize", { Text="Tamanho", Default=10, Min=2, Max=50, R
 end })
 HitboxBox:AddButton({ Text="Ver Hitbox (2s)", Func=verHitbox })
 
-FlingBox:AddToggle("FlingToggle", { Text="Fling (clique no chão)", Default=false, Callback=function(v)
-    if v then ativarFling() else desativarFling() end
-end })
+-- keybinds no config (obsidian mostra automaticamente todos os KeyPickers aqui)
+SaveManager:BuildConfigSection(ConfigTab)
+local KeybindBox = ConfigTab:AddLeftGroupbox("Keybinds", "keyboard")
+Library:SetupKeybinds(KeybindBox)
 
 -- init
 task.wait(0.5)
