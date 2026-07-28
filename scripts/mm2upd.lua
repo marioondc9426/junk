@@ -1186,6 +1186,7 @@ TracerBox:AddSlider("TracerThickness", { Text="Espessura", Default=1, Min=1, Max
     -- aplica nas linhas ativas
     for _, l in pairs(tracerLinhas) do pcall(function() l.Thickness = v end) end
 end })
+local MovBox = MovementTab:AddLeftGroupbox("Movimento", "zap")
 local FlyToggle = MovBox:AddToggle("FlyToggle", { Text="Voar", Default=false, Callback=function(v) if v then startFly() else stopFly() end end })
 FlyToggle:AddKeyPicker("FlyKeybind", { Text="Tecla Voar", Default="L", Mode="Toggle", SyncToggleState=true, Callback=function() toggleFly() end })
 MovBox:AddInput("FlySpeedInput", { Text="Velocidade de Voo", Default="50", Callback=function(v) flySpeed=tonumber(v) or 50 end })
