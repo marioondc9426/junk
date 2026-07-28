@@ -232,7 +232,7 @@ trackThread(task.spawn(function()
             isAdmin = false
         end
     end
-end)
+end))
 
 -- step 5: settings
 setStep(5, "carregando settings...")
@@ -287,7 +287,7 @@ trackThread(task.spawn(function()
             end
         end
     end
-end)
+end))
 
 local userSettingsRaw = dbGet("userSettings/" .. username)
 local userSettings = {}
@@ -302,10 +302,10 @@ trackThread(task.spawn(function()
         time = os.time(),
         role = userRole or "guest"
     }))
-end)
+end))
 trackConnection(game:GetService("Players").LocalPlayer.AncestryChanged:Connect(function()
     dbSet("users/" .. username .. "/online", "false")
-end)
+end))
 
 
 
@@ -424,13 +424,13 @@ end
 trackThread(task.spawn(carregarRoles))
 trackConnection(game:GetService("ReplicatedStorage").DescendantAdded:Connect(function(obj)
     if obj.Name == "GetPlayerData" then task.wait(1); carregarRoles() end
-end)
+end))
 trackThread(task.spawn(function()
     while task.wait(5) do
         if not getgenv().VynixuMM2_Running then break end
         carregarRoles()
     end
-end)
+end))
 
 local function getRole(plr)
     if not plr or not rolesLoaded then return nil end
@@ -500,7 +500,7 @@ trackConnection(RS.RenderStepped:Connect(function()
     for _, map in pairs(ESP.Highlights) do
         for _, h in pairs(map) do if h and h.Parent then h.OutlineColor = c end end
     end
-end)
+end))
 
 local function espLoop(tipo, checkFn, colorFn)
     task.spawn(function()
@@ -601,7 +601,7 @@ trackConnection(RS.RenderStepped:Connect(function()
             dl.Text = math.floor((lhrp.Position - plr.Character.HumanoidRootPart.Position).Magnitude) .. "m"
         end
     end
-end)
+end))
 
 local function ativarNamesESP()
     espStates.Names = true
@@ -635,7 +635,7 @@ trackConnection(game.Players.PlayerRemoving:Connect(function(plr)
     if plr.Character then
         for tipo in pairs(ESP.Highlights) do ESP:remove(tipo, plr.Character) end
     end
-end)
+end))
 
 -- inf jump
 local InfJumpEnabled = false
@@ -646,7 +646,7 @@ trackConnection(UIS.JumpRequest:Connect(function()
     if hum and hum.Health > 0 then
         hum:ChangeState(Enum.HumanoidStateType.Jumping)
     end
-end)
+end))
 
 -- recarregar script
 local function recarregarScript()
@@ -738,7 +738,7 @@ trackConnection(RS.Stepped:Connect(function()
             if p:IsA("BasePart") then p.CanCollide = false end
         end
     end
-end)
+end))
 
 local function setWalkSpeed(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.WalkSpeed=tonumber(v) or 16 end end
 local function setJumpPower(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.JumpPower=tonumber(v) or 50 end end
@@ -930,7 +930,7 @@ trackThread(task.spawn(function()
         if not getgenv().VynixuMM2_Running then break end
         if hitboxAtivo then aplicarHitbox() end
     end
-end)
+end))
 trackConnection(game.Players.PlayerRemoving:Connect(function(plr) hitboxOriginais[plr]=nil end))
 
 local antiFlingAtivo = false
