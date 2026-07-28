@@ -1,5 +1,5 @@
 -- vynixu mm2 - obsidian edition
-local VERSAO = "5.1"
+local VERSAO = "5.2"
 
 -- 1 instância por vez
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
@@ -30,13 +30,7 @@ local Loading = Library:CreateLoading({
     ShowSidebar = true,
 })
 Loading.Sidebar:AddLabel("v" .. VERSAO .. " changelogs:")
-Loading.Sidebar:AddLabel("+ key system")
-Loading.Sidebar:AddLabel("+ ranks (owner/co-owner/admin)")
-Loading.Sidebar:AddLabel("+ disable feature on the fly")
-Loading.Sidebar:AddLabel("+ auto updater")
-Loading.Sidebar:AddLabel("+ kill aura")
-Loading.Sidebar:AddLabel("+ tabela de usuarios")
-Loading.Sidebar:AddLabel("+ rejoin")
+Loading.Sidebar:AddLabel("+ check pra update e role periodicamente")
 Loading.Sidebar:AddLabel("usuario: " .. username)
 Loading:SetMessage("inicializando...")
 Loading:SetCurrentStep(1)
@@ -112,19 +106,51 @@ Loading:SetDescription("verificando key...")
 local userRole = nil -- nil = sem acesso, "user"/"admin"/"co-owner"/"owner"
 
 -- tenta autenticar pelo nome direto nos admins
-local adminRaw = dbGet("admins/" .. username)
-if adminRaw and adminRaw ~= "null" then
-    local ok, adminData = pcall(function() return HS:JSONDecode(adminRaw) end)
-    if ok and type(adminData) == "table" then
-        -- estrutura: { boolean = true/false, role = "owner"/"co-owner"/"admin", authmethod = "name"/"key" }
-        if adminData.boolean == true then
-            userRole = adminData.role or "admin"
+-- step 3: check admin status (com verificação periódica)
+Loading:SetCurrentStep(3)
+Loading:SetDescription("verificando permissões...")
+
+-- função para checar admin
+local function checarAdmin()
+    local adminRaw = dbGet("admins/" .. username)
+    if adminRaw and adminRaw ~= "null" then
+        local ok, adminData = pcall(function() return HS:JSONDecode(adminRaw) end)
+        if ok and type(adminData) == "table" then
+            if adminData.boolean == true then
+                userRole = adminData.role or "admin"
+                return true  -- é admin
+            end
+        elseif adminRaw == "true" then
+            userRole = "admin"
+            return true
         end
-    elseif adminRaw == "true" then
-        -- compatibilidade com formato antigo
-        userRole = "admin"
     end
+    return false  -- não é admin
 end
+local isAdmin = checarAdmin()
+task.spawn(function()
+    while task.wait(60) do
+        local novoStatus = checarAdmin()
+        if novoStatus and not isAdmin then
+            -- usuário virou admin!
+            Library:Notify({
+                Title = "Permissões Atualizadas!",
+                Description = "Você agora é um " .. userRole .. "!",
+                Time = 10,
+            })
+            isAdmin = true
+        elseif not novoStatus and isAdmin then
+            -- usuário perdeu admin!
+            Library:Notify({
+                Title = "Permissões Removidas",
+                Description = "Você não é mais um administrador.",
+                Time = 10,
+            })
+            userRole = "user"
+            isAdmin = false
+        end
+    end
+end)
 
 -- se nao é admin, verifica key
 if not userRole then
