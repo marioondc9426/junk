@@ -34,7 +34,7 @@ Loading.Sidebar:AddLabel("+ bug fixes")
 Loading.Sidebar:AddLabel("usuario: " .. username)
 Loading:SetMessage("inicializando...")
 Loading:SetCurrentStep(1)
-Loading:SetDescription("verificando instancias...")
+Loading:SetDescription("loading")
 task.wait(0.3)
 
 -- firebase (definido UMA VEZ)
@@ -60,7 +60,7 @@ local function dbSet(path, data)
 end
 
 -- step 1: auto updater (spawn pra nao bloquear)
-Loading:SetCurrentStep(1)
+Loading:SetCurrentStep(2)
 Loading:SetDescription("loading.")
 task.spawn(function()
     local function checarVersao()
@@ -85,7 +85,7 @@ task.spawn(function()
 end)
 
 -- step 2: check blacklist
-Loading:SetCurrentStep(2)
+Loading:SetCurrentStep(3)
 Loading:SetDescription("loading..")
 local blacklistMsg = dbGet("blacklistedGames/" .. placeId)
 if blacklistMsg and blacklistMsg ~= "null" then
@@ -95,7 +95,7 @@ if blacklistMsg and blacklistMsg ~= "null" then
 end
 
 -- step 3: autenticação + rank
-Loading:SetCurrentStep(3)
+Loading:SetCurrentStep(4)
 Loading:SetDescription("loading...")
 
 local userRole = "guest"  -- padrão
@@ -162,8 +162,8 @@ task.spawn(function()
     end
 end)
 -- step 4: check ban
-Loading:SetCurrentStep(4)
-Loading:SetDescription("checando acesso...")
+Loading:SetCurrentStep(5)
+Loading:SetDescription("loading.")
 local isBanned = dbGet("banned/" .. username)
 if isBanned and isBanned ~= "null" and isBanned ~= "false" then
     Loading:SetMessage("acesso negado")
@@ -197,8 +197,8 @@ task.spawn(function()
 end)
 
 -- step 5: settings
-Loading:SetCurrentStep(5)
-Loading:SetDescription("carregando permissoes...")
+Loading:SetCurrentStep(6)
+Loading:SetDescription("loading..")
 
 local globalSettingsRaw = dbGet("globalSettings")
 local globalSettings = {
