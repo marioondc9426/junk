@@ -1171,7 +1171,7 @@ TracerBox:AddToggle("TracerToggle", { Text="Tracers", Default=false, Callback=fu
 end })
 TracerBox:AddDropdown("TracerModo", {
     Values = { "camera", "baixo" },
-    Default = "camera", -- n ta funcionando
+    Default = "camera", -- n ta funcionando-
     Text = "Origem",
     Callback = function(v) tracerModo = v end
 })
