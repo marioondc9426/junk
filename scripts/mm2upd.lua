@@ -98,8 +98,20 @@ end
 Loading:SetCurrentStep(3)
 Loading:SetDescription("verificando permissões...")
 
-local userRole = nil
-
+local userRole = "guest"  -- padrão
+local function checarKeyAtiva()
+    local userKeyRaw = dbGet("userKeys/" .. username)
+    if userKeyRaw and userKeyRaw ~= "null" then
+        local keyInput = userKeyRaw:gsub('"', ''):gsub('%s', '')
+        local keyRoleRaw = dbGet("keys/" .. keyInput)
+        if keyRoleRaw and keyRoleRaw ~= "null" then
+            local role = keyRoleRaw:gsub('"', ''):gsub('%s', '')
+            userRole = role
+            return true
+        end
+    end
+    return false
+end
 local function checarAdmin()
     local adminRaw = dbGet("admins/" .. username)
     if adminRaw and adminRaw ~= "null" then
@@ -117,12 +129,9 @@ local function checarAdmin()
     return false
 end
 
--- checa admin PRIMEIRO e define userRole
-local adminResult = checarAdmin()
-
--- se nao é admin, vai como guest (key é inserida na aba Key System da UI)
-if not adminResult then
-    userRole = "guest"
+local temKey = checarKeyAtiva()
+if not temKey then
+    checarAdmin()  -- se não tem key, tenta admin
 end
 
 -- step 4: check ban
