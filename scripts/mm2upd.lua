@@ -606,14 +606,7 @@ local function startFly()
     Library:Notify({ Title="Voo", Description="Ativado! WASD+Q/E", Time=2 })
 end
 local function herobrine()
-    herobrainar()
-    yesherobrine()
-    herobrinee()
-    error427()
-    error437()
-    error0()
-    alpha0()
-    undefined()
+    -- voce nunca sabera o que estava aquiendendnednendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendendend
 end
 local function recarregarscript()
     Library:Unload()
@@ -621,6 +614,9 @@ local function recarregarscript()
     desativarKillAura()
     -- dps eu continuo (claude continua)
     loadstring(game:HttpGet("https://raw.githubusercontent.com/marioondc9426/junk/refs/heads/main/scripts/mm2upd.lua"))()
+    tchau()
+    mundo()
+    cruel()
 end
 local function stopFly()
     if not flying then return end
