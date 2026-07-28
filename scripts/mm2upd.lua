@@ -61,7 +61,7 @@ end
 
 -- step 1: auto updater (spawn pra nao bloquear)
 Loading:SetCurrentStep(1)
-Loading:SetDescription("checando versao...")
+Loading:SetDescription("loading.")
 task.spawn(function()
     local function checarVersao()
         local verRaw = dbGet("version")
@@ -86,7 +86,7 @@ end)
 
 -- step 2: check blacklist
 Loading:SetCurrentStep(2)
-Loading:SetDescription("checando blacklist...")
+Loading:SetDescription("loading..")
 local blacklistMsg = dbGet("blacklistedGames/" .. placeId)
 if blacklistMsg and blacklistMsg ~= "null" then
     Loading:SetMessage("failed")
@@ -96,7 +96,7 @@ end
 
 -- step 3: autenticação + rank
 Loading:SetCurrentStep(3)
-Loading:SetDescription("verificando permissões...")
+Loading:SetDescription("loading...")
 
 local userRole = "guest"  -- padrão
 local function checarKeyAtiva()
@@ -131,9 +131,36 @@ end
 
 local temKey = checarKeyAtiva()
 if not temKey then
-    checarAdmin()  -- se não tem key, tenta admin
+    checarAdmin()  
 end
-
+task.spawn(function()
+    while getgenv().VynixuMM2_Running do
+        task.wait(60)  -- a cada 1 minuto
+        
+        -- Só checa admin se NÃO tiver key ativa
+        local userKeyRaw = dbGet("userKeys/" .. username)
+        if not userKeyRaw or userKeyRaw == "null" then
+            -- Não tem key, então pode checar admin
+            local adminRaw = dbGet("admins/" .. username)
+            if adminRaw and adminRaw ~= "null" then
+                local ok, adminData = pcall(function() return HS:JSONDecode(adminRaw) end)
+                if ok and type(adminData) == "table" and adminData.boolean == true then
+                    userRole = adminData.role or "admin"
+                end
+            else
+                -- Se perdeu admin E não tem key, volta pra guest
+                if userRole ~= "guest" then
+                    userRole = "guest"
+                    Library:Notify({
+                        Title = "Permissões Removidas",
+                        Description = "Você não tem mais permissões especiais.",
+                        Time = 5
+                    })
+                end
+            end
+        end
+    end
+end)
 -- step 4: check ban
 Loading:SetCurrentStep(4)
 Loading:SetDescription("checando acesso...")
