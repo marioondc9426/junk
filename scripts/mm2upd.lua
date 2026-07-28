@@ -1,5 +1,5 @@
 -- vynixu mm2 - obsidian edition
-local VERSAO = "5.3"
+local VERSAO = "5.4"
 
 -- 1 instância por vez
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
@@ -37,7 +37,7 @@ Loading:SetCurrentStep(1)
 Loading:SetDescription("verificando instancias...")
 task.wait(0.3)
 
--- firebase
+-- firebase (definido UMA VEZ)
 local DB = "https://vynixu-database-default-rtdb.firebaseio.com/"
 
 local function dbGet(path)
@@ -59,10 +59,10 @@ local function dbSet(path, data)
     end)
 end
 
+-- step 1: auto updater (spawn pra nao bloquear)
 Loading:SetCurrentStep(1)
 Loading:SetDescription("checando versao...")
 task.spawn(function()
-    -- função reutilizável
     local function checarVersao()
         local verRaw = dbGet("version")
         if verRaw and verRaw ~= "null" then
@@ -78,34 +78,28 @@ task.spawn(function()
         end
         return false
     end
-    
-    -- checa imediatamente
     checarVersao()
-    
-    -- depois checa periodicamente (DENTRO do spawn)
     while task.wait(60) do
-        if checarVersao() then
-            break
-        end
+        if checarVersao() then break end
     end
 end)
--- step 2: check blacklist de jogos
+
+-- step 2: check blacklist
 Loading:SetCurrentStep(2)
 Loading:SetDescription("checando blacklist...")
 local blacklistMsg = dbGet("blacklistedGames/" .. placeId)
 if blacklistMsg and blacklistMsg ~= "null" then
     Loading:SetMessage("failed")
-    Loading:SetDescription(blacklistmsg)
+    Loading:SetDescription(blacklistMsg)
     task.wait(5); Library:Destroy(); return
 end
-local userRole = nil -- nil = sem acesso, "user"/"admin"/"co-owner"/"owner"
 
--- tenta autenticar pelo nome direto nos admins
--- step 3: check admin status (com verificação periódica)
+-- step 3: autenticação + rank
 Loading:SetCurrentStep(3)
 Loading:SetDescription("verificando permissões...")
 
--- função para checar admin
+local userRole = nil
+
 local function checarAdmin()
     local adminRaw = dbGet("admins/" .. username)
     if adminRaw and adminRaw ~= "null" then
@@ -113,69 +107,22 @@ local function checarAdmin()
         if ok and type(adminData) == "table" then
             if adminData.boolean == true then
                 userRole = adminData.role or "admin"
-                return true  -- é admin
+                return true
             end
         elseif adminRaw == "true" then
             userRole = "admin"
             return true
         end
     end
-    return false  -- não é admin
+    return false
 end
-local isAdmin = checarAdmin()
-task.spawn(function()
-    while task.wait(15) do
-        local novoStatus = checarAdmin()
-        if novoStatus and not isAdmin then
-            -- usuário virou admin!
-            Library:Notify({
-                Title = "Permissões Atualizadas!",
-                Description = "Você agora é um " .. userRole .. "!",
-                Time = 10,
-            })
-            isAdmin = true
-        elseif not novoStatus and isAdmin then
-            -- usuário perdeu admin!
-            Library:Notify({
-                Title = "Permissões Removidas",
-                Description = "Você não é mais um administrador.",
-                Time = 10,
-            })
-            userRole = "user"
-            isAdmin = false
-        end
-    end
-end)
 
--- se nao é admin, verifica key
-if not userRole then
-    -- pega key do usuario se tiver salvo, ou pede
-    local savedKey = ""
-    -- tenta pegar do storage se disponivel
-    pcall(function()
-        local kf = readfile and readfile("VynixuMM2Script/key.txt")
-        if kf and kf ~= "" then savedKey = kf:gsub("%s", "") end
-    end)
+-- checa admin PRIMEIRO e define userRole
+local adminResult = checarAdmin()
 
-    if savedKey ~= "" then
-        local keyRoleRaw = dbGet("keys/" .. savedKey)
-        if keyRoleRaw and keyRoleRaw ~= "null" then
-            userRole = keyRoleRaw:gsub('"', '')
-        end
-    end
-
-    if not userRole then
-        -- sem key salva, tenta verificar ban antes de pedir
-        local isBanned = dbGet("banned/" .. username)
-        if isBanned and isBanned ~= "null" and isBanned ~= "false" then
-            Loading:SetMessage("acesso negado")
-            Loading:SetDescription("voce foi banido do script.")
-            task.wait(5); Library:Destroy(); return
-        end
-
-        -- sem key = sem acesso (nao fecha, mas sem features premium)
-        userRole = "guest"
-    end
+-- se nao é admin, vai como guest (key é inserida na aba Key System da UI)
+if not adminResult then
+    userRole = "guest"
 end
 
 -- step 4: check ban
@@ -183,20 +130,35 @@ Loading:SetCurrentStep(4)
 Loading:SetDescription("checando acesso...")
 local isBanned = dbGet("banned/" .. username)
 if isBanned and isBanned ~= "null" and isBanned ~= "false" then
-    Loading:SetMessage("o null da o bumbu")
-    Loading:SetDescription("e sinistro")
+    Loading:SetMessage("acesso negado")
+    Loading:SetDescription("voce foi banido do script.")
     task.wait(5); Library:Destroy(); return
 end
 
--- perms por rank
+-- perms por rank (definido DEPOIS do userRole estar correto)
 local isOwner   = userRole == "owner"
 local isCoOwner = userRole == "co-owner" or isOwner
 local isAdmin   = userRole == "admin" or isCoOwner
--- admin nao tem: ban/delay/disable features/blacklist (so owner/co-owner tem)
 local canBan         = isCoOwner
 local canSetDelay    = isCoOwner
 local canDisableFeat = isCoOwner
 local canBlacklist   = isCoOwner
+
+-- polling de permissões (spawn pra nao bloquear)
+task.spawn(function()
+    while task.wait(15) do
+        if not getgenv().VynixuMM2_Running then break end
+        local novoAdmin = checarAdmin()
+        local novoIsAdmin = userRole == "admin" or userRole == "co-owner" or userRole == "owner"
+        if novoAdmin and not isAdmin then
+            Library:Notify({ Title="Permissões Atualizadas!", Description="Você agora é um " .. userRole .. "!", Time=10 })
+            isAdmin = true
+        elseif not novoAdmin and isAdmin then
+            Library:Notify({ Title="Permissões Removidas", Description="Você não é mais um administrador.", Time=10 })
+            isAdmin = false
+        end
+    end
+end)
 
 -- step 5: settings
 Loading:SetCurrentStep(5)
@@ -215,7 +177,6 @@ if globalSettingsRaw and globalSettingsRaw ~= "null" then
     end)
 end
 
--- disabled features on the fly (polling 15s)
 local disabledFeaturesGlobal = {}
 local function fetchDisabledFeatures()
     local raw = dbGet("disabledFeatures")
@@ -227,55 +188,28 @@ local function fetchDisabledFeatures()
     end
 end
 fetchDisabledFeatures()
--- SCRIPT PARA CRIAR A VERSÃO (roda 1 vez só)
-local DB = "https://vynixu-database-default-rtdb.firebaseio.com/"
-local VERSAO = "5.2"
 
-local function dbSet(path, data)
-    pcall(function()
-        request({
-            Url = DB .. path .. ".json",
-            Method = "PUT",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = data
-        })
-    end)
-end
-task.wait(1)
-local function dbGet(path)
-    local ok, res = pcall(function()
-        return request({ Url = DB .. path .. ".json", Method = "GET" })
-    end)
-    if ok and res and res.StatusCode == 200 then return res.Body end
-    return nil
-end
+-- polling disabled features (UMA thread só)
 task.spawn(function()
-    while getgenv().VynixuMM2_Running do
-        task.wait(15)
+    while task.wait(15) do
+        if not getgenv().VynixuMM2_Running then break end
         fetchDisabledFeatures()
-        -- atualiza toggles desabilitados
+        local toggleMap = {
+            fly = "FlyToggle",
+            noclip = "NoclipToggle",
+            esp = "MurdererESP",
+            autoGun = "AutoGunGrabber",
+            hitbox = "HitboxToggle",
+            speedHack = "WSToggle",
+            jumpHack = "JPToggle",
+            killAura = "KillAuraToggle",
+        }
         for feat, disabled in pairs(disabledFeaturesGlobal) do
             if disabled == true then
-                -- marca Disabled nos toggles correspondentes
-                local toggleMap = {
-                    fly = "FlyToggle",
-                    noclip = "NoclipToggle",
-                    esp = "MurdererESP",
-                    autoGun = "AutoGunGrabber",
-                    hitbox = "HitboxToggle",
-                    speedHack = "WSToggle",
-                    jumpHack = "JPToggle",
-                    killAura = "KillAuraToggle",
-                }
                 local tid = toggleMap[feat]
                 if tid and Toggles[tid] then
-                    if Toggles[tid].Value then
-                        Toggles[tid]:SetValue(false)
-                    end
-                    -- marca visualmente como desabilitado
-                    pcall(function()
-                        Toggles[tid].Disabled = true
-                    end)
+                    if Toggles[tid].Value then Toggles[tid]:SetValue(false) end
+                    pcall(function() Toggles[tid].Disabled = true end)
                 end
             end
         end
@@ -288,7 +222,6 @@ if userSettingsRaw and userSettingsRaw ~= "null" then
     pcall(function() userSettings = HS:JSONDecode(userSettingsRaw) end)
 end
 
--- registra online em background
 task.spawn(function()
     dbSet("users/" .. username, HS:JSONEncode({
         online = true,
@@ -304,7 +237,6 @@ end)
 if isAdmin then Loading.Sidebar:AddLabel("[" .. (userRole or "ADMIN"):upper() .. "]") end
 
 local function featureAllowed(name)
-    -- check global disabled features (on the fly)
     if disabledFeaturesGlobal[name] == true then return false end
     if userSettings.disabledFeatures then
         for _, f in pairs(userSettings.disabledFeatures) do
@@ -339,6 +271,7 @@ local MovementTab = Window:AddTab("Movimento", "zap")
 local TeleportTab = Window:AddTab("Teleporte", "map-pin")
 local MiscTab     = Window:AddTab("Misc", "cog")
 local AdminTab    = isAdmin and Window:AddTab("Admin", "shield") or nil
+local KeyTab      = (not isAdmin) and Window:AddTab("Key System", "key") or nil
 local ConfigTab   = Window:AddTab("Config", "settings")
 
 SaveManager:SetLibrary(Library)
@@ -364,7 +297,6 @@ local Settings = {
 
 local espStates = { Murderer=false, Sherrif=false, Innocent=false, Gun=false, Names=false }
 
--- roles via GetPlayerData
 local playerRoles, rolesLoaded = {}, false
 
 local function carregarRoles()
@@ -378,7 +310,12 @@ task.spawn(carregarRoles)
 game:GetService("ReplicatedStorage").DescendantAdded:Connect(function(obj)
     if obj.Name == "GetPlayerData" then task.wait(1); carregarRoles() end
 end)
-task.spawn(function() while true do task.wait(5); carregarRoles() end end)
+task.spawn(function()
+    while task.wait(5) do
+        if not getgenv().VynixuMM2_Running then break end
+        carregarRoles()
+    end
+end)
 
 local function getRole(plr)
     if not plr or not rolesLoaded then return nil end
@@ -466,10 +403,10 @@ local function espLoop(tipo, checkFn, colorFn)
     end)
 end
 
-local function ativarMurdererESP()   espStates.Murderer = true;  espLoop("Murderer", isMurderer, function() return Settings.MurdererColor end) end
+local function ativarMurdererESP()    espStates.Murderer = true;  espLoop("Murderer", isMurderer, function() return Settings.MurdererColor end) end
 local function desativarMurdererESP() espStates.Murderer = false end
-local function ativarSherrifESP()    espStates.Sherrif  = true;  espLoop("Sherrif",  isSherrif,  function() return Settings.SherrifColor end) end
-local function desativarSherrifESP() espStates.Sherrif  = false end
+local function ativarSherrifESP()     espStates.Sherrif  = true;  espLoop("Sherrif",  isSherrif,  function() return Settings.SherrifColor end) end
+local function desativarSherrifESP()  espStates.Sherrif  = false end
 
 local function ativarInnocentESP()
     espStates.Innocent = true
@@ -505,7 +442,6 @@ local function ativarGunESP()
 end
 local function desativarGunESP() espStates.Gun = false end
 
--- names esp
 local namesBillboards = {}
 
 local function removerNome(plr)
@@ -655,7 +591,6 @@ local function stopFly()
 end
 local function toggleFly() if flying then stopFly() else startFly() end end
 
--- noclip
 RS.Stepped:Connect(function()
     if noclip and not flying and Player.Character then
         for _, p in pairs(Player.Character:GetDescendants()) do
@@ -664,13 +599,11 @@ RS.Stepped:Connect(function()
     end
 end)
 
--- movimento
 local function setWalkSpeed(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.WalkSpeed=tonumber(v) or 16 end end
 local function setJumpPower(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.JumpPower=tonumber(v) or 50 end end
 local function resetWalkSpeed() setWalkSpeed(16) end
 local function resetJumpPower() setJumpPower(50) end
 
--- teleportes
 local function tpToLobby()
     local c=Player.Character; if c and c:FindFirstChild("HumanoidRootPart") then c.HumanoidRootPart.CFrame=CFrame.new(-108.5,145,0.6) end
 end
@@ -701,12 +634,10 @@ local function tpToPlayer(nome)
     Library:Notify({ Title="TP", Description="Jogador '"..nome.."' não encontrado!", Time=2 })
 end
 
--- rejoin
 local function rejoin()
     game:GetService("TeleportService"):Teleport(game.PlaceId, Player)
 end
 
--- gun grabber
 local function findGunDrop()
     for _,obj in pairs(workspace:GetDescendants()) do
         if obj.Name=="GunDrop" then local p=obj.Parent; if p and not p:FindFirstChild("Humanoid") then return obj end end
@@ -756,9 +687,7 @@ local function iniciarAutoGun()
     end)
 end
 
--- kill aura (murder only, auto desativa sem faca)
 local killAuraAtivo = false
-local killAuraConn = nil
 
 local function temFaca()
     local char = Player.Character; if not char then return false end
@@ -779,27 +708,21 @@ local function ativarKillAura()
     task.spawn(function()
         while killAuraAtivo do
             task.wait(0.1)
-            -- auto desativa se nao tiver faca
             if not temFaca() then
                 killAuraAtivo = false
-                if Toggles.KillAuraToggle then
-                    Toggles.KillAuraToggle:SetValue(false)
-                end
+                if Toggles.KillAuraToggle then Toggles.KillAuraToggle:SetValue(false) end
                 Library:Notify({Title="Kill Aura",Description="Desativado: sem faca!",Time=3})
                 break
             end
             local char = Player.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             if not hrp then continue end
-            -- só ataca se for murderer
             if not isMurderer(Player) then continue end
             for _, plr in pairs(game.Players:GetPlayers()) do
                 if plr == Player or not plr.Character then continue end
                 local ohrp = plr.Character:FindFirstChild("HumanoidRootPart")
                 if not ohrp then continue end
-                local dist = (hrp.Position - ohrp.Position).Magnitude
-                if dist <= 8 then
-                    -- tp pra cima do player e volta
+                if (hrp.Position - ohrp.Position).Magnitude <= 8 then
                     local pos = hrp.CFrame
                     hrp.CFrame = ohrp.CFrame
                     task.wait(0.05)
@@ -809,12 +732,8 @@ local function ativarKillAura()
         end
     end)
 end
+local function desativarKillAura() killAuraAtivo = false end
 
-local function desativarKillAura()
-    killAuraAtivo = false
-end
-
--- hitbox expander
 local hitboxAtivo, hitboxBrutal, hitboxSize = false, false, 10
 local hitboxOriginais, hitboxHighlights = {}, {}
 
@@ -865,10 +784,14 @@ local function verHitbox()
     end)
     Library:Notify({Title="View Hitbox",Description="Mostrando por 2s",Time=2})
 end
-task.spawn(function() while true do task.wait(0.5); if hitboxAtivo then aplicarHitbox() end end end)
+task.spawn(function()
+    while task.wait(0.5) do
+        if not getgenv().VynixuMM2_Running then break end
+        if hitboxAtivo then aplicarHitbox() end
+    end
+end)
 game.Players.PlayerRemoving:Connect(function(plr) hitboxOriginais[plr]=nil end)
 
--- anti fling
 local antiFlingAtivo = false
 local antiFlingConn = nil
 
@@ -888,7 +811,6 @@ local function desativarAntiFling()
     if antiFlingConn then antiFlingConn:Disconnect(); antiFlingConn=nil end
 end
 
--- tabela de usuarios no misc
 local function getPlayerTable()
     local char = Player.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -907,7 +829,6 @@ end
 
 -- ===== UI =====
 
--- ESP tab
 local EspLeft    = EspTab:AddLeftGroupbox("Controles ESP", "eye")
 local EspRight   = EspTab:AddRightGroupbox("Cores ESP", "palette")
 local OutlineBox = EspTab:AddRightGroupbox("Borda", "square")
@@ -934,7 +855,6 @@ ot:AddColorPicker("OutlineColorPicker", { Default=Settings.OutlineColor, Transpa
 OutlineBox:AddToggle("RainbowOutline", { Text="Borda Rainbow", Default=false, Callback=function(v) Settings.OutlineRainbow=v end })
 OutlineBox:AddSlider("OutlineTransparency", { Text="Transparência Borda", Default=0, Min=0, Max=1, Rounding=2, Callback=function(v) Settings.OutlineTransp=v end })
 
--- movimento tab
 local MovBox = MovementTab:AddLeftGroupbox("Movimento", "zap")
 local FlyToggle = MovBox:AddToggle("FlyToggle", { Text="Voar", Default=false, Callback=function(v) if v then startFly() else stopFly() end end })
 FlyToggle:AddKeyPicker("FlyKeybind", { Text="Tecla Voar", Default="L", Mode="Toggle", SyncToggleState=true, Callback=function() toggleFly() end })
@@ -979,7 +899,6 @@ local JPToggle = MovBox:AddToggle("JPToggle", { Text="Jump Hack", Default=false,
 })
 JPToggle:AddKeyPicker("JPKey", { Text="Tecla Jump Hack", Default="RightBracket", Mode="Toggle", SyncToggleState=true, Callback=function() end })
 
--- teleporte tab
 local TpBox = TeleportTab:AddLeftGroupbox("Teleportes", "map-pin")
 TpBox:AddButton({ Text="TP para Lobby",     Func=tpToLobby })
 TpBox:AddButton({ Text="TP para Mapa",      Func=tpToMap })
@@ -992,7 +911,6 @@ TpBox:AddButton({ Text="TP para Jogador", Func=function()
 end })
 TpBox:AddButton({ Text="Rejoin", Func=rejoin })
 
--- misc tab
 local MiscLeft  = MiscTab:AddLeftGroupbox("Misc", "cog")
 local MiscRight = MiscTab:AddRightGroupbox("Jogadores", "users")
 local HitboxBox = featureAllowed("hitbox") and MiscTab:AddRightGroupbox("Hitbox", "maximize") or nil
@@ -1018,15 +936,13 @@ end })
 
 MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end })
 
--- tabela de jogadores
 local playerTableLabel = MiscRight:AddLabel("carregando...")
 MiscRight:AddButton({ Text="Atualizar", Func=function()
     playerTableLabel:SetText(getPlayerTable())
 end })
--- auto refresh da tabela a cada 3s
 task.spawn(function()
-    while getgenv().VynixuMM2_Running do
-        task.wait(3)
+    while task.wait(3) do
+        if not getgenv().VynixuMM2_Running then break end
         pcall(function() playerTableLabel:SetText(getPlayerTable()) end)
     end
 end)
@@ -1045,11 +961,10 @@ if HitboxBox then
     HitboxBox:AddButton({ Text="Ver Hitbox (2s)", Func=verHitbox })
 end
 
--- admin panel
 if isAdmin and AdminTab then
     local AdminLeft  = AdminTab:AddLeftGroupbox("Usuarios Online", "users")
     local AdminRight = AdminTab:AddRightGroupbox("Acoes", "shield")
-    local AdminGames = isCoOwner and AdminTab:AddRightGroupbox("Blacklist Jogos", "slash") or nil
+    local AdminGames = canBlacklist and AdminTab:AddRightGroupbox("Blacklist Jogos", "slash") or nil
 
     local function refreshUsers()
         local raw = dbGet("users")
@@ -1110,7 +1025,6 @@ if isAdmin and AdminTab then
         AdminRight:AddInput("FeatureInput", { Text="Feature (fly/esp/hitbox...)", Default="", Callback=function(v) featureInput=v end })
         AdminRight:AddButton({ Text="Desabilitar Feature (Global)", Func=function()
             if featureInput == "" then return end
-            -- atualiza no firebase
             local raw = dbGet("disabledFeatures")
             local data = {}
             if raw and raw ~= "null" then pcall(function() data = HS:JSONDecode(raw) end) end
@@ -1143,7 +1057,6 @@ if isAdmin and AdminTab then
         end })
     end
 
-    -- adicionar admin (co-owner+ pode adicionar admins)
     if isCoOwner then
         local newAdminInput, newAdminRole = "", "admin"
         AdminRight:AddInput("NewAdminInput", { Text="Novo Admin (nome)", Default="", Callback=function(v) newAdminInput=v end })
@@ -1164,6 +1077,28 @@ if isAdmin and AdminTab then
             dbSet("admins/" .. newAdminInput, HS:JSONEncode({ boolean=false, role="none", authmethod="name" }))
             Library:Notify({Title="Admin",Description=newAdminInput.." removido",Time=3})
         end })
+
+        local jumpBrrAtivo = false
+        local jumpBrrWS = 100
+        AdminRight:AddToggle("JumpGoBrr", { Text="Jump Go Brr", Default=false, Callback=function(v)
+            jumpBrrAtivo = v
+            if v then
+                task.spawn(function()
+                    while jumpBrrAtivo do
+                        task.wait(0.05)
+                        local c = Player.Character
+                        local hum = c and c:FindFirstChildWhichIsA("Humanoid")
+                        if hum then
+                            hum.WalkSpeed = (hum.Jump or hum.FloorMaterial == Enum.Material.Air) and jumpBrrWS or 16
+                        end
+                    end
+                    local c = Player.Character
+                    local hum = c and c:FindFirstChildWhichIsA("Humanoid")
+                    if hum then hum.WalkSpeed = 16 end
+                end)
+            end
+        end })
+        AdminRight:AddSlider("JumpBrrSpeed", { Text="Speed no Ar", Default=100, Min=20, Max=500, Rounding=0, Callback=function(v) jumpBrrWS=v end })
     end
 
     if canBlacklist and AdminGames then
@@ -1181,38 +1116,72 @@ if isAdmin and AdminTab then
             Library:Notify({Title="Admin",Description="jogo "..gameIdInput.." desbloqueado!",Time=3})
         end })
     end
-
-    -- jump go brr (owner/co-owner only)
-    if isCoOwner then
-        local jumpBrrAtivo = false
-        local jumpBrrWS = 100
-        AdminRight:AddToggle("JumpGoBrr", { Text="Jump Go Brr", Default=false, Callback=function(v)
-            jumpBrrAtivo = v
-            if v then
-                task.spawn(function()
-                    while jumpBrrAtivo do
-                        task.wait(0.05)
-                        local c = Player.Character
-                        local hum = c and c:FindFirstChildWhichIsA("Humanoid")
-                        if hum then
-                            if hum.Jump or hum.FloorMaterial == Enum.Material.Air then
-                                hum.WalkSpeed = jumpBrrWS
-                            else
-                                hum.WalkSpeed = 16
-                            end
-                        end
-                    end
-                    local c = Player.Character
-                    local hum = c and c:FindFirstChildWhichIsA("Humanoid")
-                    if hum then hum.WalkSpeed = 16 end
-                end)
-            end
-        end })
-        AdminRight:AddSlider("JumpBrrSpeed", { Text="Speed no Ar", Default=100, Min=20, Max=500, Rounding=0, Callback=function(v) jumpBrrWS=v end })
-    end
 end
 
--- config tab (sem duplicata)
+-- aba key system (só pra quem não é admin)
+if KeyTab then
+    local KeyBox   = KeyTab:AddLeftGroupbox("Ativar Key", "key")
+    local KeyInfo  = KeyTab:AddRightGroupbox("Status", "info")
+
+    local keyStatus = userRole == "guest" and "sem key" or ("ativa: " .. userRole)
+    local keyStatusLabel = KeyInfo:AddLabel("status: " .. keyStatus)
+    local keyRoleLabel   = KeyInfo:AddLabel("role: " .. (userRole == "guest" and "guest (sem acesso)" or userRole))
+
+    local keyInput = ""
+    KeyBox:AddLabel("insira sua key abaixo:")
+    KeyBox:AddInput("KeyInput", {
+        Text = "Key",
+        Default = "",
+        Placeholder = "XXXX-XXXX-XXXX",
+        Callback = function(v) keyInput = v:gsub("%s", "") end
+    })
+
+    KeyBox:AddButton({ Text = "Ativar Key", Func = function()
+        if keyInput == "" then
+            Library:Notify({ Title="Key System", Description="Digite uma key primeiro!", Time=3 })
+            return
+        end
+
+        Library:Notify({ Title="Key System", Description="Verificando key...", Time=2 })
+
+        local keyRoleRaw = dbGet("keys/" .. keyInput)
+        if keyRoleRaw and keyRoleRaw ~= "null" then
+            local newRole = keyRoleRaw:gsub('"', ''):gsub('%s', '')
+            userRole = newRole
+            isOwner   = userRole == "owner"
+            isCoOwner = userRole == "co-owner" or isOwner
+            isAdmin   = userRole == "admin" or isCoOwner
+            canBan         = isCoOwner
+            canSetDelay    = isCoOwner
+            canDisableFeat = isCoOwner
+            canBlacklist   = isCoOwner
+            gunDelay = userSettings.gunDelay or globalSettings.defaultGunDelay
+
+            -- salva no firebase vinculando username -> key
+            task.spawn(function()
+                dbSet("userKeys/" .. username, '"' .. keyInput .. '"')
+            end)
+
+            keyStatusLabel:SetText("status: ativa ✓")
+            keyRoleLabel:SetText("role: " .. newRole)
+
+            Library:Notify({
+                Title = "Key System",
+                Description = "Key ativada! Role: " .. newRole .. "\nRecarregue o script para aplicar todas as permissões.",
+                Time = 6
+            })
+        else
+            Library:Notify({ Title="Key System", Description="Key inválida! Tente novamente.", Time=4 })
+        end
+    end })
+
+    KeyBox:AddButton({ Text = "Limpar Key", Func = function()
+        keyInput = ""
+        Options.KeyInput:SetValue("")
+        Library:Notify({ Title="Key System", Description="Campo limpo.", Time=2 })
+    end })
+end
+
 SaveManager:BuildConfigSection(ConfigTab)
 local MenuGroup = ConfigTab:AddLeftGroupbox("Menu", "wrench")
 
@@ -1221,20 +1190,17 @@ MenuGroup:AddToggle("KeybindMenuOpen", {
     Text = "Abrir Menu de Keybinds",
     Callback = function(v) Library.KeybindFrame.Visible = v end,
 })
-
 MenuGroup:AddToggle("ShowCustomCursor", {
     Text = "Cursor Customizado",
     Default = true,
     Callback = function(v) Library.ShowCustomCursor = v end,
 })
-
 MenuGroup:AddDropdown("NotificationSide", {
     Values = { "Left", "Right" },
     Default = "Right",
     Text = "Lado das Notificações",
     Callback = function(v) Library:SetNotifySide(v) end,
 })
-
 MenuGroup:AddDropdown("DPIDropdown", {
     Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
     Default = "100%",
@@ -1244,18 +1210,15 @@ MenuGroup:AddDropdown("DPIDropdown", {
         Library:SetDPIScale(tonumber(v))
     end,
 })
-
 MenuGroup:AddSlider("UICornerSlider", {
     Text = "Corner Radius",
     Default = Library.CornerRadius,
     Min = 0, Max = 20, Rounding = 0,
     Callback = function(v) Window:SetCornerRadius(v) end,
 })
-
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Tecla do Menu"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Tecla do Menu" })
 Library.ToggleKeybind = Options.MenuKeybind
-
 MenuGroup:AddButton({ Text = "Descarregar Script", Func = function() Library:Unload() end })
 
 SaveManager:LoadAutoloadConfig()
