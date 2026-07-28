@@ -68,8 +68,8 @@ Loading:SetCurrentStep(2)
 Loading:SetDescription("checando blacklist...")
 local blacklistMsg = dbGet("blacklistedGames/" .. placeId)
 if blacklistMsg and blacklistMsg ~= "null" then
-    Loading:SetMessage("jogo bloqueado")
-    Loading:SetDescription("este jogo esta na blacklist. script nao carregado.")
+    Loading:SetMessage("failed")
+    Loading:SetDescription(blacklistMsg)
     task.wait(5); Library:Destroy(); return
 end
 
