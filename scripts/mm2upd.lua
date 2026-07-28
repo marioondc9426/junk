@@ -161,7 +161,7 @@ trackThread(task.spawn(function()
     while task.wait(10) do
         if checarVersao() then break end
     end
-end)
+end))
 
 -- step 2: check blacklist
 setStep(2, "checando blacklist...")
