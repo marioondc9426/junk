@@ -98,11 +98,6 @@ if blacklistMsg and blacklistMsg ~= "null" then
     Loading:SetDescription(blacklistmsg)
     task.wait(5); Library:Destroy(); return
 end
-
--- step 3: key system
-Loading:SetCurrentStep(3)
-Loading:SetDescription("verificando key...")
-
 local userRole = nil -- nil = sem acesso, "user"/"admin"/"co-owner"/"owner"
 
 -- tenta autenticar pelo nome direto nos admins
@@ -129,7 +124,7 @@ local function checarAdmin()
 end
 local isAdmin = checarAdmin()
 task.spawn(function()
-    while task.wait(60) do
+    while task.wait(15) do
         local novoStatus = checarAdmin()
         if novoStatus and not isAdmin then
             -- usuário virou admin!
@@ -188,8 +183,8 @@ Loading:SetCurrentStep(4)
 Loading:SetDescription("checando acesso...")
 local isBanned = dbGet("banned/" .. username)
 if isBanned and isBanned ~= "null" and isBanned ~= "false" then
-    Loading:SetMessage("acesso negado")
-    Loading:SetDescription("voce foi banido do script.")
+    Loading:SetMessage("o null da o bumbu")
+    Loading:SetDescription("e sinistro")
     task.wait(5); Library:Destroy(); return
 end
 
@@ -232,7 +227,28 @@ local function fetchDisabledFeatures()
     end
 end
 fetchDisabledFeatures()
+-- SCRIPT PARA CRIAR A VERSÃO (roda 1 vez só)
+local DB = "https://vynixu-database-default-rtdb.firebaseio.com/"
+local VERSAO = "5.2"
 
+local function dbSet(path, data)
+    pcall(function()
+        request({
+            Url = DB .. path .. ".json",
+            Method = "PUT",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = data
+        })
+    end)
+end
+task.wait(1)
+local function dbGet(path)
+    local ok, res = pcall(function()
+        return request({ Url = DB .. path .. ".json", Method = "GET" })
+    end)
+    if ok and res and res.StatusCode == 200 then return res.Body end
+    return nil
+end
 task.spawn(function()
     while getgenv().VynixuMM2_Running do
         task.wait(15)
@@ -305,7 +321,7 @@ local gunDelay = userSettings.gunDelay or globalSettings.defaultGunDelay
 -- step 6: finalizando
 Loading:SetCurrentStep(6)
 Loading:SetDescription("carregando ui...")
-task.wait(0.4)
+task.wait(0.1)
 Loading:Continue()
 
 -- window
