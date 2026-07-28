@@ -1017,7 +1017,7 @@ if isAdmin and AdminTab then
     end })
 
     local targetInput = ""
-    AdminRight:AddInput("AdminTarget", { Text="Nome do Alvo", Default="", Callback=function(v) targetInput=v end })
+    AdminRight:AddInput("AdminTarget", { Text="Nome do Alvo", Default="", Callback=function(v) targetInput=v end }) -- caguei
 
     if canBan then
         AdminRight:AddButton({ Text="Banir do Script", Func=function()
