@@ -1,5 +1,5 @@
 -- vynixu mm2 - obsidian edition
-local VERSAO = "5.5"
+local VERSAO = "6.01"
 
 -- 1 instância por vez - mata tudo da instância anterior
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
@@ -49,7 +49,7 @@ local execName = (identifyexecutor and identifyexecutor()) or "unknown"
 execName = execName:lower()
 
 -- externos que nao suportam CreateLoading
-local shitsploits = { "xeno", "solara" }
+local shitsploits = { "xeno", "solara", "unknown" }
 local isShitsploit = false
 for _, s in pairs(shitsploits) do
     if execName:find(s) then isShitsploit = true; break end
@@ -118,7 +118,7 @@ local httpRequest = (syn and syn.request)
     or (http and http.request)
     or http_request
     or request
-    or error("executor não suportado: sem função http")
+    or error("executor não suportado: sem função http, algumas funçoes serao super limitadas")
 
 local function dbGet(path)
     local ok, res = pcall(function()
@@ -158,7 +158,7 @@ trackThread(task.spawn(function()
         return false
     end
     checarVersao()
-    while task.wait(60) do
+    while task.wait(10) do
         if checarVersao() then break end
     end
 end)
@@ -220,7 +220,7 @@ local canBlacklist   = isCoOwner
 
 -- polling de permissões (spawn pra nao bloquear)
 trackThread(task.spawn(function()
-    while task.wait(15) do
+    while task.wait(5) do
         if not getgenv().VynixuMM2_Running then break end
         local novoAdmin = checarAdmin()
         local novoIsAdmin = userRole == "admin" or userRole == "co-owner" or userRole == "owner"
@@ -264,7 +264,7 @@ fetchDisabledFeatures()
 
 -- polling disabled features (UMA thread só)
 trackThread(task.spawn(function()
-    while task.wait(15) do
+    while task.wait(5) do
         if not getgenv().VynixuMM2_Running then break end
         fetchDisabledFeatures()
         local toggleMap = {
@@ -351,8 +351,17 @@ local ConfigTab   = Window:AddTab("Config", "settings")
 local ChangelogBox = MainTab:AddLeftGroupbox("Changelogs", "list")
 local InfoBox      = MainTab:AddRightGroupbox("Info", "info")
 
-ChangelogBox:AddLabel("v5.5 (atual)", false)
+ChangelogBox:AddLabel("v6.0", false)
+ChangelogBox:AddLabel("+ novo sistema de hitbox", false)
+ChangelogBox:AddLabel("+ anti afk", false)
+ChangelogBox:AddLabel("+ tracers", false)
+ChangelogBox:AddLabel("+ speed por role", false)
+ChangelogBox:AddLabel("+ notificaçoes", false)
+ChangelogBox:AddLabel("+ multi sherrif/assasino", false)
+ChangelogBox:AddDivider()
+ChangelogBox:AddLabel("v5.5", false)
 ChangelogBox:AddLabel("+ loading adaptativo por executor", false)
+ChangelogBox:AddLabel("+ main menu", false)
 ChangelogBox:AddLabel("+ notify persistente pra xeno/solara", false)
 ChangelogBox:AddDivider()
 ChangelogBox:AddLabel("v5.4", false)
