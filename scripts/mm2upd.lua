@@ -21,7 +21,7 @@ local RS  = game:GetService("RunService")
 local HS  = game:GetService("HttpService")
 local username = Player.Name
 local placeId = tostring(game.PlaceId)
-
+local InfJumpEnabled = false -- começa desligado
 -- loading com 6 steps
 local Loading = Library:CreateLoading({
     Title = "Vynixu MM2 Script",
@@ -557,7 +557,22 @@ game.Players.PlayerRemoving:Connect(function(plr)
         for tipo in pairs(ESP.Highlights) do ESP:remove(tipo, plr.Character) end
     end
 end)
-
+-- inf jump
+local function infjumpon()
+    UIS.JumpRequest:Connect(function()
+        if not InfJumpEnabled then return end -- se desligado, não faz nada
+        if Player.Character then
+            local hum = Player.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                hum:ChangeState("Jumping")
+            end
+        end
+    end)
+end
+local function toggleInfJump()
+    InfJumpEnabled = not InfJumpEnabled
+    print("InfJump: " .. (InfJumpEnabled and "LIGADO" or "DESLIGADO"))
+end
 -- fly
 local function restaurarColisoes()
     local char = Player.Character; if not char then return end
@@ -964,6 +979,11 @@ end })
 MiscLeft:AddToggle("AntiFling", { Text="Anti Fling", Default=false, Callback=function(v)
     if v then ativarAntiFling() else desativarAntiFling() end
     Library:Notify({Title="Anti Fling",Description=v and "Ativado!" or "Desativado!",Time=1})
+end })
+
+MiscLeft:AddToggle("InfJump", { Text="Infinite Jump", Default=false, Callback=function(v)
+    if v then toggleInfJump() else toggleInfJump() end
+    Library:Notify({Title="Inf Jump",Description=v and "Ativado!" or "Desativado!",Time=1})
 end })
 
 MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end }) -- inutil, mas vai q
