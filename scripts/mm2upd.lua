@@ -79,7 +79,7 @@ task.spawn(function()
         return false
     end
     checarVersao()
-    while task.wait(60) do
+    while task.wait(20) do
         if checarVersao() then break end
     end
 end)
@@ -191,7 +191,7 @@ fetchDisabledFeatures()
 
 -- polling disabled features (UMA thread só)
 task.spawn(function()
-    while task.wait(15) do
+    while task.wait(5) do
         if not getgenv().VynixuMM2_Running then break end
         fetchDisabledFeatures()
         local toggleMap = {
@@ -912,7 +912,6 @@ end })
 TpBox:AddButton({ Text="Rejoin", Func=rejoin })
 
 local MiscLeft  = MiscTab:AddLeftGroupbox("Misc", "cog")
-local MiscRight = MiscTab:AddRightGroupbox("Jogadores", "users")
 local HitboxBox = featureAllowed("hitbox") and MiscTab:AddRightGroupbox("Hitbox", "maximize") or nil
 
 MiscLeft:AddButton({ Text="Pegar Arma (Manual)", Func=gunGrabber })
@@ -936,16 +935,7 @@ end })
 
 MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end })
 
-local playerTableLabel = MiscRight:AddLabel("carregando...")
-MiscRight:AddButton({ Text="Atualizar", Func=function()
-    playerTableLabel:SetText(getPlayerTable())
-end })
-task.spawn(function()
-    while task.wait(3) do
-        if not getgenv().VynixuMM2_Running then break end
-        pcall(function() playerTableLabel:SetText(getPlayerTable()) end)
-    end
-end)
+
 
 if HitboxBox then
     HitboxBox:AddToggle("HitboxToggle", { Text="Hitbox Expander", Default=false, Callback=function(v)
@@ -1127,16 +1117,14 @@ if KeyTab then
     local keyStatusLabel = KeyInfo:AddLabel("status: " .. keyStatus)
     local keyRoleLabel   = KeyInfo:AddLabel("role: " .. (userRole == "guest" and "guest (sem acesso)" or userRole))
 
-    local keyInput = ""
     KeyBox:AddLabel("insira sua key abaixo:")
     KeyBox:AddInput("KeyInput", {
         Text = "Key",
         Default = "",
-        Placeholder = "XXXX-XXXX-XXXX",
-        Callback = function(v) keyInput = v:gsub("%s", "") end
     })
 
     KeyBox:AddButton({ Text = "Ativar Key", Func = function()
+        local keyInput = (Options.KeyInput and Options.KeyInput.Value or ""):gsub("%s", "")
         if keyInput == "" then
             Library:Notify({ Title="Key System", Description="Digite uma key primeiro!", Time=3 })
             return
@@ -1176,8 +1164,7 @@ if KeyTab then
     end })
 
     KeyBox:AddButton({ Text = "Limpar Key", Func = function()
-        keyInput = ""
-        Options.KeyInput:SetValue("")
+        if Options.KeyInput then Options.KeyInput:SetValue("") end
         Library:Notify({ Title="Key System", Description="Campo limpo.", Time=2 })
     end })
 end
