@@ -617,9 +617,6 @@ local function recarregarscript()
     espStates.Names = false
     espStates.Gun = false
     loadstring(game:HttpGet("https://raw.githubusercontent.com/marioondc9426/junk/refs/heads/main/scripts/mm2upd.lua"))()
-    tchau()
-    mundo()
-    cruel()
 end
 local function stopFly()
     if not flying then return end
