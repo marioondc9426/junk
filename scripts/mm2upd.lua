@@ -30,7 +30,7 @@ local Loading = Library:CreateLoading({
     ShowSidebar = true,
 })
 Loading.Sidebar:AddLabel("v" .. VERSAO .. " changelogs:")
-Loading.Sidebar:AddLabel("+ check pra update e role periodicamente")
+Loading.Sidebar:AddLabel("+ bug fixes")
 Loading.Sidebar:AddLabel("usuario: " .. username)
 Loading:SetMessage("inicializando...")
 Loading:SetCurrentStep(1)
