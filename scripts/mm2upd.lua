@@ -21,7 +21,7 @@ local RS  = game:GetService("RunService")
 local HS  = game:GetService("HttpService")
 local username = Player.Name
 local placeId = tostring(game.PlaceId)
-local InfJumpEnabled = false -- começa desligado
+ local InfJumpEnabled = false -- começa desligado
 -- loading com 6 steps
 local Loading = Library:CreateLoading({
     Title = "Vynixu MM2 Script",
