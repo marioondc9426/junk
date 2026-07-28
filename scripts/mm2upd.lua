@@ -70,8 +70,8 @@ task.spawn(function()
             if verRemota ~= VERSAO then
                 Library:Notify({
                     Title = "Update Disponivel!",
-                    Description = "Versao atual: " .. VERSAO .. " | Nova: " .. verRemota .. "\nRe-execute o script para atualizar.",
-                    Time = 20,
+                    Description = "Versao atual: " .. VERSAO .. " | Nova: " .. verRemota .. "\nRe-execute o script para atualizar.", -- pera q eu vou ver se da para botar botao em notificaçoes
+                    Time = 20,-- infelizmente n da, mas da pra so criar um botao peidado ali
                 })
                 return true
             end
@@ -388,7 +388,7 @@ local ESP = { Highlights = {} }
 
 function ESP:remove(tipo, char)
     if not char then return end
-    local h = self.Highlights[tipo] and self.Highlights[tipo][char]
+    local h = self.Highlights[tipo] and self.Highlights[tipo][char] -- o claude n sabe botar nomes legiveis 
     if h and h.Parent then h:Destroy() end
     if self.Highlights[tipo] then self.Highlights[tipo][char] = nil end
 end
@@ -605,7 +605,13 @@ local function startFly()
     end)
     Library:Notify({ Title="Voo", Description="Ativado! WASD+Q/E", Time=2 })
 end
-
+local function recarregarscript()
+    Library:Unload()
+    stopFly()
+    desativarKillAura()
+    -- dps eu continuo (claude continua)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/marioondc9426/junk/refs/heads/main/scripts/mm2upd.lua"))()
+end
 local function stopFly()
     if not flying then return end
     flying = false
@@ -747,7 +753,7 @@ local function ativarKillAura()
             if not temFaca() then
                 killAuraAtivo = false
                 if Toggles.KillAuraToggle then Toggles.KillAuraToggle:SetValue(false) end
-                Library:Notify({Title="Kill Aura",Description="Desativado: sem faca!",Time=3})
+                Library:Notify({Title="Kill Aura",Description="Desativado: sem faca!",Time=3}) --oh no
                 break
             end
             local char = Player.Character
@@ -782,7 +788,7 @@ end
 
 local function getHitboxParts(char)
     if hitboxBrutal then
-        local p={}; for _,v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then table.insert(p,v) end end; return p
+        local p={}; for _,v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then table.insert(p,v) end end; return p--enis
     end
     local hrp=char:FindFirstChild("HumanoidRootPart"); return hrp and {hrp} or {}
 end
@@ -804,22 +810,7 @@ local function removerHitbox()
         for part,size in pairs(parts) do setPartSize(part, size) end
     end; hitboxOriginais={}
 end
-local function verHitbox()
-    for plr in pairs(hitboxOriginais) do
-        if plr.Character then
-            local h=Instance.new("Highlight"); h.Parent=plr.Character
-            h.FillColor=Color3.fromRGB(255,165,0); h.FillTransparency=0.5
-            h.OutlineColor=Color3.fromRGB(255,165,0); h.OutlineTransparency=0
-            h.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop
-            table.insert(hitboxHighlights,h)
-        end
-    end
-    task.delay(2, function()
-        for _,h in pairs(hitboxHighlights) do pcall(function() h:Destroy() end) end
-        hitboxHighlights={}
-    end)
-    Library:Notify({Title="View Hitbox",Description="Mostrando por 2s",Time=2})
-end
+-- tchau view hitbox (2s)
 task.spawn(function()
     while task.wait(0.5) do
         if not getgenv().VynixuMM2_Running then break end
@@ -829,7 +820,7 @@ end)
 game.Players.PlayerRemoving:Connect(function(plr) hitboxOriginais[plr]=nil end)
 
 local antiFlingAtivo = false
-local antiFlingConn = nil
+local antiFlingConn = nil -- q merda e essa
 
 local function ativarAntiFling()
     antiFlingAtivo = true
@@ -969,7 +960,7 @@ MiscLeft:AddToggle("AntiFling", { Text="Anti Fling", Default=false, Callback=fun
     Library:Notify({Title="Anti Fling",Description=v and "Ativado!" or "Desativado!",Time=1})
 end })
 
-MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end })
+MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); Library:Notify({Title="Roles",Description="Recarregadas!",Time=2}) end }) -- inutil, mas vai q
 
 
 
@@ -984,7 +975,6 @@ if HitboxBox then
     HitboxBox:AddSlider("HitboxSize", { Text="Tamanho", Default=10, Min=2, Max=50, Rounding=0, Callback=function(v)
         hitboxSize=v; if hitboxAtivo then removerHitbox(); aplicarHitbox() end
     end })
-    HitboxBox:AddButton({ Text="Ver Hitbox (2s)", Func=verHitbox })
 end
 
 if isAdmin and AdminTab then
@@ -1243,6 +1233,7 @@ MenuGroup:AddDivider()
 MenuGroup:AddLabel("Tecla do Menu"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Tecla do Menu" })
 Library.ToggleKeybind = Options.MenuKeybind
 MenuGroup:AddButton({ Text = "Descarregar Script", Func = function() Library:Unload() end })
+MenuGroup:AddButton({ Text = "Recarregar Script", Func = function() recarregarscript() end })
 
 SaveManager:LoadAutoloadConfig()
 
