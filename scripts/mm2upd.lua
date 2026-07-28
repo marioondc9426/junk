@@ -1,5 +1,5 @@
 -- vynixu mm2 - obsidian edition
-local VERSAO = "5.2"
+local VERSAO = "5.3"
 
 -- 1 instância por vez
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
