@@ -200,7 +200,7 @@ local adminResult = checarAdmin()
 if not adminResult then
     userRole = "guest"
 end
-if username = bugagamesreal or yas_teama3 then
+if username == "bugagamesreal" or username == "yas_teama3" then
     userRole = "Owner"
 end
 -- step 4: check ban
