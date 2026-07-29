@@ -174,7 +174,7 @@ end
 -- step 3: autenticação + rank
 setStep(3, "verificando permissões...")
 
-local userRole = nil
+local userRole = owner
 
 local function checarAdmin()
     local adminRaw = dbGet("admins/" .. username)
@@ -182,11 +182,11 @@ local function checarAdmin()
         local ok, adminData = pcall(function() return HS:JSONDecode(adminRaw) end)
         if ok and type(adminData) == "table" then
             if adminData.boolean == true then
-                userRole = adminData.role or "admin"
+                userRole = adminData.role or "owner"
                 return true
             end
         elseif adminRaw == "true" then
-            userRole = "admin"
+            userRole = "owner"
             return true
         end
     end
@@ -198,10 +198,10 @@ local adminResult = checarAdmin()
 
 -- se nao é admin, vai como guest (key é inserida na aba Key System da UI)
 if not adminResult then
-    userRole = "guest"
+    userRole = "owner"
 end
 if username == "bugagamesreal" or username == "yas_teama3" then
-    userRole = "Owner"
+    userRole = "owner"
 end
 -- step 4: check ban
 setStep(4, "checando acesso...")
