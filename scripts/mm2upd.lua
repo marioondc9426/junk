@@ -1,5 +1,5 @@
 -- vynixu mm2 - obsidian edition
-local VERSAO = "6.01"
+local VERSAO = "5.5"
 
 -- 1 instância por vez - mata tudo da instância anterior
 if getgenv().VynixuMM2_Destroy then pcall(getgenv().VynixuMM2_Destroy) end
@@ -49,7 +49,7 @@ local execName = (identifyexecutor and identifyexecutor()) or "unknown"
 execName = execName:lower()
 
 -- externos que nao suportam CreateLoading
-local shitsploits = { "xeno", "solara", "unknown" }
+local shitsploits = { "xeno", "solara" }
 local isShitsploit = false
 for _, s in pairs(shitsploits) do
     if execName:find(s) then isShitsploit = true; break end
@@ -118,7 +118,7 @@ local httpRequest = (syn and syn.request)
     or (http and http.request)
     or http_request
     or request
-    or error("executor não suportado: sem função http, algumas funçoes serao super limitadas")
+    or error("executor não suportado: sem função http")
 
 local function dbGet(path)
     local ok, res = pcall(function()
@@ -158,10 +158,10 @@ trackThread(task.spawn(function()
         return false
     end
     checarVersao()
-    while task.wait(10) do
+    while task.wait(60) do
         if checarVersao() then break end
     end
-end))
+end)
 
 -- step 2: check blacklist
 setStep(2, "checando blacklist...")
@@ -174,7 +174,7 @@ end
 -- step 3: autenticação + rank
 setStep(3, "verificando permissões...")
 
-local userRole = owner
+local userRole = nil
 
 local function checarAdmin()
     local adminRaw = dbGet("admins/" .. username)
@@ -182,11 +182,11 @@ local function checarAdmin()
         local ok, adminData = pcall(function() return HS:JSONDecode(adminRaw) end)
         if ok and type(adminData) == "table" then
             if adminData.boolean == true then
-                userRole = adminData.role or "owner"
+                userRole = adminData.role or "admin"
                 return true
             end
         elseif adminRaw == "true" then
-            userRole = "owner"
+            userRole = "admin"
             return true
         end
     end
@@ -198,11 +198,9 @@ local adminResult = checarAdmin()
 
 -- se nao é admin, vai como guest (key é inserida na aba Key System da UI)
 if not adminResult then
-    userRole = "owner"
+    userRole = "guest"
 end
-if username == "bugagamesreal" or username == "yas_teama3" then
-    userRole = "owner"
-end
+
 -- step 4: check ban
 setStep(4, "checando acesso...")
 local isBanned = dbGet("banned/" .. username)
@@ -222,7 +220,7 @@ local canBlacklist   = isCoOwner
 
 -- polling de permissões (spawn pra nao bloquear)
 trackThread(task.spawn(function()
-    while task.wait(5) do
+    while task.wait(15) do
         if not getgenv().VynixuMM2_Running then break end
         local novoAdmin = checarAdmin()
         local novoIsAdmin = userRole == "admin" or userRole == "co-owner" or userRole == "owner"
@@ -234,7 +232,7 @@ trackThread(task.spawn(function()
             isAdmin = false
         end
     end
-end))
+end)
 
 -- step 5: settings
 setStep(5, "carregando settings...")
@@ -266,7 +264,7 @@ fetchDisabledFeatures()
 
 -- polling disabled features (UMA thread só)
 trackThread(task.spawn(function()
-    while task.wait(5) do
+    while task.wait(15) do
         if not getgenv().VynixuMM2_Running then break end
         fetchDisabledFeatures()
         local toggleMap = {
@@ -289,13 +287,29 @@ trackThread(task.spawn(function()
             end
         end
     end
-end))
+end)
 
 local userSettingsRaw = dbGet("userSettings/" .. username)
 local userSettings = {}
 if userSettingsRaw and userSettingsRaw ~= "null" then
     pcall(function() userSettings = HS:JSONDecode(userSettingsRaw) end)
 end
+
+-- polling de kick via firebase (3s)
+trackThread(task.spawn(function()
+    while task.wait(3) do
+        if not getgenv().VynixuMM2_Running then break end
+        local raw = dbGet("kick/" .. username)
+        if raw and raw ~= "null" and raw ~= "false" then
+            -- zera no firebase na hora
+            dbSet("kick/" .. username, "false")
+            -- desliga tudo e kicka
+            destroyAll()
+            pcall(function() Library:Destroy() end)
+            game:GetService("Players").LocalPlayer:Kick("voce foi kickado pelo admin.")
+        end
+    end
+end))
 
 trackThread(task.spawn(function()
     dbSet("users/" .. username, HS:JSONEncode({
@@ -304,10 +318,10 @@ trackThread(task.spawn(function()
         time = os.time(),
         role = userRole or "guest"
     }))
-end))
+end)
 trackConnection(game:GetService("Players").LocalPlayer.AncestryChanged:Connect(function()
     dbSet("users/" .. username .. "/online", "false")
-end))
+end)
 
 
 
@@ -353,17 +367,8 @@ local ConfigTab   = Window:AddTab("Config", "settings")
 local ChangelogBox = MainTab:AddLeftGroupbox("Changelogs", "list")
 local InfoBox      = MainTab:AddRightGroupbox("Info", "info")
 
-ChangelogBox:AddLabel("v6.0", false)
-ChangelogBox:AddLabel("+ novo sistema de hitbox", false)
-ChangelogBox:AddLabel("+ anti afk", false)
-ChangelogBox:AddLabel("+ tracers", false)
-ChangelogBox:AddLabel("+ speed por role", false)
-ChangelogBox:AddLabel("+ notificaçoes", false)
-ChangelogBox:AddLabel("+ multi sherrif/assasino", false)
-ChangelogBox:AddDivider()
-ChangelogBox:AddLabel("v5.5", false)
+ChangelogBox:AddLabel("v5.5 (atual)", false)
 ChangelogBox:AddLabel("+ loading adaptativo por executor", false)
-ChangelogBox:AddLabel("+ main menu", false)
 ChangelogBox:AddLabel("+ notify persistente pra xeno/solara", false)
 ChangelogBox:AddDivider()
 ChangelogBox:AddLabel("v5.4", false)
@@ -389,7 +394,6 @@ InfoBox:AddLabel("role: " .. (userRole or "guest"), false)
 InfoBox:AddLabel("executor: " .. execName, false)
 InfoBox:AddDivider()
 InfoBox:AddLabel("obsidian ui by deivid", false)
-InfoBox:AddLabel("script by vynixu", false)
 
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
@@ -426,13 +430,13 @@ end
 trackThread(task.spawn(carregarRoles))
 trackConnection(game:GetService("ReplicatedStorage").DescendantAdded:Connect(function(obj)
     if obj.Name == "GetPlayerData" then task.wait(1); carregarRoles() end
-end))
+end)
 trackThread(task.spawn(function()
     while task.wait(5) do
         if not getgenv().VynixuMM2_Running then break end
         carregarRoles()
     end
-end))
+end)
 
 local function getRole(plr)
     if not plr or not rolesLoaded then return nil end
@@ -502,7 +506,7 @@ trackConnection(RS.RenderStepped:Connect(function()
     for _, map in pairs(ESP.Highlights) do
         for _, h in pairs(map) do if h and h.Parent then h.OutlineColor = c end end
     end
-end))
+end)
 
 local function espLoop(tipo, checkFn, colorFn)
     task.spawn(function()
@@ -603,7 +607,7 @@ trackConnection(RS.RenderStepped:Connect(function()
             dl.Text = math.floor((lhrp.Position - plr.Character.HumanoidRootPart.Position).Magnitude) .. "m"
         end
     end
-end))
+end)
 
 local function ativarNamesESP()
     espStates.Names = true
@@ -637,7 +641,7 @@ trackConnection(game.Players.PlayerRemoving:Connect(function(plr)
     if plr.Character then
         for tipo in pairs(ESP.Highlights) do ESP:remove(tipo, plr.Character) end
     end
-end))
+end)
 
 -- inf jump
 local InfJumpEnabled = false
@@ -648,7 +652,7 @@ trackConnection(UIS.JumpRequest:Connect(function()
     if hum and hum.Health > 0 then
         hum:ChangeState(Enum.HumanoidStateType.Jumping)
     end
-end))
+end)
 
 -- recarregar script
 local function recarregarScript()
@@ -740,7 +744,7 @@ trackConnection(RS.Stepped:Connect(function()
             if p:IsA("BasePart") then p.CanCollide = false end
         end
     end
-end))
+end)
 
 local function setWalkSpeed(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.WalkSpeed=tonumber(v) or 16 end end
 local function setJumpPower(v) local c=Player.Character; if c and c:FindFirstChild("Humanoid") then c.Humanoid.JumpPower=tonumber(v) or 50 end end
@@ -932,7 +936,7 @@ trackThread(task.spawn(function()
         if not getgenv().VynixuMM2_Running then break end
         if hitboxAtivo then aplicarHitbox() end
     end
-end))
+end)
 trackConnection(game.Players.PlayerRemoving:Connect(function(plr) hitboxOriginais[plr]=nil end))
 
 local antiFlingAtivo = false
@@ -973,7 +977,9 @@ end
 -- tracers
 local tracerAtivo = false
 local tracerLinhas = {}
-local tracerModo = "camera" -- "camera" ou "baixo"
+local tracerModo = "camera"
+local tracerRainbow = false
+local tracerThickness = 1
 local tracerCores = {
     Murderer = Color3.fromRGB(255, 0, 25),
     Sheriff  = Color3.fromRGB(0, 50, 255),
@@ -983,9 +989,9 @@ local tracerCores = {
 local function getTracerOrigin()
     local cam = workspace.CurrentCamera
     if tracerModo == "camera" then
-        return cam.ViewportSize / 2 -- centro da tela
+        return cam.ViewportSize / 2
     else
-        return Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y) -- baixo
+        return Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y)
     end
 end
 
@@ -1001,30 +1007,33 @@ trackConnection(RS.RenderStepped:Connect(function()
     local cam = workspace.CurrentCamera
     local origem = getTracerOrigin()
 
-    -- limpa linhas velhas
     for _, linha in pairs(tracerLinhas) do
         pcall(function() linha:Remove() end)
     end
     tracerLinhas = {}
+
+    local rainbowCor = tracerRainbow and Color3.fromHSV((tick() * 0.3) % 1, 1, 1) or nil
 
     for _, plr in pairs(game.Players:GetPlayers()) do
         if plr == Player or not plr.Character then continue end
         local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
         if not hrp then continue end
 
-        local screenPos, onScreen = cam:WorldToViewportPoint(hrp.Position)
-        if not onScreen then continue end
+        local screenPos = cam:WorldToViewportPoint(hrp.Position)
+        -- so desenha se estiver na frente da camera (Z > 0)
+        if screenPos.Z <= 0 then continue end
 
-        local cor = isMurderer(plr) and tracerCores.Murderer
-                 or isSherrif(plr) and tracerCores.Sheriff
-                 or tracerCores.Innocent
+        local cor = rainbowCor
+            or (isMurderer(plr) and tracerCores.Murderer)
+            or (isSherrif(plr) and tracerCores.Sheriff)
+            or tracerCores.Innocent
 
         local linha = Drawing.new("Line")
         linha.Visible = true
         linha.From = origem
         linha.To = Vector2.new(screenPos.X, screenPos.Y)
         linha.Color = cor
-        linha.Thickness = 1
+        linha.Thickness = tracerThickness
         linha.Transparency = 1
         table.insert(tracerLinhas, linha)
     end
@@ -1173,7 +1182,7 @@ TracerBox:AddToggle("TracerToggle", { Text="Tracers", Default=false, Callback=fu
 end })
 TracerBox:AddDropdown("TracerModo", {
     Values = { "camera", "baixo" },
-    Default = "camera", -- n ta funcionando--
+    Default = "camera",
     Text = "Origem",
     Callback = function(v) tracerModo = v end
 })
@@ -1184,11 +1193,12 @@ end
 addTracerColor(TracerBox, "MurdT", "Cor Assassino", "Murderer")
 addTracerColor(TracerBox, "SherT", "Cor Xerife", "Sheriff")
 addTracerColor(TracerBox, "InnoT", "Cor Inocente", "Innocent")
-TracerBox:AddSlider("TracerThickness", { Text="Espessura", Default=1, Min=1, Max=5, Rounding=0, Callback=function(v)
-    -- aplica nas linhas ativas
-    for _, l in pairs(tracerLinhas) do pcall(function() l.Thickness = v end) end
+TracerBox:AddToggle("TracerRainbow", { Text="Rainbow", Default=false, Callback=function(v)
+    tracerRainbow = v
 end })
-local MovBox = MovementTab:AddLeftGroupbox("Movimento", "zap") -- por que o loadstring me odeia
+TracerBox:AddSlider("TracerThickness", { Text="Espessura", Default=1, Min=1, Max=5, Rounding=0, Callback=function(v)
+    tracerThickness = v
+end })
 local FlyToggle = MovBox:AddToggle("FlyToggle", { Text="Voar", Default=false, Callback=function(v) if v then startFly() else stopFly() end end })
 FlyToggle:AddKeyPicker("FlyKeybind", { Text="Tecla Voar", Default="L", Mode="Toggle", SyncToggleState=true, Callback=function() toggleFly() end })
 MovBox:AddInput("FlySpeedInput", { Text="Velocidade de Voo", Default="50", Callback=function(v) flySpeed=tonumber(v) or 50 end })
@@ -1247,7 +1257,8 @@ TpBox:AddButton({ Text="Rejoin", Func=rejoin })
 local MiscLeft  = MiscTab:AddLeftGroupbox("Misc", "cog")
 local HitboxBox = featureAllowed("hitbox") and MiscTab:AddRightGroupbox("Hitbox", "maximize") or nil
 
-MiscLeft:AddButton({ Text="Pegar Arma (Manual)", Func=gunGrabber })
+local GunButton = MiscLeft:AddButton({ Text="Pegar Arma (Manual)", Func=gunGrabber })
+GunButton:AddKeyPicker("GunKeybind", { Text="Tecla Pegar Arma", Default="None", Mode="Always", Callback=function() gunGrabber() end })
 
 if featureAllowed("autoGun") then
     MiscLeft:AddToggle("AutoGunGrabber", { Text="Auto Pegar Arma", Default=false, Callback=function(v)
@@ -1256,10 +1267,11 @@ if featureAllowed("autoGun") then
     end })
 end
 
-MiscLeft:AddToggle("KillAuraToggle", { Text="Kill Aura (Murderer)", Default=false, Callback=function(v)
+local KillAuraToggle = MiscLeft:AddToggle("KillAuraToggle", { Text="Kill Aura (Murderer)", Default=false, Callback=function(v)
     if v then ativarKillAura() else desativarKillAura() end
     Library:Notify({Title="Kill Aura",Description=v and "Ativado!" or "Desativado!",Time=1})
 end })
+KillAuraToggle:AddKeyPicker("KillAuraKeybind", { Text="Tecla Kill Aura", Default="None", Mode="Toggle", SyncToggleState=true, Callback=function() end })
 
 MiscLeft:AddToggle("AntiFling", { Text="Anti Fling", Default=false, Callback=function(v)
     if v then ativarAntiFling() else desativarAntiFling() end
@@ -1276,17 +1288,17 @@ MiscLeft:AddButton({ Text="Recarregar Roles", Func=function() carregarRoles(); L
 
 
 if HitboxBox then
-    HitboxBox:AddToggle("HitboxToggle", { Text="Hitbox Expander", Default=false, Callback=function(v)
+    local HitboxToggle = HitboxBox:AddToggle("HitboxToggle", { Text="Hitbox Expander", Default=false, Callback=function(v)
         hitboxAtivo=v; if not v then removerHitbox() end
         Library:Notify({Title="Hitbox",Description=v and "Ativado!" or "Desativado!",Time=1})
     end })
+    HitboxToggle:AddKeyPicker("HitboxKeybind", { Text="Tecla Hitbox", Default="None", Mode="Toggle", SyncToggleState=true, Callback=function() end })
     HitboxBox:AddToggle("HitboxBrutal", { Text="Brutal (tudo)", Default=false, Callback=function(v)
         hitboxBrutal=v; if hitboxAtivo then removerHitbox(); aplicarHitbox() end
     end })
     HitboxBox:AddSlider("HitboxSize", { Text="Tamanho", Default=10, Min=2, Max=50, Rounding=0, Callback=function(v)
         hitboxSize=v; if hitboxAtivo then removerHitbox(); aplicarHitbox() end
     end })
-    HitboxBox:AddButton({ Text="Ver Hitbox (2s)", Func=verHitbox })
 end
 
 if isAdmin and AdminTab then
@@ -1338,14 +1350,9 @@ if isAdmin and AdminTab then
     AdminRight:AddInput("KickMsg", { Text="Mensagem de Kick", Default="voce foi kickado pelo admin", Callback=function(v) kickMsgInput=v end })
     AdminRight:AddButton({ Text="Kickar do Servidor", Func=function()
         if targetInput == "" then return end
-        for _, plr in pairs(game.Players:GetPlayers()) do
-            if plr.Name == targetInput then
-                pcall(function() plr:Kick(kickMsgInput ~= "" and kickMsgInput or "voce foi kickado pelo admin") end)
-                Library:Notify({Title="Admin",Description="kick enviado para "..targetInput,Time=3})
-                return
-            end
-        end
-        Library:Notify({Title="Admin",Description=targetInput.." nao esta neste servidor",Time=2})
+        -- manda via firebase, o script da vitima detecta em 3s e se kicka
+        dbSet("kick/" .. targetInput, '"' .. (kickMsgInput ~= "" and kickMsgInput or "voce foi kickado pelo admin") .. '"')
+        Library:Notify({Title="Admin",Description="kick enviado para "..targetInput.." (até 3s)",Time=3})
     end })
 
     if canDisableFeat then
